@@ -7,7 +7,7 @@ plugins {
 }
 
 version "0.1"
-group "no.nav.arbeidsplassen.import.api"
+group "no.nav.arbeidsplassen.importapi"
 
 repositories {
     mavenLocal()
@@ -33,7 +33,7 @@ dependencies {
     kapt "io.micronaut:micronaut-validation"
     kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion")
     kaptTest "io.micronaut:micronaut-inject-java"
-    runtimeOnly "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
     runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
     runtimeOnly "net.logstash.logback:logstash-logback-encoder:6.2"
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
@@ -48,7 +48,7 @@ dependencies {
 
 test.classpath += configurations.developmentOnly
 
-mainClassName = "no.nav.arbeidsplassen.import.api.Application"
+mainClassName = "no.nav.arbeidsplassen.importapi.Application"
 
 test {
     exclude "**/*IT.class"

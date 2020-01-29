@@ -1,0 +1,25 @@
+micronaut:
+  application:
+    name: import-api
+  http:
+    client:
+      read-timeout: 300s
+  metrics:
+    enabled: true
+    sensitive: false
+    binders:
+      jvm:
+        enabled: true
+    export:
+      prometheus:
+        enabled: true
+        descriptions: false
+endpoints:
+  metrics:
+    enabled: true
+  prometheus:
+    sensitive: false
+jackson:
+  bean-introspection-module: true
+  serialization:
+    indentOutput: true
