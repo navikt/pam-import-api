@@ -20,7 +20,7 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     override fun <S : Provider> save(entity: S): S {
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity,false)
+                prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
@@ -29,7 +29,7 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
         }
         else {
             connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity,true)
+                prepareSQL(entity)
                 check(executeUpdate() == 1 )
                 return entity
             }
@@ -41,17 +41,18 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
         return entities.map { save(it) }.toMutableList()
     }
 
-    private fun PreparedStatement.prepareSQL(entity: Provider, update: Boolean) {
+    private fun PreparedStatement.prepareSQL(entity: Provider) {
         setObject(1, entity.uuid)
         setString(2, entity.username)
         setString(3, entity.email)
         setObject(4, entity.created)
-        if (update) {
-            setLong(5, entity.id!!)
-            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+        if (entity.isNew()) {
+            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+            setLong(5, entity.id!!)
+            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+
         }
     }
 }

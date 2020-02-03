@@ -20,7 +20,7 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
     override fun <S : AdAdminStatus> save(entity: S): S {
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity, false)
+                prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
@@ -29,7 +29,7 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
         }
         else {
             connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity,true)
+                prepareSQL(entity)
                 check (executeUpdate() == 1)
                 return entity
             }
@@ -37,19 +37,20 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
     }
 
 
-    private fun PreparedStatement.prepareSQL(entity: AdAdminStatus, update: Boolean) {
+    private fun PreparedStatement.prepareSQL(entity: AdAdminStatus) {
         setObject(1, entity.uuid)
         setString(2, entity.status.name)
         setString(3, entity.message)
         setString(4, entity.reference)
         setLong(5, entity.providerId)
         setObject(6, entity.created)
-        if (update) {
-            setLong(7, entity.id!!)
-            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+        if (entity.isNew()) {
+            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+            setLong(7, entity.id!!)
+            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+
         }
     }
 

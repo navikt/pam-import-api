@@ -19,7 +19,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     override fun <S : AdState> save(entity: S): S {
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity, false)
+                prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
@@ -28,7 +28,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         }
         else {
             connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity, true)
+                prepareSQL(entity)
                 check(executeUpdate() == 1 )
                 return entity
             }
@@ -40,19 +40,20 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         return entities.map { save(it) }.toMutableList()
     }
 
-    private fun PreparedStatement.prepareSQL(entity: AdState, update: Boolean) {
+    private fun PreparedStatement.prepareSQL(entity: AdState) {
         setObject(1, entity.uuid)
         setString(2, entity.reference)
         setLong(3, entity.providerId)
         setString(4, entity.jsonPayload)
         setInt(5, entity.version)
         setObject(6, entity.created)
-        if (update) {
-            setLong(7, entity.id!!)
-            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+        if (entity.isNew()) {
+            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+            setLong(7, entity.id!!)
+            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+
         }
     }
 
