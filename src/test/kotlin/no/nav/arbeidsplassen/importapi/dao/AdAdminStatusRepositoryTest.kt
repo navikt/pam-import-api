@@ -27,5 +27,9 @@ class AdAdminStatusRepositoryTest(private val adAdminStatusRepository: AdAdminSt
         adAdminStatusRepository.deleteById(updated.id!!)
         val deleted = adAdminStatusRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
+        val adminStatus2 = AdAdminStatus(message = "Diskriminerende", reference = "54321", providerId = providerinDB.id!!)
+        val adminStatuses = mutableListOf(adminStatus, adminStatus2)
+        adAdminStatusRepository.saveAll(adminStatuses)
+        assertEquals(2, adAdminStatusRepository.findAll().count())
     }
 }

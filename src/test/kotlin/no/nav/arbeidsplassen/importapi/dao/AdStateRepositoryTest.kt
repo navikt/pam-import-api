@@ -28,5 +28,9 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
         adStateRepository.deleteById(created.id!!)
         val deleted = adStateRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
+        val adstate2 = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = providerinDB.id!!, reference = "123456")
+        val adstates = mutableListOf(adState, adstate2)
+        adStateRepository.saveAll(adstates)
+        assertEquals(2, adStateRepository.findAll().count())
     }
 }
