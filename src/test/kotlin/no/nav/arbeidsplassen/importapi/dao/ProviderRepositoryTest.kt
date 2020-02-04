@@ -31,5 +31,4 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         assertEquals(2,providerRepository.findAll().count())
     }
 
-
 }
