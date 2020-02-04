@@ -3,8 +3,7 @@ package no.nav.arbeidsplassen.importapi.dao
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
-import io.micronaut.data.runtime.config.DataSettings
-import org.h2.value.Transfer
+import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
@@ -35,7 +34,7 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
             }
         }
     }
-
+    @Transactional
     abstract fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
 
     @Transactional
@@ -51,11 +50,11 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
         setString(5, entity.message)
         setObject(6, entity.created)
         if (entity.isNew()) {
-            DataSettings.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
             setLong(7, entity.id!!)
-            DataSettings.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }
 }
