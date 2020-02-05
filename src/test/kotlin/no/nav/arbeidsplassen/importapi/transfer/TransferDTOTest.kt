@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.transfer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.dto.Transfer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import javax.inject.Inject

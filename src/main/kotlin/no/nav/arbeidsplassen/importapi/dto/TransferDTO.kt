@@ -1,10 +1,10 @@
-package no.nav.arbeidsplassen.importapi.transfer
+package no.nav.arbeidsplassen.importapi.dto
 
 import java.time.LocalDateTime
 
-data class Transfer(val provider: Provider, val ads: List<Ad> = listOf())
+data class Transfer(val provider: Provider, val ads: List<Ad>)
 
-data class Provider(val id: Long?, val uuid: String?, val userName: String?, val email: String?)
+data class Provider(val id: Long?, val uuid: String, val userName: String?, val email: String?)
 
 data class Ad(val reference: String, val created: LocalDateTime = LocalDateTime.now(),
               val published: LocalDateTime = LocalDateTime.now(), val expires: LocalDateTime,

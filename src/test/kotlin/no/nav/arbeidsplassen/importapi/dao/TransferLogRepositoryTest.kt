@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.md5Hex
-import no.nav.arbeidsplassen.importapi.transfer.Ad
-import no.nav.arbeidsplassen.importapi.transfer.Transfer
+import no.nav.arbeidsplassen.importapi.dto.Ad
+import no.nav.arbeidsplassen.importapi.dto.Transfer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
