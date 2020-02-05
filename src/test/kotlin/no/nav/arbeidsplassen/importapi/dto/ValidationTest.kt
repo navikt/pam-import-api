@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.transfer
+package no.nav.arbeidsplassen.importapi.dto
 
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dto.DTOValidation

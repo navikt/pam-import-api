@@ -12,8 +12,8 @@ import javax.transaction.Transactional
 @JdbcRepository(dialect = Dialect.ANSI)
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
 
-    val insertSQL = """INSERT INTO "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version", "created") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ad_state" SET "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "ad_state" ("uuid", "reference", "provider_id", "json_payload", "transfer_version", "created") VALUES (?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "ad_state" SET "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "transfer_version"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
     override fun <S : AdState> save(entity: S): S {
@@ -45,7 +45,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         setString(2, entity.reference)
         setLong(3, entity.providerId)
         setString(4, entity.jsonPayload)
-        setInt(5, entity.version)
+        setLong(5, entity.transferVersion)
         setObject(6, entity.created)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")

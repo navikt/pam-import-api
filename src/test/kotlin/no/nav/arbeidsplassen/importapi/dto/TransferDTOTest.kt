@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.transfer
+package no.nav.arbeidsplassen.importapi.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException

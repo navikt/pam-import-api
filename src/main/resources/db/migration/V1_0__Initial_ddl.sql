@@ -8,7 +8,8 @@ CREATE TABLE provider (
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
-    UNIQUE KEY(uuid)
+    UNIQUE KEY(uuid),
+    UNIQUE KEY(username)
 );
 
 CREATE SEQUENCE transfer_log_id_seq;
@@ -23,8 +24,10 @@ CREATE TABLE transfer_log (
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
-    UNIQUE KEY(provider_id,md5)
+    UNIQUE KEY(provider_id,md5),
 );
+
+CREATE INDEX transfer_log_status_idx ON transfer_log(status);
 
 CREATE SEQUENCE adstate_id_seq;
 
@@ -34,7 +37,7 @@ CREATE TABLE ad_state(
     provider_id BIGINT NOT NULL REFERENCES provider(id),
     reference VARCHAR(255) NOT NULL,
     json_payload TEXT NOT NULL,
-    version INTEGER NOT NULL,
+    transfer_version BIGINT NOT NULL REFERENCES transfer_log(id),
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
