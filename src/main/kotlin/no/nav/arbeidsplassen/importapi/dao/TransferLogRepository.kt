@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.dao
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
@@ -34,12 +35,16 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
             }
         }
     }
+
     @Transactional
     abstract fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
 
     @Transactional
-    override fun <S : TransferLog> saveAll(entities: MutableIterable<S>): MutableIterable<S> {
-        return entities.map { save(it) }.toMutableList()
+    abstract fun findByStatus(status:TransferLogStatus, pageable: Pageable): List<TransferLog>
+
+    @Transactional
+    override fun <S : TransferLog> saveAll(entities: Iterable<S>): Iterable<S> {
+        return entities.map { save(it) }.toList()
     }
 
     private fun PreparedStatement.prepareSQL(entity: TransferLog) {

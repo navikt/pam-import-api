@@ -35,7 +35,7 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
         assertTrue(deleted.isEmpty)
         val adstate2 = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = providerinDB.id!!,
                 reference = "123456", transferVersion = transferInDb.id!!)
-        val adstates = mutableListOf(adState, adstate2)
+        val adstates = listOf(adState, adstate2)
         adStateRepository.saveAll(adstates)
         assertEquals(2, adStateRepository.findAll().count())
     }

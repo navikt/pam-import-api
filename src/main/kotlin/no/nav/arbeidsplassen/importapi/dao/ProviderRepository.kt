@@ -37,8 +37,8 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     }
 
     @Transactional
-    override fun <S : Provider> saveAll(entities: MutableIterable<S>): MutableIterable<S> {
-        return entities.map { save(it) }.toMutableList()
+    override fun <S : Provider> saveAll(entities: Iterable<S>): Iterable<S> {
+        return entities.map { save(it) }.toList()
     }
 
     private fun PreparedStatement.prepareSQL(entity: Provider) {

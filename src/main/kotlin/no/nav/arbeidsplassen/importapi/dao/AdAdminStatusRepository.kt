@@ -55,8 +55,8 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
     }
 
     @Transactional
-    override fun <S : AdAdminStatus> saveAll(entities: MutableIterable<S>): MutableIterable<S> {
-        return entities.map { save(it) }.toMutableList()
+    override fun <S : AdAdminStatus> saveAll(entities: Iterable<S>): Iterable<S> {
+        return entities.map { save(it) }.toList()
     }
 
 }

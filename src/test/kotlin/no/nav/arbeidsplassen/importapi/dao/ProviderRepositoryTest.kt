@@ -26,7 +26,7 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         val deleted = providerRepository.findById(created.id!!)
         Assertions.assertTrue(deleted.isEmpty)
         val provider2 = Provider(email="test2@test.test", username="tester2")
-        val providers = mutableListOf(provider, provider2)
+        val providers = listOf(provider, provider2)
         providerRepository.saveAll(providers)
         assertEquals(2,providerRepository.findAll().count())
     }

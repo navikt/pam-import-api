@@ -7,6 +7,7 @@ import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
+import java.util.*
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ANSI)
@@ -36,9 +37,12 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     }
 
     @Transactional
-    override fun <S : AdState> saveAll(entities: MutableIterable<S>): MutableIterable<S> {
-        return entities.map { save(it) }.toMutableList()
+    override fun <S : AdState> saveAll(entities: Iterable<S>): Iterable<S> {
+        return entities.map { save(it) }.toList()
     }
+
+    @Transactional
+    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdState>
 
     private fun PreparedStatement.prepareSQL(entity: AdState) {
         setObject(1, entity.uuid)

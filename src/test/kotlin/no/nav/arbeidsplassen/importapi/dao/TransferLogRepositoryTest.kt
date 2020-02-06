@@ -2,6 +2,8 @@ package no.nav.arbeidsplassen.importapi.dao
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Sort
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.dto.Ad
@@ -37,11 +39,10 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
             ads.add(ad.copy(reference=i.toString()))
         }
         val newTransfer = transfer.copy(ads = ads)
-        val start = System.currentTimeMillis()
         val payload2 = objectMapper.writeValueAsString(newTransfer)
-        println("length: ${payload2.toByteArray().size}")
         transferLogRepository.save(TransferLog(providerId = providerinDB.id!!, md5="md5hash", payload = payload2))
-        println("time ${System.currentTimeMillis()-start}")
+        val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED,Pageable.from(0,100, Sort.of(Sort.Order.asc("updated"))))
+        println(findByStatus.size)
     }
 
     @Test
