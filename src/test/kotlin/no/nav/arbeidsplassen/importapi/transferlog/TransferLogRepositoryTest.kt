@@ -1,16 +1,16 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.dao.AdStateRepositoryTest
+import no.nav.arbeidsplassen.importapi.dao.ProviderRepository
+import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.dto.Ad
 import no.nav.arbeidsplassen.importapi.dto.Transfer
-import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
-import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
-import no.nav.arbeidsplassen.importapi.transferlog.TransferLogStatus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
