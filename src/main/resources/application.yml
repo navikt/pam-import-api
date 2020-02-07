@@ -37,3 +37,8 @@ transferlog:
   size: 50
   delete:
     months: 6
+  scheduler:
+    enabled: true
+shedlock:
+  defaults:
+    lock-at-most-for: 5m

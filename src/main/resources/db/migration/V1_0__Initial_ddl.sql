@@ -60,3 +60,11 @@ CREATE TABLE ad_admin_status(
     UNIQUE KEY(uuid),
     UNIQUE KEY(provider_id, reference)
 );
+
+CREATE TABLE shedlock(
+    name VARCHAR(64),
+    lock_until TIMESTAMP(3) NULL,
+    locked_at TIMESTAMP(3) NULL,
+    locked_by  VARCHAR(255),
+    PRIMARY KEY (name)
+)

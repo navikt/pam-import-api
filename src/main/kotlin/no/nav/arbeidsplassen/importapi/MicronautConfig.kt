@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.micronaut.context.annotation.Factory
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
+import net.javacrumbs.shedlock.core.LockProvider
+import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider
 import javax.inject.Singleton
+import javax.sql.DataSource
 
 @Singleton
 class ObjectMapperBeanEventListener(): BeanCreatedEventListener<ObjectMapper> {
@@ -21,4 +25,14 @@ class ObjectMapperBeanEventListener(): BeanCreatedEventListener<ObjectMapper> {
                 .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
         return objectMapper
     }
+}
+
+@Factory
+class MicronautConfig(private val dataSource: DataSource) {
+
+    @Singleton
+    fun lockProvider(): LockProvider {
+        return JdbcLockProvider(dataSource)
+    }
+
 }
