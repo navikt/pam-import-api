@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Value
@@ -28,11 +28,11 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             try {
                 LOG.info("Received a transfer from provider ${it.providerId}")
                 adStateRepository.saveAll(mapTransferLogs(it))
-                transferLogRepository.save(it.copy(status=TransferLogStatus.DONE))
+                transferLogRepository.save(it.copy(status= TransferLogStatus.DONE))
             }
             catch (e: Exception) {
                 LOG.error("Got exception while handling transfer log ${it.id}")
-                transferLogRepository.save(it.copy(status=TransferLogStatus.ERROR))
+                transferLogRepository.save(it.copy(status= TransferLogStatus.ERROR))
             }
         }
     }

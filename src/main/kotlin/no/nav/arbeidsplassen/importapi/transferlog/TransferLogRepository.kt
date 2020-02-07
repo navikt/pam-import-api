@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.Pageable
@@ -41,7 +41,7 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
     abstract fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
 
     @Transactional
-    abstract fun findByStatus(status:TransferLogStatus, pageable: Pageable): List<TransferLog>
+    abstract fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog>
 
     @Transactional
     abstract fun deleteByUpdatedBefore(updated: LocalDateTime)

@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Requires

@@ -8,6 +8,9 @@ import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.dto.Ad
 import no.nav.arbeidsplassen.importapi.dto.Transfer
+import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
+import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
+import no.nav.arbeidsplassen.importapi.transferlog.TransferLogStatus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -22,12 +25,12 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         val payload = objectMapper.writeValueAsString(transferJsonNode)
         val md5hash = payload.md5Hex()
         println ("md5hash: $md5hash")
-        val transferLog = TransferLog(providerId = provider.id!!,md5 = md5hash, payload = payload)
+        val transferLog = TransferLog(providerId = provider.id!!, md5 = md5hash, payload = payload)
         val create = transferLogRepository.save(transferLog)
         val read = transferLogRepository.findById(create.id!!).get()
         assertNotNull(read)
         assertTrue(transferLogRepository.existsByProviderIdAndMd5( provider.id!!,md5hash))
-        val updated = transferLogRepository.save(read.copy(status=TransferLogStatus.DONE))
+        val updated = transferLogRepository.save(read.copy(status= TransferLogStatus.DONE))
         println(updated)
         transferLogRepository.deleteById(updated.id!!)
         assertEquals(0,transferLogRepository.findAll().count())
@@ -39,7 +42,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         }
         val newTransfer = transfer.copy(ads = ads)
         val payload2 = objectMapper.writeValueAsString(newTransfer)
-        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5="md5hash", payload = payload2))
+        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = "md5hash", payload = payload2))
         val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED,Pageable.from(0,100, Sort.of(Sort.Order.asc("updated"))))
         println(findByStatus.size)
     }

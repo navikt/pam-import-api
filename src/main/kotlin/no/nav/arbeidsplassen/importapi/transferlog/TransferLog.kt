@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.transferlog
 
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -12,7 +12,7 @@ data class TransferLog (
         val md5: String,
         val payload: String,
         @Enumerated(EnumType.STRING)
-        val status:  TransferLogStatus = TransferLogStatus.RECEIVED,
+        val status: TransferLogStatus = TransferLogStatus.RECEIVED,
         val message: String? = null,
         val created: LocalDateTime = LocalDateTime.now(),
         val updated: LocalDateTime = LocalDateTime.now()
