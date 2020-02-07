@@ -7,6 +7,7 @@ import no.nav.arbeidsplassen.importapi.dao.*
 import no.nav.arbeidsplassen.importapi.dto.*
 import org.slf4j.LoggerFactory
 import java.lang.Exception
+import java.time.LocalDateTime
 import javax.inject.Singleton
 import kotlin.streams.toList
 
@@ -14,7 +15,8 @@ import kotlin.streams.toList
 class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val adStateRepository: AdStateRepository,
                        private val objectMapper: ObjectMapper,
-                       @Value("\${transferlog.size:50}") private val logSize: Int) {
+                       @Value("\${transferlog.size:50}") private val logSize: Int,
+                       @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogTasks::class.java)
@@ -33,6 +35,11 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 transferLogRepository.save(it.copy(status=TransferLogStatus.ERROR))
             }
         }
+    }
+
+    fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
+        LOG.info("Deleting transferlog before $date")
+        transferLogRepository.deleteByUpdatedBefore(date)
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {

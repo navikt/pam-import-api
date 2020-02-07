@@ -35,3 +35,5 @@ flyway:
       locations: classpath:db/migration
 transferlog:
   size: 50
+  delete:
+    months: 6

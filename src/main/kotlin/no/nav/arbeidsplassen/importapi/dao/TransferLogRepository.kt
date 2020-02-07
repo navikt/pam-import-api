@@ -8,6 +8,7 @@ import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ANSI)
@@ -43,6 +44,8 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
     abstract fun findByStatus(status:TransferLogStatus, pageable: Pageable): List<TransferLog>
 
     @Transactional
+    abstract fun deleteByUpdatedBefore(updated: LocalDateTime)
+
     override fun <S : TransferLog> saveAll(entities: Iterable<S>): Iterable<S> {
         return entities.map { save(it) }.toList()
     }
