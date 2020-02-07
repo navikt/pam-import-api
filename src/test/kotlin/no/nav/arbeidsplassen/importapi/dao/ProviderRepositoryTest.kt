@@ -12,10 +12,9 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
 
     @Test
     fun providerCRUDTest() {
-        val provider = Provider(email = "test@test.test", username = "tester")
-        val created = providerRepository.save(provider)
-        assertNotNull(created.id)
-        val id = created.id!!
+        val provider = providerRepository.newTestProvider()
+        assertNotNull(provider.id)
+        val id = provider.id!!
         val read = providerRepository.findById(id).get()
         assertEquals(provider.email, read.email)
         val update = read.copy(email="updated@test.test")
@@ -23,10 +22,11 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         assertEquals("updated@test.test", updated.email)
         println(updated.toString())
         providerRepository.deleteById(id)
-        val deleted = providerRepository.findById(created.id!!)
+        val deleted = providerRepository.findById(provider.id!!)
         Assertions.assertTrue(deleted.isEmpty)
         val provider2 = Provider(email="test2@test.test", username="tester2")
-        val providers = listOf(provider, provider2)
+        val provider3 = Provider(email="test3@test.test", username="tester3")
+        val providers = listOf(provider2, provider3)
         providerRepository.saveAll(providers)
         assertEquals(2,providerRepository.findAll().count())
     }

@@ -14,13 +14,12 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
 
     @Test
     fun adStateCrudTest() {
-        val provider = Provider(email = "test@test.test", username = "tester")
-        val providerinDB = providerRepository.save(provider)
+        val provider = providerRepository.newTestProvider()
         val transfer = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), Transfer::class.java)
-        val transferLog = TransferLog(providerId = providerinDB.id!!, md5 = "123456", payload = "jsonstring")
+        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
         val transferInDb = transferLogRepository.save(transferLog)
         val ad = transfer.ads[0]
-        val adState = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = providerinDB.id!!,
+        val adState = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = provider.id!!,
                 reference = ad.reference, transferVersion = transferInDb.id!!)
         val created = adStateRepository.save(adState)
         assertNotNull(created.id)
@@ -33,7 +32,7 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
         adStateRepository.deleteById(created.id!!)
         val deleted = adStateRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
-        val adstate2 = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = providerinDB.id!!,
+        val adstate2 = AdState(jsonPayload = objectMapper.writeValueAsString(ad),providerId = provider.id!!,
                 reference = "123456", transferVersion = transferInDb.id!!)
         val adstates = listOf(adState, adstate2)
         adStateRepository.saveAll(adstates)

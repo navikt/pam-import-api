@@ -37,7 +37,7 @@ CREATE TABLE ad_state(
     provider_id BIGINT NOT NULL REFERENCES provider(id),
     reference VARCHAR(255) NOT NULL,
     json_payload TEXT NOT NULL,
-    transfer_version BIGINT NOT NULL REFERENCES transfer_log(id),
+    transfer_version BIGINT NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),

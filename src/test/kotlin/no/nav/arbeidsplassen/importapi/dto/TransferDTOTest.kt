@@ -9,20 +9,17 @@ import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
 @MicronautTest
-class TransferDTOTest{
+class TransferDTOTest {
 
     @Inject
     lateinit var objectMapper: ObjectMapper
 
     @Test
     fun jsonToTransferDTO() {
-        try {
-            val transfer = objectMapper.readValue(TransferDTOTest::class.java.getResourceAsStream("/transfer-ads.json"), Transfer::class.java)
-            Assertions.assertEquals(2, transfer.ads.size)
-            Assertions.assertEquals("Sørumsand barnehage",transfer.ads[0].employer!!.businessName)
-        }
-        catch (e: MissingKotlinParameterException) {
-            println(e.localizedMessage)
-        }
+
+        val transfer = objectMapper.readValue(TransferDTOTest::class.java.getResourceAsStream("/transfer-ads.json"), Transfer::class.java)
+        Assertions.assertEquals(2, transfer.ads.size)
+        Assertions.assertEquals("Sørumsand barnehage", transfer.ads[0].employer!!.businessName)
+
     }
 }

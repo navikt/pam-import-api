@@ -17,17 +17,16 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
                                 private val objectMapper: ObjectMapper) {
     @Test
     fun transferLogCrudTest() {
-        val provider = Provider(email = "transfer@test.test", username = "transfer")
-        val providerinDB = providerRepository.save(provider)
+        val provider = providerRepository.newTestProvider()
         val transferJsonNode = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), JsonNode::class.java)
         val payload = objectMapper.writeValueAsString(transferJsonNode)
         val md5hash = payload.md5Hex()
         println ("md5hash: $md5hash")
-        val transferLog = TransferLog(providerId = providerinDB.id!!,md5 = md5hash, payload = payload)
+        val transferLog = TransferLog(providerId = provider.id!!,md5 = md5hash, payload = payload)
         val create = transferLogRepository.save(transferLog)
         val read = transferLogRepository.findById(create.id!!).get()
         assertNotNull(read)
-        assertTrue(transferLogRepository.existsByProviderIdAndMd5( providerinDB.id!!,md5hash))
+        assertTrue(transferLogRepository.existsByProviderIdAndMd5( provider.id!!,md5hash))
         val updated = transferLogRepository.save(read.copy(status=TransferLogStatus.DONE))
         println(updated)
         transferLogRepository.deleteById(updated.id!!)
@@ -40,7 +39,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         }
         val newTransfer = transfer.copy(ads = ads)
         val payload2 = objectMapper.writeValueAsString(newTransfer)
-        transferLogRepository.save(TransferLog(providerId = providerinDB.id!!, md5="md5hash", payload = payload2))
+        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5="md5hash", payload = payload2))
         val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED,Pageable.from(0,100, Sort.of(Sort.Order.asc("updated"))))
         println(findByStatus.size)
     }

@@ -33,3 +33,5 @@ flyway:
   datasources:
     default:
       locations: classpath:db/migration
+transferlog:
+  size: 50
