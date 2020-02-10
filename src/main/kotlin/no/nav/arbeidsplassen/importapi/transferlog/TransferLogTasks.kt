@@ -12,9 +12,7 @@ import javax.inject.Singleton
 import kotlin.streams.toList
 
 @Singleton
-class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
-                       private val adStateRepository: AdStateRepository,
-                       private val objectMapper: ObjectMapper,
+class TransferLogTasks(private val transferLogService: TransferLogService,
                        @Value("\${transferlog.size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
@@ -23,36 +21,16 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     fun doTransferLogTask() {
-        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
+        val transferlogs = transferLogService.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
+        LOG.info("received ${transferlogs.size}")
         transferlogs.stream().forEach {
-            try {
-                LOG.info("Received a transfer from provider ${it.providerId}")
-                adStateRepository.saveAll(mapTransferLogs(it))
-                transferLogRepository.save(it.copy(status= TransferLogStatus.DONE))
-            }
-            catch (e: Exception) {
-                LOG.error("Got exception while handling transfer log ${it.id}")
-                transferLogRepository.save(it.copy(status= TransferLogStatus.ERROR))
-            }
+            transferLogService.mapTransferLog(it)
         }
     }
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
         LOG.info("Deleting transferlog before $date")
-        transferLogRepository.deleteByUpdatedBefore(date)
-    }
-
-    private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
-        val transferDTO = objectMapper.readValue(transferLog.payload, Transfer::class.java)
-        return transferDTO.ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
-
-    }
-
-    private fun mapAdToAdState(ad: Ad, transferLog: TransferLog): AdState {
-        val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
-        return inDb.map { it.copy(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
-                .orElse(AdState(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),
-                        providerId = transferLog.providerId, reference = ad.reference))
+        transferLogService.deleteByUpdatedBefore(date)
     }
 
 }
