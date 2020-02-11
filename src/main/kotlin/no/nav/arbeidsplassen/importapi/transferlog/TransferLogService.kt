@@ -31,7 +31,7 @@ class TransferLogService(private val adStateRepository: AdStateRepository,
             adStateRepository.saveAll(mapTransferLogs(it))
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
         } catch (e: Exception) {
-            LOG.error("Got exception while handling transfer log ${it.id}")
+            LOG.error("Got exception while handling transfer log ${it.id}", e)
             transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))
         }
     }

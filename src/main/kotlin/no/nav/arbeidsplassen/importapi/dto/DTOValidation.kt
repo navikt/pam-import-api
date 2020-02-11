@@ -47,7 +47,7 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
 }
 
 enum class ErrorType {
-    PARSE_ERROR, MISSING_PARAMETER, UNKNOWN
+    PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, UNKNOWN
 }
 
 class ValidationError(message: String, val type: ErrorType) : Throwable(message)
