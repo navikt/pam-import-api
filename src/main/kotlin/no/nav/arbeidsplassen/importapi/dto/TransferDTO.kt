@@ -9,10 +9,10 @@ data class ProviderDTO(val id: Long?, val uuid: String, val userName: String?, v
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
                  val properties: Map<String, Any> = hashMapOf(),
-                 val title: String, val privacy: String, val positions: Int = 1,
+                 val title: String, val adText: String, val privacy: String = "SHOW_ALL", val positions: Int = 1,
                  val employer: EmployerDTO?, val categoryList: List<CategoryDTO> = listOf())
 
-data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?)
+data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?, val location: LocationDTO)
 
 data class CategoryDTO(val code: String, val categoryType: String = "AP2020", val name: String?, val description: String?)
 

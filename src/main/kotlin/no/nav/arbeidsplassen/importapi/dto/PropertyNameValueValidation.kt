@@ -36,7 +36,7 @@ class PropertyNameValueValidation {
     fun checkOnlyValidValues(properties: HashMap<String, Any>) {
         propertiesToValidate.forEach {
             if (properties.containsKey("extent"))
-                validateProperty("extent", properties.get("extent") as String)
+                validateProperty("extent", properties["extent"] as String)
         }
     }
 
