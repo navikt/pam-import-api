@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.dao
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.dto.Transfer
+import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
 import org.junit.jupiter.api.Assertions.*
@@ -17,7 +17,7 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
     @Test
     fun adStateCrudTest() {
         val provider = providerRepository.newTestProvider()
-        val transfer = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), Transfer::class.java)
+        val transfer = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), TransferDTO::class.java)
         val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
         val transferInDb = transferLogRepository.save(transferLog)
         val ad = transfer.ads[0]

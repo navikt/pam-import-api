@@ -5,8 +5,8 @@ import io.micronaut.aop.Around
 import io.micronaut.data.model.Pageable
 import no.nav.arbeidsplassen.importapi.dao.AdState
 import no.nav.arbeidsplassen.importapi.dao.AdStateRepository
-import no.nav.arbeidsplassen.importapi.dto.Ad
-import no.nav.arbeidsplassen.importapi.dto.Transfer
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
@@ -47,12 +47,12 @@ class TransferLogService(private val adStateRepository: AdStateRepository,
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
-        val transferDTO = objectMapper.readValue(transferLog.payload, Transfer::class.java)
+        val transferDTO = objectMapper.readValue(transferLog.payload, TransferDTO::class.java)
         return transferDTO.ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
 
     }
 
-    private fun mapAdToAdState(ad: Ad, transferLog: TransferLog): AdState {
+    private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
         val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
         return inDb.map { it.copy(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
                 .orElse(AdState(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),

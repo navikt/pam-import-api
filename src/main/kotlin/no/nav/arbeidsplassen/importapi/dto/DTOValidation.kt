@@ -30,9 +30,9 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         }
     }
 
-    fun nodeToDTO(jsonNode: JsonNode): Transfer {
+    fun nodeToDTO(jsonNode: JsonNode): TransferDTO {
         try {
-            return objectMapper.treeToValue(jsonNode, Transfer::class.java)
+            return objectMapper.treeToValue(jsonNode, TransferDTO::class.java)
         }
         catch (e: Exception) {
             when (e) {

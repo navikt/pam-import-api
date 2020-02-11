@@ -9,8 +9,8 @@ import no.nav.arbeidsplassen.importapi.dao.AdStateRepositoryTest
 import no.nav.arbeidsplassen.importapi.dao.ProviderRepository
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.md5Hex
-import no.nav.arbeidsplassen.importapi.dto.Ad
-import no.nav.arbeidsplassen.importapi.dto.Transfer
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -34,9 +34,9 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         println(updated)
         transferLogRepository.deleteById(updated.id!!)
         assertEquals(0,transferLogRepository.findAll().count())
-        val transfer = objectMapper.treeToValue(transferJsonNode, Transfer::class.java)
+        val transfer = objectMapper.treeToValue(transferJsonNode, TransferDTO::class.java)
         val ad = transfer.ads[0]
-        var ads = mutableListOf<Ad>()
+        var ads = mutableListOf<AdDTO>()
         for (i in 1..100 ) {
             ads.add(ad.copy(reference=i.toString()))
         }
