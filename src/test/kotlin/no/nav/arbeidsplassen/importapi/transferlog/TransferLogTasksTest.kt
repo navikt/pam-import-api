@@ -20,7 +20,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
 
     @Test
     fun doTransferLogTaskTest() {
-        val json = dtoValidation.jsonToNode(TransferLogTasksTest::class.java.getResourceAsStream("/transfer-ads.json"))
+        val json = dtoValidation.parseJson(TransferLogTasksTest::class.java.getResourceAsStream("/transfer-ads.json"))
         val payload = objectMapper.writeValueAsString(json)
         val provider = providerRepository.newTestProvider()
         transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.md5Hex(), payload = payload))

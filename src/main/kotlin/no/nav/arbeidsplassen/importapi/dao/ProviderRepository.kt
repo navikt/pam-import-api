@@ -1,12 +1,15 @@
 package no.nav.arbeidsplassen.importapi.dao
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
+import java.util.*
 import javax.transaction.Transactional
 
 
@@ -40,6 +43,12 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     override fun <S : Provider> saveAll(entities: Iterable<S>): Iterable<S> {
         return entities.map { save(it) }.toList()
     }
+
+    @Transactional
+    abstract fun findByUuid(uuid: UUID): Optional<Provider>
+
+    @Transactional
+    abstract fun list(pageable: Pageable): Slice<Provider>
 
     private fun PreparedStatement.prepareSQL(entity: Provider) {
         setObject(1, entity.uuid)

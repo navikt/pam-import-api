@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.dao
 
+import io.micronaut.data.model.Pageable
 import io.micronaut.test.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +17,9 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         assertNotNull(provider.id)
         val id = provider.id!!
         val read = providerRepository.findById(id).get()
+        val uuid = providerRepository.findByUuid(provider.uuid).get()
         assertEquals(provider.email, read.email)
+        assertEquals(provider.username, uuid.username)
         val update = read.copy(email="updated@test.test")
         val updated = providerRepository.save(update)
         assertEquals("updated@test.test", updated.email)
@@ -28,7 +31,7 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         val provider3 = Provider(email="test3@test.test", username="tester3")
         val providers = listOf(provider2, provider3)
         providerRepository.saveAll(providers)
-        assertEquals(2,providerRepository.findAll().count())
+        assertEquals(2,providerRepository.list(Pageable.from(0)).content.count())
     }
 
 }

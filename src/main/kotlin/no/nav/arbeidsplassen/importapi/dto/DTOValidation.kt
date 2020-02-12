@@ -15,7 +15,8 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
     companion object {
         private val LOG = LoggerFactory.getLogger(DTOValidation::class.java)
     }
-    fun jsonToNode(json: InputStream): JsonNode {
+
+    fun parseJson(json: InputStream): JsonNode {
         try {
             return objectMapper.readTree(json)
         }
@@ -30,7 +31,7 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         }
     }
 
-    fun nodeToDTO(jsonNode: JsonNode): TransferDTO {
+    fun parseToDTO(jsonNode: JsonNode): TransferDTO {
         try {
             return objectMapper.treeToValue(jsonNode, TransferDTO::class.java)
         }
@@ -43,6 +44,11 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
                 }
             }
         }
+    }
+
+    fun providerNotMissingValues(dto: ProviderDTO) {
+        if (dto.email == null) throw ValidationError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
+        if (dto.userName == null) throw ValidationError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
     }
 }
 
