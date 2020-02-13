@@ -6,7 +6,7 @@ import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.AdStateRepositoryTest
-import no.nav.arbeidsplassen.importapi.dao.ProviderRepository
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.dto.AdDTO

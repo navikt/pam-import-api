@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.dao
 
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

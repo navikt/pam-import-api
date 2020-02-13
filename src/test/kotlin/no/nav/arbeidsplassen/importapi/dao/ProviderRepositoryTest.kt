@@ -2,6 +2,8 @@ package no.nav.arbeidsplassen.importapi.dao
 
 import io.micronaut.data.model.Pageable
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.provider.Provider
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -27,8 +29,8 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         providerRepository.deleteById(id)
         val deleted = providerRepository.findById(provider.id!!)
         Assertions.assertTrue(deleted.isEmpty)
-        val provider2 = Provider(email="test2@test.test", username="tester2")
-        val provider3 = Provider(email="test3@test.test", username="tester3")
+        val provider2 = Provider(email = "test2@test.test", username = "tester2")
+        val provider3 = Provider(email = "test3@test.test", username = "tester3")
         val providers = listOf(provider2, provider3)
         providerRepository.saveAll(providers)
         assertEquals(2,providerRepository.list(Pageable.from(0)).content.count())

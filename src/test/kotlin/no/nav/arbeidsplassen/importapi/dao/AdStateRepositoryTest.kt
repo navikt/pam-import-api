@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.dao
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dto.TransferDTO
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
 import org.junit.jupiter.api.Assertions.*

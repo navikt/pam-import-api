@@ -6,6 +6,7 @@ import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.*
 import no.nav.arbeidsplassen.importapi.dto.DTOValidation
 import no.nav.arbeidsplassen.importapi.md5Hex
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime

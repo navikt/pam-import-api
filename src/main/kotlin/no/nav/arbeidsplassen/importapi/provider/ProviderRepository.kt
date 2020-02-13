@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.Pageable
