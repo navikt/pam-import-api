@@ -1,6 +1,8 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.dao.Provider
 import no.nav.arbeidsplassen.importapi.dao.ProviderRepository
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
@@ -17,6 +19,12 @@ class ProviderService(private val providerRepository: ProviderRepository) {
 
     fun findByUuid(uuid: UUID): ProviderDTO {
        return toDTO(providerRepository.findByUuid(uuid).orElseThrow())
+    }
+
+    fun list(page: Pageable): Slice<ProviderDTO> {
+        return providerRepository.list(page).map {
+            toDTO(it)
+        }
     }
 
     private fun toEntity(dto: ProviderDTO): Provider {

@@ -1,8 +1,9 @@
 package no.nav.arbeidsplassen.importapi.provider
 
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import io.reactivex.Observable
 import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.dto.DTOValidation
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
@@ -16,6 +17,11 @@ class ProviderController(private val providerService: ProviderService,
     @Get("/{uuid}")
     fun getProvider(@PathVariable uuid: UUID): Single<HttpResponse<ProviderDTO>> {
         return Single.just(HttpResponse.ok(providerService.findByUuid(uuid)))
+    }
+
+    @Get("/")
+    fun getProviders(pageable: Pageable): Single<HttpResponse<Slice<ProviderDTO>>> {
+        return Single.just(HttpResponse.ok(providerService.list(pageable)))
     }
 
     @Post("/")
@@ -35,5 +41,6 @@ class ProviderController(private val providerService: ProviderService,
             HttpResponse.created(providerService.save(updated))
         }
     }
+
 
 }
