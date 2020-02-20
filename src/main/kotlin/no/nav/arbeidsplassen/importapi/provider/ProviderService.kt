@@ -1,23 +1,29 @@
 package no.nav.arbeidsplassen.importapi.provider
 
+import io.micronaut.aop.Around
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import java.util.*
 import javax.inject.Singleton
+import javax.transaction.Transactional
 
 @Singleton
+@Around
 class ProviderService(private val providerRepository: ProviderRepository) {
 
 
+    @Transactional
     fun save(dto: ProviderDTO): ProviderDTO {
         return toDTO(providerRepository.save(toEntity(dto)))
     }
 
+    @Transactional
     fun findByUuid(uuid: UUID): ProviderDTO {
        return toDTO(providerRepository.findByUuid(uuid).orElseThrow())
     }
 
+    @Transactional
     fun list(page: Pageable): Slice<ProviderDTO> {
         return providerRepository.list(page).map {
             toDTO(it)

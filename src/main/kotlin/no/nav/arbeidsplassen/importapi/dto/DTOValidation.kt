@@ -16,7 +16,7 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         private val LOG = LoggerFactory.getLogger(DTOValidation::class.java)
     }
 
-    fun parseJson(json: InputStream): JsonNode {
+    fun parseJson(json: String): JsonNode {
         try {
             return objectMapper.readTree(json)
         }
@@ -53,7 +53,7 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
 }
 
 enum class ErrorType {
-    PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, UNKNOWN
+    PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 }
 
 class ValidationError(message: String, val type: ErrorType) : Throwable(message)

@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Value
 import io.micronaut.data.model.Pageable
 import no.nav.arbeidsplassen.importapi.dao.*
@@ -9,10 +10,14 @@ import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
 import javax.inject.Singleton
+import javax.transaction.Transactional
 import kotlin.streams.toList
 
 @Singleton
-class TransferLogTasks(private val transferLogService: TransferLogService,
+@Around
+class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
+                       private val adStateRepository: AdStateRepository,
+                       private val objectMapper: ObjectMapper,
                        @Value("\${transferlog.size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
@@ -21,16 +26,46 @@ class TransferLogTasks(private val transferLogService: TransferLogService,
     }
 
     fun doTransferLogTask() {
-        val transferlogs = transferLogService.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
-        LOG.info("received ${transferlogs.size}")
+        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
+        LOG.debug("received ${transferlogs.size}")
         transferlogs.stream().forEach {
-            transferLogService.mapTransferLog(it)
+            mapTransferLog(it)
         }
     }
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
         LOG.info("Deleting transferlog before $date")
-        transferLogService.deleteByUpdatedBefore(date)
+        deleteByUpdatedBefore(date)
+    }
+
+    @Transactional
+    fun mapTransferLog(it: TransferLog) {
+        try {
+            LOG.info("mapping transfer $it.id from provider ${it.providerId}")
+            adStateRepository.saveAll(mapTransferLogs(it))
+            transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
+        } catch (e: Exception) {
+            LOG.error("Got exception while handling transfer log ${it.id}", e)
+            transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))
+        }
+    }
+
+    @Transactional
+    fun deleteByUpdatedBefore(date: LocalDateTime) {
+        transferLogRepository.deleteByUpdatedBefore(date)
+    }
+
+    private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
+        val transferDTO = objectMapper.readValue(transferLog.payload, TransferDTO::class.java)
+        return transferDTO.ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
+
+    }
+
+    private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
+        val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
+        return inDb.map { it.copy(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
+                .orElse(AdState(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),
+                        providerId = transferLog.providerId, reference = ad.reference))
     }
 
 }
