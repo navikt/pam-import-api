@@ -4,6 +4,7 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.dto.ApiError
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import java.util.*
@@ -23,7 +24,7 @@ class TransferController(private val dtoValidation: DTOValidation,
             val providerDTO = checkProviderExistElseThrow(transferDTO.provider.uuid)
             val md5 = it.md5Hex()
             if (transferLogService.existsByProviderIdAndMd5(providerDTO.id!!, md5))
-                throw ValidationError("Content already exists", ErrorType.CONFLICT)
+                throw ApiError("Content already exists", ErrorType.CONFLICT)
             transferDTO.provider.id = providerDTO.id
             HttpResponse.created(transferLogService.saveTransfer(transferDTO, md5, it))
         }
@@ -36,7 +37,7 @@ class TransferController(private val dtoValidation: DTOValidation,
             Single.just(HttpResponse.ok(transferLogService.findByVersionId(versionId)))
         }
         catch (e: NoSuchElementException) {
-            throw ValidationError("Transfer $versionId does not exist", ErrorType.NOT_FOUND)
+            throw ApiError("Transfer $versionId does not exist", ErrorType.NOT_FOUND)
         }
     }
 
@@ -46,7 +47,7 @@ class TransferController(private val dtoValidation: DTOValidation,
         try {
             return  providerService.findByUuid(uuid)
         } catch (e: NoSuchElementException) {
-            throw ValidationError("Provider $uuid does not exist", ErrorType.NOT_FOUND)
+            throw ApiError("Provider $uuid does not exist", ErrorType.NOT_FOUND)
         }
     }
 

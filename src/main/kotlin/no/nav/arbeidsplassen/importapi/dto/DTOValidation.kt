@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 import java.lang.Exception
 import javax.inject.Singleton
 
@@ -22,10 +21,10 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         }
         catch (e: Exception) {
             when (e) {
-                is JsonParseException -> throw ValidationError("Parse error: ${e.localizedMessage}", ErrorType.PARSE_ERROR)
+                is JsonParseException -> throw ApiError("Parse error: ${e.localizedMessage}", ErrorType.PARSE_ERROR)
                 else -> {
                     LOG.error("Got unknown exception:", e)
-                    throw ValidationError("Unknown error: ${e.localizedMessage}", ErrorType.UNKNOWN)
+                    throw ApiError("Unknown error: ${e.localizedMessage}", ErrorType.UNKNOWN)
                 }
             }
         }
@@ -37,18 +36,18 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         }
         catch (e: Exception) {
             when (e) {
-                is MissingKotlinParameterException -> throw ValidationError("Missing parameter: ${e.parameter.name}", ErrorType.MISSING_PARAMETER)
+                is MissingKotlinParameterException -> throw ApiError("Missing parameter: ${e.parameter.name}", ErrorType.MISSING_PARAMETER)
                 else -> {
                     LOG.error("Got unknown exception:", e)
-                    throw ValidationError("Unknown error: ${e.localizedMessage}", ErrorType.UNKNOWN)
+                    throw ApiError("Unknown error: ${e.localizedMessage}", ErrorType.UNKNOWN)
                 }
             }
         }
     }
 
     fun providerNotMissingValues(dto: ProviderDTO) {
-        if (dto.email == null) throw ValidationError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
-        if (dto.userName == null) throw ValidationError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
+        if (dto.email == null) throw ApiError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
+        if (dto.userName == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
     }
 }
 
@@ -56,4 +55,4 @@ enum class ErrorType {
     PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 }
 
-class ValidationError(message: String, val type: ErrorType) : Throwable(message)
+class ApiError(message: String, val type: ErrorType) : Throwable(message)

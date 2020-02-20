@@ -27,7 +27,7 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             put("workhours", "Kveld")
             put("sector", "Privat")
         }
-        val error = assertThrows<ValidationError> { propertyEnumValidation.checkOnlyValidValues(errors) }
+        val error = assertThrows<ApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
 }

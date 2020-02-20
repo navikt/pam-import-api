@@ -1,7 +1,6 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import no.nav.arbeid.pam.kodeverk.ansettelse.*
-import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
 @Singleton
@@ -30,7 +29,7 @@ class PropertyNameValueValidation {
 
     fun validateProperty(name:String, value: String) {
         if (!validValues.get(name)!!.contains(value))
-            throw ValidationError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
+            throw ApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
     }
 
     fun checkOnlyValidValues(properties: HashMap<String, Any>) {
