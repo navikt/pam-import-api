@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Value
 import io.micronaut.data.model.Pageable
-import no.nav.arbeidsplassen.importapi.dao.*
+import no.nav.arbeidsplassen.importapi.adstate.AdState
+import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.dto.*
 import org.slf4j.LoggerFactory
 import java.lang.Exception
@@ -63,8 +64,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
     private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
         val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
-        return inDb.map { it.copy(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
-                .orElse(AdState(transferVersion = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),
+        return inDb.map { it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
+                .orElse(AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),
                         providerId = transferLog.providerId, reference = ad.reference))
     }
 

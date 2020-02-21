@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.dao.*
 import no.nav.arbeidsplassen.importapi.dto.DTOValidation
 import no.nav.arbeidsplassen.importapi.md5Hex

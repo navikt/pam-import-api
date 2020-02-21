@@ -37,13 +37,16 @@ CREATE TABLE ad_state(
     provider_id BIGINT NOT NULL REFERENCES provider(id),
     reference VARCHAR(255) NOT NULL,
     json_payload TEXT NOT NULL,
-    transfer_version BIGINT NOT NULL,
+    version_id BIGINT NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
     UNIQUE KEY(uuid),
     UNIQUE KEY(provider_id,reference)
 );
+
+CREATE INDEX ad_state_updated_idx ON ad_state(updated);
+CREATE INDEX ad_state_version_id_idx ON ad_state(version_id);
 
 CREATE SEQUENCE ad_admin_status_seq;
 

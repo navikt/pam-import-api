@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.adstate
 
 import java.time.LocalDateTime
 import java.util.*
@@ -12,7 +12,7 @@ data class AdState(
         val uuid: UUID = UUID.randomUUID(),
         val providerId: Long,
         val reference: String,
-        val transferVersion: Long,
+        val versionId: Long,
         val jsonPayload: String,
         val created: LocalDateTime = LocalDateTime.now(),
         val updated: LocalDateTime = LocalDateTime.now()
