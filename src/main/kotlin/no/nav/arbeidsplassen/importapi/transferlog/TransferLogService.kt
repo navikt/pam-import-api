@@ -1,20 +1,11 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.aop.Around
-import io.micronaut.data.model.Pageable
-import no.nav.arbeidsplassen.importapi.dao.AdState
-import no.nav.arbeidsplassen.importapi.dao.AdStateRepository
-import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.time.LocalDateTime
 import javax.inject.Singleton
 import javax.transaction.Transactional
-import javax.validation.Payload
-import kotlin.streams.toList
 
 @Singleton
 @Around
