@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.adadminstatus
 
 import java.time.LocalDateTime
 import java.util.*

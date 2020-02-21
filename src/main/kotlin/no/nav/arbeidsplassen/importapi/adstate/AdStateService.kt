@@ -3,7 +3,10 @@ package no.nav.arbeidsplassen.importapi.adstate
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
+import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ErrorType
 import java.time.LocalDateTime
+import java.util.*
 import javax.inject.Singleton
 
 @Singleton
@@ -15,9 +18,15 @@ class AdStateService(private val adStateRepository: AdStateRepository ) {
         }
     }
 
-    fun getAdStatesByProviderReference(providerId:Long, reference:String): AdStateDTO {
-        return adStateRepository.findByProviderIdAndReference(providerId, reference).orElseThrow().toDTO()
-    }
+    fun getAdStateByUuid(uuid: UUID):
+            AdStateDTO = adStateRepository.findByUuid(uuid)
+            .orElseThrow{ApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)}
+            .toDTO()
+
+    fun getAdStatesByProviderReference(providerId:Long, reference:String): AdStateDTO =
+        adStateRepository.findByProviderIdAndReference(providerId, reference)
+                .orElseThrow { ApiError("AdState with $providerId $reference not found", ErrorType.NOT_FOUND) }
+                .toDTO()
 
     fun getAdStatesByUpdated(updated:LocalDateTime, pageable: Pageable): Slice<AdStateDTO> {
         return adStateRepository.findByUpdatedGreaterThanEquals(updated, pageable).map {

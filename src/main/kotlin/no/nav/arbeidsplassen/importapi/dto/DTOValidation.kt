@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ErrorType
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import javax.inject.Singleton
@@ -45,14 +47,4 @@ class DTOValidation(private val objectMapper: ObjectMapper) {
         }
     }
 
-    fun providerNotMissingValues(dto: ProviderDTO) {
-        if (dto.email == null) throw ApiError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
-        if (dto.userName == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
-    }
 }
-
-enum class ErrorType {
-    PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
-}
-
-class ApiError(message: String, val type: ErrorType) : Throwable(message)

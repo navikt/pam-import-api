@@ -2,6 +2,8 @@ package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
+import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import java.util.*
 import javax.inject.Singleton
@@ -11,25 +13,28 @@ class ProviderService(private val providerRepository: ProviderRepository) {
 
 
     fun save(dto: ProviderDTO): ProviderDTO {
-        return toDTO(providerRepository.save(toEntity(dto)))
+        if (dto.email == null) throw ApiError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
+        if (dto.userName == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
+        return providerRepository.save(dto.toEntity()).toDTO()
     }
 
     fun findByUuid(uuid: UUID): ProviderDTO {
-       return toDTO(providerRepository.findByUuid(uuid).orElseThrow())
+       return providerRepository.findByUuid(uuid)
+               .orElseThrow{ApiError("Provider $uuid not found", ErrorType.NOT_FOUND)}
+               .toDTO()
     }
 
     fun list(page: Pageable): Slice<ProviderDTO> {
         return providerRepository.list(page).map {
-            toDTO(it)
+            it.toDTO()
         }
     }
 
-    private fun toEntity(dto: ProviderDTO): Provider {
-        check(dto.email!=null && dto.userName!=null)
-        return Provider(id = dto.id, email = dto.email, username = dto.userName, uuid = dto.uuid)
+    private fun ProviderDTO.toEntity(): Provider {
+        return Provider(id = id, email = email!!, username = userName!!, uuid = uuid)
     }
 
-    private fun toDTO(entity: Provider): ProviderDTO {
-        return ProviderDTO(id=entity.id, email = entity.email, userName = entity.username, uuid = entity.uuid)
+    private fun Provider.toDTO(): ProviderDTO {
+        return ProviderDTO(id=id, email = email, userName = username, uuid = uuid)
     }
 }

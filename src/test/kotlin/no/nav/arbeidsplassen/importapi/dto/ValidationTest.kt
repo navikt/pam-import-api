@@ -1,6 +1,8 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ErrorType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

@@ -10,8 +10,7 @@ import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import java.util.*
 
 @Controller("/internal/providers")
-class ProviderController(private val providerService: ProviderService,
-                         private val dtoValidation: DTOValidation) {
+class ProviderController(private val providerService: ProviderService) {
 
 
     @Get("/{uuid}")
@@ -27,7 +26,6 @@ class ProviderController(private val providerService: ProviderService,
     @Post("/")
     fun createProvider(@Body provider: Single<ProviderDTO>): Single<HttpResponse<ProviderDTO>> {
         return provider.map {
-            dtoValidation.providerNotMissingValues(it)
             HttpResponse.created(providerService.save(it))
         }
     }
@@ -35,7 +33,6 @@ class ProviderController(private val providerService: ProviderService,
     @Put("/{uuid}")
     fun putProvider(@Body provider: Single<ProviderDTO>, @PathVariable uuid:UUID): Single<HttpResponse<ProviderDTO>> {
         return provider.map {
-            dtoValidation.providerNotMissingValues(it)
             val updated = providerService.findByUuid(uuid).copy(
                     email=it.email, userName = it.userName)
             HttpResponse.created(providerService.save(updated))

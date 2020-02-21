@@ -1,6 +1,8 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import no.nav.arbeid.pam.kodeverk.ansettelse.*
+import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ErrorType
 import javax.inject.Singleton
 
 @Singleton

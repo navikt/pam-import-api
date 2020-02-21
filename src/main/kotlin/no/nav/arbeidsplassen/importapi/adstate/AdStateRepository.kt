@@ -71,6 +71,9 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<AdState>
 
     @Transactional
+    abstract fun findByUuid(uuid: UUID): Optional<AdState>
+
+    @Transactional
     abstract fun list(versionId: Long, pageable: Pageable): Slice<AdState>
 
 }
