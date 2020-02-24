@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
@@ -15,9 +16,10 @@ class TransferDTOTest {
     @Test
     fun jsonToTransferDTO() {
 
-        val transfer = objectMapper.readValue(TransferDTOTest::class.java.getResourceAsStream("/transfer-ads.json"), TransferDTO::class.java)
-        Assertions.assertEquals(2, transfer.ads.size)
-        Assertions.assertEquals("Sørumsand barnehage", transfer.ads[0].employer!!.businessName)
+        val ads = objectMapper.transferToAdList()
+        Assertions.assertEquals(2, ads.size)
+        Assertions.assertEquals("Sørumsand barnehage", ads[0].employer!!.businessName)
+
 
     }
 }

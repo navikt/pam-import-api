@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
@@ -7,32 +8,37 @@ import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.dto.*
 import no.nav.arbeidsplassen.importapi.ApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import java.time.LocalDateTime
 
 
 @Controller("/api/v1/transfers")
 class TransferController(private val dtoValidation: DTOValidation,
                          private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
-                         @Value("\${adsSize}") val  adsSize: Int = 100) {
+                         private val adStateService: AdStateService,
+                         private val objectMapper: ObjectMapper,
+                         @Value("\${adsSize:100}") val adsSize: Int = 100) {
 
-    @Post("/")
-    fun postTransfer(@Body upload: Single<String>): Single<HttpResponse<TransferLogDTO>> {
+    @Post("/{providerId}")
+    fun postTransfer(@PathVariable providerId: Long, @Body upload: Single<List<AdDTO>>): Single<HttpResponse<TransferLogDTO>> {
+        println("We are posting!")
         return upload.map {
             // TODO authorized provider access here
-            val transferJson = dtoValidation.parseJson(it)
-            val transferDTO = dtoValidation.parseToDTO(transferJson)
-            if (transferDTO.ads.size>100 || transferDTO.ads.size<1) {
+
+            if (it.size>100 || it.size<1) {
                 throw ApiError("ads should be between 1 to max 100", ErrorType.INVALID_VALUE)
             }
-            val providerDTO = providerService.findByUuid(transferDTO.provider.uuid)
-            val md5 = it.md5Hex()
-            if (transferLogService.existsByProviderIdAndMd5(providerDTO.id!!, md5)) {
+            //val providerDTO = providerService.findById(providerId)
+            val payload = it.toString()
+            val md5 = payload.md5Hex()
+            val transferLogDTO = TransferLogDTO(providerId=providerId, payload = payload, md5 = md5)
+            if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
                 throw ApiError("Content already exists", ErrorType.CONFLICT)
             }
-            transferDTO.provider.id = providerDTO.id
-            HttpResponse.created(transferLogService.saveTransfer(transferDTO, md5, it))
+            HttpResponse.created(transferLogService.saveTransfer(transferLogDTO))
         }
     }
 
@@ -41,5 +47,15 @@ class TransferController(private val dtoValidation: DTOValidation,
         return Single.just(HttpResponse.ok(transferLogService.findByVersionId(versionId)))
     }
 
+//    @Delete("/{providerId}/{reference}")
+//    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String): Single<HttpResponse<TransferLogDTO>> {
+//        val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
+//        // set expire to now, so that this ad will be "deleted"
+//        val ad = adState.ad.copy(expires = LocalDateTime.now().minusSeconds(1))
+//        val transferDTO = TransferDTO(ProviderDTO(id=providerId), ads = listOf(ad))
+//        val jsonPayload = objectMapper.writeValueAsString(transferDTO)
+//        val md5 = jsonPayload.md5Hex()
+//        return Single.just(HttpResponse.ok(transferLogService.saveTransfer(transferDTO, md5, jsonPayload)))
+//    }
 
 }

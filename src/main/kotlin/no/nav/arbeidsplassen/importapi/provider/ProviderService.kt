@@ -14,14 +14,12 @@ class ProviderService(private val providerRepository: ProviderRepository) {
 
     fun save(dto: ProviderDTO): ProviderDTO {
         if (dto.email == null) throw ApiError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
-        if (dto.userName == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
+        if (dto.identifier == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 
-    fun findByUuid(uuid: UUID): ProviderDTO {
-       return providerRepository.findByUuid(uuid)
-               .orElseThrow{ApiError("Provider $uuid not found", ErrorType.NOT_FOUND)}
-               .toDTO()
+    fun findById(id:Long): ProviderDTO {
+        return providerRepository.findById(id).orElseThrow().toDTO()
     }
 
     fun list(page: Pageable): Slice<ProviderDTO> {
@@ -31,10 +29,10 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     }
 
     private fun ProviderDTO.toEntity(): Provider {
-        return Provider(id = id, email = email!!, username = userName!!, uuid = uuid)
+        return Provider(id = id, email = email, identifier = identifier)
     }
 
     private fun Provider.toDTO(): ProviderDTO {
-        return ProviderDTO(id=id, email = email, userName = username, uuid = uuid)
+        return ProviderDTO(id=id, email = email, identifier = identifier)
     }
 }

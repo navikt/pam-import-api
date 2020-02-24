@@ -6,7 +6,6 @@ import io.micronaut.data.model.Sort
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
-import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
@@ -23,10 +22,10 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
     @Test
     fun adStateCrudTest() {
         val provider = providerRepository.newTestProvider()
-        val transfer = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), TransferDTO::class.java)
+        val ads = objectMapper.transferToAdList()
         val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
         val transferInDb = transferLogRepository.save(transferLog)
-        val ad = transfer.ads[0]
+        val ad = ads[0]
         val adState = AdState(jsonPayload = objectMapper.writeValueAsString(ad), providerId = provider.id!!,
                 reference = ad.reference, versionId = transferInDb.id!!)
         val created = adStateRepository.save(adState)

@@ -11,8 +11,7 @@ data class Provider(
         @Id
         @GeneratedValue
         var id: Long? = null,
-        val uuid: UUID = UUID.randomUUID(),
-        val username: String,
+        val identifier: String,
         val email: String,
         val updated: LocalDateTime = LocalDateTime.now(),
         val created: LocalDateTime = LocalDateTime.now())

@@ -10,18 +10,18 @@ import org.junit.jupiter.api.assertThrows
 @MicronautTest
 class ValidationTest(private val dtoValidation: DTOValidation) {
 
-    @Test
-    fun jsonParseTest() {
-        val jsonStream = ValidationTest::class.java.getResourceAsStream("/transfer-ads-parse-error.json")
-        val error = assertThrows<ApiError> { dtoValidation.parseJson(jsonStream.bufferedReader().use { it.readText()}) }
-        assertEquals(ErrorType.PARSE_ERROR, error.type)
-    }
-
-    @Test
-    fun jsonMissingValueTest() {
-        val jsonStream = ValidationTest::class.java.getResourceAsStream("/transfer-ads-missing.json")
-        val error = assertThrows<ApiError> { dtoValidation.parseToDTO(dtoValidation.parseJson(jsonStream.bufferedReader().use { it.readText() }))}
-        assertEquals(ErrorType.MISSING_PARAMETER, error.type)
-    }
+//    @Test
+//    fun jsonParseTest() {
+//        val jsonStream = ValidationTest::class.java.getResourceAsStream("/transfer-ads-parse-error.json")
+//        val error = assertThrows<ApiError> { dtoValidation.parseJson(jsonStream.bufferedReader().use { it.readText()}) }
+//        assertEquals(ErrorType.PARSE_ERROR, error.type)
+//    }
+//
+//    @Test
+//    fun jsonMissingValueTest() {
+//        val jsonStream = ValidationTest::class.java.getResourceAsStream("/transfer-ads-missing.json")
+//        val error = assertThrows<ApiError> { dtoValidation.parseToDTO(dtoValidation.parseJson(jsonStream.bufferedReader().use { it.readText() }))}
+//        assertEquals(ErrorType.MISSING_PARAMETER, error.type)
+//    }
 
 }

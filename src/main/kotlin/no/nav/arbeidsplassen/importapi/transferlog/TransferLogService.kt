@@ -3,7 +3,6 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import io.micronaut.aop.Around
 import no.nav.arbeidsplassen.importapi.ApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
-import no.nav.arbeidsplassen.importapi.dto.TransferDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import javax.inject.Singleton
 import javax.transaction.Transactional
@@ -17,8 +16,8 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
             Boolean = transferLogRepository.existsByProviderIdAndMd5(providerId, md5)
 
     @Transactional
-    fun saveTransfer(dto: TransferDTO, md5: String, payload: String): TransferLogDTO {
-        return transferLogRepository.save(dto.toEntity(md5, payload)).toDTO()
+    fun saveTransfer(dto: TransferLogDTO): TransferLogDTO {
+        return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 
     @Transactional
@@ -28,11 +27,12 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
                .toDTO()
     }
 
-    private fun TransferDTO.toEntity(md5:String, payload: String): TransferLog {
-        return TransferLog(providerId = provider.id!!, md5 = md5, payload = payload)
+    private fun TransferLogDTO.toEntity(): TransferLog {
+        return TransferLog(providerId = providerId, md5 = md5, payload = payload!!)
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, message = message, status = status.name, md5 = md5, created = created, updated = updated)
+        return TransferLogDTO(versionId = id!!, providerId = providerId, message = message, status = status.name,
+                md5 = md5, created = created, updated = updated, payload = payload)
     }
 }

@@ -20,7 +20,6 @@ class AdStateController(private val adStateService: AdStateService) {
     fun getAdStateByUuid(@PathVariable uuid: UUID): AdStateDTO
             = adStateService.getAdStateByUuid(uuid)
 
-
     @Get("/versions/{versionId}")
     fun getAdStatesByProvider(@PathVariable versionId: Long, pageable: Pageable): Slice<AdStateDTO> {
         return adStateService.getAdStatesByVersionId(versionId, pageable)

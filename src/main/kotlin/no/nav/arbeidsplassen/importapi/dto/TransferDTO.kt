@@ -3,10 +3,6 @@ package no.nav.arbeidsplassen.importapi.dto
 import java.time.LocalDateTime
 import java.util.*
 
-data class TransferDTO(val provider: ProviderDTO, val ads: List<AdDTO>)
-
-data class ProviderDTO(var id: Long?, val uuid: UUID = UUID.randomUUID(), val userName: String?, val email: String?)
-
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
                  val properties: Map<String, Any> = hashMapOf(),

@@ -1,16 +1,19 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.ApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Singleton
 
 @Singleton
-class AdStateService(private val adStateRepository: AdStateRepository ) {
+class AdStateService(private val adStateRepository: AdStateRepository,
+                     private val objectMapper: ObjectMapper) {
 
     fun getAdStates(pageable: Pageable): Slice<AdStateDTO> {
         return adStateRepository.list(pageable).map {
@@ -42,7 +45,7 @@ class AdStateService(private val adStateRepository: AdStateRepository ) {
 
     private fun AdState.toDTO(): AdStateDTO {
         return AdStateDTO(uuid = uuid, versionId = versionId, providerId = providerId, reference = reference,
-                jsonPayload = jsonPayload, updated = updated, created = created)
+                ad = objectMapper.readValue(jsonPayload, AdDTO::class.java), updated = updated, created = created)
     }
 
 }

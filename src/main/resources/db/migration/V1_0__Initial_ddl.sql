@@ -2,14 +2,12 @@ CREATE SEQUENCE provider_id_seq;
 
 CREATE TABLE provider (
     id BIGINT NOT NULL DEFAULT NEXTVAL('provider_id_seq'),
-    uuid UUID NOT NULL,
-    username VARCHAR(255) NOT NULL,
+    identifier VARCHAR(64) NOT NULL,
     email VARCHAR(255) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
-    UNIQUE KEY(uuid),
-    UNIQUE KEY(username)
+    UNIQUE KEY(identifier)
 );
 
 CREATE SEQUENCE transfer_log_id_seq;

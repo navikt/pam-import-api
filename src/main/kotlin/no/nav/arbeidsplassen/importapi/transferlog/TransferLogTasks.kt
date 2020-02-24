@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Value
@@ -57,8 +58,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
-        val transferDTO = objectMapper.readValue(transferLog.payload, TransferDTO::class.java)
-        return transferDTO.ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
+        val ads = objectMapper.readValue(transferLog.payload, object: TypeReference<List<AdDTO>>(){})
+        return ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
 
     }
 
