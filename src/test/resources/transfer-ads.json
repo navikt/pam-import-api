@@ -1,10 +1,4 @@
-{
-  "provider": {
-    "uuid": "8262de7d-9654-4364-af70-d86a4994d320",
-    "userName": "webcruiter",
-    "email": "webcruiter@test.com"
-  },
-  "ads": [
+[
     {
       "reference": "140095810",
       "positions": 2,
@@ -132,5 +126,4 @@
         }
       ]
     }
-  ]
-}
+]

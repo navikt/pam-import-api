@@ -21,13 +21,13 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper) {
 
     @Test
     fun postAdTransfer() {
-        val post  = HttpRequest.POST("/api/v1/transfers", objectMapper.transferJsonString())
-                .contentType(MediaType.TEXT_PLAIN)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-        val response = client.exchange(post, String::class.java).blockingFirst()
-        val request = HttpRequest.GET<String>("/internal/isAlive")
-        val body = client.toBlocking().retrieve(request)
-        println(body)
+//        val post  = HttpRequest.POST("/api/v1/transfers", objectMapper.transferJsonString())
+//                .contentType(MediaType.TEXT_PLAIN)
+//                .accept(MediaType.APPLICATION_JSON_TYPE)
+//        val response = client.exchange(post, String::class.java).blockingFirst()
+//        val request = HttpRequest.GET<String>("/internal/isAlive")
+//        val body = client.toBlocking().retrieve(request)
+//        println(body)
     }
 
 }

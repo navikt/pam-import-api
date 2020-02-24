@@ -16,8 +16,8 @@ import javax.transaction.Transactional
 @JdbcRepository(dialect = Dialect.ANSI)
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
-    val insertSQL = """INSERT INTO "provider" ("identifier", "email", "created") VALUES (?,?,?,?)"""
-    val updateSQL = """UPDATE "provider" SET "identifier"=?, "username"=?, "email"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "provider" ("identifier", "email", "created") VALUES (?,?,?)"""
+    val updateSQL = """UPDATE "provider" SET "identifier"=?, "email"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {

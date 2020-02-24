@@ -17,13 +17,11 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
                            private val transferLogRepository: TransferLogRepository,
                            private val providerRepository: ProviderRepository,
                            private val objectMapper: ObjectMapper,
-                           private val dtoValidation: DTOValidation,
                            private val adStateRepository: AdStateRepository) {
 
     @Test
     fun doTransferLogTaskTest() {
-        val json = TransferLogTasksTest::class.java.getResourceAsStream("/transfer-ads.json").bufferedReader().use { it.readText() }
-        val payload = objectMapper.writeValueAsString(json)
+        val payload = TransferLogTasksTest::class.java.getResourceAsStream("/transfer-ads.json").bufferedReader().use { it.readText() }
         val provider = providerRepository.newTestProvider()
         transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.md5Hex(), payload = payload))
         transferLogTasks.doTransferLogTask()
