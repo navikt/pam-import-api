@@ -13,8 +13,6 @@ class ProviderService(private val providerRepository: ProviderRepository) {
 
 
     fun save(dto: ProviderDTO): ProviderDTO {
-        if (dto.email == null) throw ApiError("Missing parameter: email", ErrorType.MISSING_PARAMETER)
-        if (dto.identifier == null) throw ApiError( "Missing parameter: userName", ErrorType.MISSING_PARAMETER)
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 

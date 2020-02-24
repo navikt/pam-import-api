@@ -21,7 +21,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
 
     @Test
     fun doTransferLogTaskTest() {
-        val payload = TransferLogTasksTest::class.java.getResourceAsStream("/transfer-ads.json").bufferedReader().use { it.readText() }
+        val payload = objectMapper.transferJsonString()
         val provider = providerRepository.newTestProvider()
         transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.md5Hex(), payload = payload))
         transferLogTasks.doTransferLogTask()
