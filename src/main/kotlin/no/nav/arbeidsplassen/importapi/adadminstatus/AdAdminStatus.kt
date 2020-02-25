@@ -15,6 +15,7 @@ data class AdAdminStatus(
         val message: String? = null,
         val reference: String,
         val providerId: Long,
+        val versionId: Long,
         val created: LocalDateTime = LocalDateTime.now(),
         val updated: LocalDateTime = LocalDateTime.now()
 )

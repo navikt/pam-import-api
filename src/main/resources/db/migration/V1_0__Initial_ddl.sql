@@ -55,12 +55,15 @@ CREATE TABLE ad_admin_status(
     status VARCHAR(36),
     message VARCHAR(512),
     reference VARCHAR(255),
+    version_id BIGINT NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),
     UNIQUE KEY(uuid),
     UNIQUE KEY(provider_id, reference)
 );
+
+CREATE INDEX ad_admin_status_version_id_idx ON ad_admin_status(version_id);
 
 CREATE TABLE shedlock(
     name VARCHAR(64),

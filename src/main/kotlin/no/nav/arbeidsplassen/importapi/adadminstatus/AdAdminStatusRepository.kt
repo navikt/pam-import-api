@@ -7,13 +7,14 @@ import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
+import java.util.*
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ANSI)
 abstract class AdAdminStatusRepository(private val connection: Connection): CrudRepository<AdAdminStatus, Long> {
 
-    val insertSQL = """INSERT INTO "ad_admin_status" ("uuid", "status", "message", "reference", "provider_id", "created") VALUES(?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ad_admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "ad_admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") VALUES(?,?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "ad_admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
     override fun <S : AdAdminStatus> save(entity: S): S {
@@ -42,12 +43,13 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
         setString(3, entity.message)
         setString(4, entity.reference)
         setLong(5, entity.providerId)
-        setObject(6, entity.created)
+        setLong(6, entity.versionId)
+        setObject(7, entity.created)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(7, entity.id!!)
+            setLong(8, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
 
         }
@@ -57,5 +59,11 @@ abstract class AdAdminStatusRepository(private val connection: Connection): Crud
     override fun <S : AdAdminStatus> saveAll(entities: Iterable<S>): Iterable<S> {
         return entities.map { save(it) }.toList()
     }
+
+    @Transactional
+    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdAdminStatus>
+
+    @Transactional
+    abstract fun findByVersionId(versionId: Long): List<AdAdminStatus>
 
 }
