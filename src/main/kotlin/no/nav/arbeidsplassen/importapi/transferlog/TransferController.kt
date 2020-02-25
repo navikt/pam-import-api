@@ -6,17 +6,15 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.md5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
-import java.time.LocalDateTime
 
 
 @Controller("/api/v1/transfers")
-class TransferController(private val dtoValidation: DTOValidation,
-                         private val transferLogService: TransferLogService,
+class TransferController(private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
                          private val adStateService: AdStateService,
                          private val objectMapper: ObjectMapper,
@@ -29,14 +27,14 @@ class TransferController(private val dtoValidation: DTOValidation,
             // TODO authorized provider access here
 
             if (it.size>100 || it.size<1) {
-                throw ApiError("ads should be between 1 to max 100", ErrorType.INVALID_VALUE)
+                throw ImportApiError("ads should be between 1 to max 100", ErrorType.INVALID_VALUE)
             }
             //val providerDTO = providerService.findById(providerId)
             val payload = it.toString()
             val md5 = payload.md5Hex()
             val transferLogDTO = TransferLogDTO(providerId=providerId, payload = payload, md5 = md5)
             if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                throw ApiError("Content already exists", ErrorType.CONFLICT)
+                throw ImportApiError("Content already exists", ErrorType.CONFLICT)
             }
             HttpResponse.created(transferLogService.saveTransfer(transferLogDTO))
         }

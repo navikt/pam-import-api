@@ -2,10 +2,7 @@ package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
-import no.nav.arbeidsplassen.importapi.ApiError
-import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
-import java.util.*
 import javax.inject.Singleton
 
 @Singleton

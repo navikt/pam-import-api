@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import no.nav.arbeid.pam.kodeverk.ansettelse.*
-import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import javax.inject.Singleton
 
@@ -31,7 +31,7 @@ class PropertyNameValueValidation {
 
     fun validateProperty(name:String, value: String) {
         if (!validValues.get(name)!!.contains(value))
-            throw ApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
+            throw ImportApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
     }
 
     fun checkOnlyValidValues(properties: HashMap<String, Any>) {

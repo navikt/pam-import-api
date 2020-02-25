@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.ApiError
+import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -29,7 +29,7 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             put("workhours", "Kveld")
             put("sector", "Privat")
         }
-        val error = assertThrows<ApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
+        val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
 }
