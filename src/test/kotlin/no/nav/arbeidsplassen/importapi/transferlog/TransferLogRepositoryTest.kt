@@ -10,7 +10,7 @@ import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
-import no.nav.arbeidsplassen.importapi.md5Hex
+import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
     fun transferLogCrudTest() {
         val provider = providerRepository.newTestProvider()
         val payload = objectMapper.transferJsonString()
-        val md5hash = payload.md5Hex()
+        val md5hash = payload.toMD5Hex()
         println ("md5hash: $md5hash")
         val transferLog = TransferLog(providerId = provider.id!!, md5 = md5hash, payload = payload)
         val create = transferLogRepository.save(transferLog)
@@ -50,10 +50,10 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
     fun transferlogMD5Test() {
         val transferJsonNode1 = objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), JsonNode::class.java)
         val payload = objectMapper.writeValueAsString(transferJsonNode1)
-        val md5hash = payload.md5Hex()
+        val md5hash = payload.toMD5Hex()
         val transferJsonNode2 =  objectMapper.readValue(AdStateRepositoryTest::class.java.getResourceAsStream("/transfer-ads.json"), JsonNode::class.java)
         val payload2 = objectMapper.writeValueAsString(transferJsonNode2)
-        val md5hash2 = payload2.md5Hex()
+        val md5hash2 = payload2.toMD5Hex()
         assertEquals(md5hash, md5hash2)
     }
 }

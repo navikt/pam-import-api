@@ -6,7 +6,7 @@ import java.security.MessageDigest
 val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
 
-fun String.md5Hex(): String {
+fun String.toMD5Hex(): String {
     val digest = MessageDigest.getInstance("MD5")!!
     val hex = digest.digest(this.toByteArray()).hexBinary()
     digest.reset()

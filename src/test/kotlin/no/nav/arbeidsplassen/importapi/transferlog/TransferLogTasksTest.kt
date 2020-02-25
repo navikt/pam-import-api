@@ -5,7 +5,7 @@ import io.micronaut.data.model.Pageable
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.dao.*
-import no.nav.arbeidsplassen.importapi.md5Hex
+import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
     fun doTransferLogTaskTest() {
         val payload = objectMapper.transferJsonString()
         val provider = providerRepository.newTestProvider()
-        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.md5Hex(), payload = payload))
+        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.toMD5Hex(), payload = payload))
         transferLogTasks.doTransferLogTask()
         val adstates = adStateRepository.findAll()
         assertEquals(2, adstates.count())
