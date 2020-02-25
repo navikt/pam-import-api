@@ -34,7 +34,6 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper) {
                 .accept(MediaType.APPLICATION_JSON_TYPE)
         val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, response.status)
-        println(response.body())
     }
 
 }
