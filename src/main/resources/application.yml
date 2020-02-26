@@ -41,4 +41,4 @@ transferlog:
     enabled: true
 shedlock:
   defaults:
-    lock-at-most-for: 5m
+    lock-at-most-for: 1m
