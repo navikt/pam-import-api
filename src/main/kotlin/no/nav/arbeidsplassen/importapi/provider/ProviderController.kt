@@ -33,7 +33,7 @@ class ProviderController(private val providerService: ProviderService) {
     fun putProvider(@Body provider: Single<ProviderDTO>, @PathVariable id:Long): Single<HttpResponse<ProviderDTO>> {
         return provider.map {
             val updated = providerService.findById(id).copy(
-                    email=it.email, identifier = it.identifier)
+                    email=it.email, identifier = it.identifier, phone = it.phone)
             HttpResponse.created(providerService.save(updated))
         }
     }

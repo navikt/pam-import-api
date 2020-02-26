@@ -16,8 +16,8 @@ import javax.transaction.Transactional
 @JdbcRepository(dialect = Dialect.ANSI)
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
-    val insertSQL = """INSERT INTO "provider" ("identifier", "email", "created") VALUES (?,?,?)"""
-    val updateSQL = """UPDATE "provider" SET "identifier"=?, "email"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "provider" ("identifier", "email", "phone", "created") VALUES (?,?,?,?)"""
+    val updateSQL = """UPDATE "provider" SET "identifier"=?, "email"=?, "phone"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {
@@ -50,12 +50,13 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     private fun PreparedStatement.prepareSQL(entity: Provider) {
         setString(1, entity.identifier)
         setString(2, entity.email)
-        setObject(3, entity.created)
+        setString(3, entity.phone)
+        setObject(4, entity.created)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(4, entity.id!!)
+            setLong(5, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
 
         }

@@ -13,6 +13,7 @@ data class Provider(
         var id: Long? = null,
         val identifier: String,
         val email: String,
+        val phone: String,
         val updated: LocalDateTime = LocalDateTime.now(),
         val created: LocalDateTime = LocalDateTime.now())
 

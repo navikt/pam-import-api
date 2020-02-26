@@ -24,10 +24,10 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     }
 
     private fun ProviderDTO.toEntity(): Provider {
-        return Provider(id = id, email = email, identifier = identifier)
+        return Provider(id = id, email = email, identifier = identifier, phone = phone)
     }
 
     private fun Provider.toDTO(): ProviderDTO {
-        return ProviderDTO(id=id, email = email, identifier = identifier)
+        return ProviderDTO(id=id, email = email, identifier = identifier, phone = phone)
     }
 }

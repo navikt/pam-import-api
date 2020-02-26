@@ -4,6 +4,7 @@ CREATE TABLE provider (
     id BIGINT NOT NULL DEFAULT NEXTVAL('provider_id_seq'),
     identifier VARCHAR(64) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    phone VARCHAR(32) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),

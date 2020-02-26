@@ -23,7 +23,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper) {
 
     @Test
     fun postAdTransfer() {
-        val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "webcruiter", email = "test@test.no"))
+        val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
         val message = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()

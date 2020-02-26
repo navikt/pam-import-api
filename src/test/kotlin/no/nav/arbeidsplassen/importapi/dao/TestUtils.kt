@@ -11,7 +11,7 @@ class TestUtils {
 }
 
 fun ProviderRepository.newTestProvider(): Provider {
-    return save(Provider(identifier = "tester", email = "tester@tester.test"))
+    return save(Provider(identifier = "tester", email = "tester@tester.test", phone = "12345678"))
 }
 
 fun ObjectMapper.transferJsonString(): String {
