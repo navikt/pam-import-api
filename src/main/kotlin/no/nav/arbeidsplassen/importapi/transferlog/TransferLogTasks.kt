@@ -43,7 +43,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     @Transactional
     fun mapTransferLog(it: TransferLog) {
         try {
-            LOG.info("mapping transfer $it.id from provider ${it.providerId}")
+            LOG.info("mapping transfer ${it.id} from provider ${it.providerId}")
             adStateRepository.saveAll(mapTransferLogs(it))
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
         } catch (e: Exception) {

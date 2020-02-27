@@ -43,7 +43,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         val payload2 = objectMapper.writeValueAsString(ads)
         transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = "md5hash", payload = payload2))
         val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED,Pageable.from(0,100, Sort.of(Sort.Order.asc("updated"))))
-        println(findByStatus.size)
+        assertNotNull(findByStatus)
     }
 
     @Test

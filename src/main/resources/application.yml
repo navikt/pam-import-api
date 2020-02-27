@@ -14,6 +14,9 @@ micronaut:
       prometheus:
         enabled: true
         descriptions: false
+  data:
+    pageable:
+      max-page-size: 1000
 endpoints:
   metrics:
     enabled: true

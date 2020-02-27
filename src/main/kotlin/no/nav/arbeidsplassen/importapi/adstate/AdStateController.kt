@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
+import io.micronaut.core.convert.format.Format
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import io.micronaut.http.annotation.*
@@ -26,7 +27,7 @@ class AdStateController(private val adStateService: AdStateService) {
     }
 
     @Get("/")
-    fun getAdStates(@QueryValue updated: LocalDateTime, pageable: Pageable): Slice<AdStateDTO> {
+    fun getAdStates(@QueryValue @Format("yyyy-MM-dd'T'HH:mm:ss.SSS") updated: LocalDateTime, pageable: Pageable): Slice<AdStateDTO> {
         return adStateService.getAdStatesByUpdated(updated, pageable)
     }
 
