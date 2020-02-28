@@ -17,7 +17,6 @@ repositories {
 }
 
 configurations {
-    // for dependencies that are needed for development only
     developmentOnly 
 }
 
@@ -65,6 +64,7 @@ dependencies {
     implementation "net.javacrumbs.shedlock:shedlock-micronaut:$shedlockVersion"
     implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc:$shedlockVersion"
     implementation "no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion"
+    implementation "no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion"
 
 }
 

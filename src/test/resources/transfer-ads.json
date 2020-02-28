@@ -61,7 +61,7 @@
       "categoryList": [
         {
           "code": "234204",
-          "categoryType": "AP2020",
+          "categoryType": "STYRK08",
           "name": "Barnehagelærer"
         }
       ]
@@ -121,7 +121,7 @@
       "categoryList": [
         {
           "code": "214605",
-          "categoryType": "AP2020",
+          "categoryType": "PYRK20",
           "name": "Sivilingeniør"
         }
       ]

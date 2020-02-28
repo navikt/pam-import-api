@@ -1,7 +1,6 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import java.time.LocalDateTime
-import java.util.*
 
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
@@ -11,10 +10,14 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
 
 data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?, val location: LocationDTO)
 
-data class CategoryDTO(val code: String, val categoryType: String = "AP2020", val name: String?, val description: String?)
+data class CategoryDTO(val code: String, val categoryType: CategoryType, val name: String?, val description: String?)
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?)
 
 data class LocationDTO(val address: String?, val postalCode: String?, val country: String?,
                        val county: String?, val municipal: String?, val city: String?,
                        val latitude: String?, val longitude: String?)
+
+enum class CategoryType {
+    STYRK08, PYRK20
+}

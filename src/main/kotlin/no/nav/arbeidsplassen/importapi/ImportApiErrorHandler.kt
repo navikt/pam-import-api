@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -27,6 +28,8 @@ class ImportApiErrorHandler : ExceptionHandler<Throwable, HttpResponse<ErrorMess
                 -> HttpResponse.badRequest(ErrorMessage("Parse error: ${error.localizedMessage}", PARSE_ERROR.name))
             is MissingKotlinParameterException
                 -> HttpResponse.badRequest(ErrorMessage("Missing parameter: ${error.parameter.name}", MISSING_PARAMETER.name))
+            is InvalidFormatException
+                -> HttpResponse.badRequest(ErrorMessage("Invalid value: ${error.localizedMessage}", INVALID_VALUE.name))
             else -> HttpResponse.serverError(ErrorMessage(error.message, UNKNOWN.name))
         }
     }
