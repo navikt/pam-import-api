@@ -11,6 +11,7 @@ import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import java.time.LocalDateTime
 
 
@@ -19,6 +20,7 @@ class TransferController(private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
                          private val adStateService: AdStateService,
                          private val objectMapper: ObjectMapper,
+                         private val styrkCodeConverter: StyrkCodeConverter,
                          @Value("\${adsSize:100}") val adsSize: Int = 100) {
 
     @Post("/{providerId}")
@@ -31,9 +33,7 @@ class TransferController(private val transferLogService: TransferLogService,
             val content = objectMapper.writeValueAsString(it)
             val md5 = content.toMD5Hex()
             val transferLogDTO = TransferLogDTO(providerId=providerId, payload = content, md5 = md5)
-            if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                throw ImportApiError("Content already exists", ErrorType.CONFLICT)
-            }
+            validateContent(providerId, md5, it)
             HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply { this.payload = null })
         }
     }
@@ -54,4 +54,15 @@ class TransferController(private val transferLogService: TransferLogService,
         return Single.just(HttpResponse.ok(transferLogService.saveTransfer(transferLogDTO)))
     }
 
+    private fun validateContent(providerId: Long, md5: String, it: List<AdDTO>) {
+        if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
+            throw ImportApiError("Content already exists", ErrorType.CONFLICT)
+        }
+        it.stream().forEach {
+            it.categoryList.stream().forEach {
+                styrkCodeConverter.lookup(it.code)
+                        .orElseThrow { ImportApiError("Category code ${it.code} is not found", ErrorType.INVALID_VALUE) }
+            }
+        }
+    }
 }

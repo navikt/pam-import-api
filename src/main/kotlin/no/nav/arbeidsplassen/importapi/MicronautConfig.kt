@@ -10,6 +10,7 @@ import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
 import net.javacrumbs.shedlock.core.LockProvider
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import javax.inject.Singleton
 import javax.sql.DataSource
 
@@ -33,6 +34,11 @@ class MicronautConfig(private val dataSource: DataSource) {
     @Singleton
     fun lockProvider(): LockProvider {
         return JdbcLockProvider(dataSource)
+    }
+
+    @Singleton
+    fun styrkCodeConverter(): StyrkCodeConverter {
+        return StyrkCodeConverter();
     }
 
 }
