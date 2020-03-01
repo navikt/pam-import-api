@@ -1,26 +1,21 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.micronaut.aop.Around
 import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import javax.inject.Singleton
-import javax.transaction.Transactional
 
 @Singleton
-@Around
 class TransferLogService(private val transferLogRepository: TransferLogRepository) {
 
-    @Transactional
+
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
             Boolean = transferLogRepository.existsByProviderIdAndMd5(providerId, md5)
 
-    @Transactional
     fun saveTransfer(dto: TransferLogDTO): TransferLogDTO {
         return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 
-    @Transactional
     fun findByVersionId(versionId:Long): TransferLogDTO {
        return transferLogRepository.findById(versionId)
                .orElseThrow{ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)}

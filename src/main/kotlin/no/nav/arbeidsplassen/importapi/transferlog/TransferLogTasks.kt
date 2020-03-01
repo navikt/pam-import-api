@@ -2,9 +2,9 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Value
 import io.micronaut.data.model.Pageable
+import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.dto.*
@@ -16,7 +16,7 @@ import javax.transaction.Transactional
 import kotlin.streams.toList
 
 @Singleton
-@Around
+@Open
 class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val adStateRepository: AdStateRepository,
                        private val objectMapper: ObjectMapper,
@@ -37,7 +37,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
         LOG.info("Deleting transferlog before $date")
-        deleteByUpdatedBefore(date)
+        transferLogRepository.deleteByUpdatedBefore(date)
     }
 
     @Transactional
@@ -50,11 +50,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             LOG.error("Got exception while handling transfer log ${it.id}", e)
             transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))
         }
-    }
-
-    @Transactional
-    fun deleteByUpdatedBefore(date: LocalDateTime) {
-        transferLogRepository.deleteByUpdatedBefore(date)
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
