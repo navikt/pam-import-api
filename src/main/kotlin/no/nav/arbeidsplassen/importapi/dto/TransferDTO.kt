@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
-                 val properties: Map<String, Any> = hashMapOf(),
-                 val title: String, val adText: String, val privacy: String = "SHOW_ALL", val positions: Int = 1,
+                 val properties: Map<String, Any> = hashMapOf(), val title: String, val adText: String,
+                 val privacy: PrivacyType = PrivacyType.SHOW_ALL, val positions: Int = 1,
                  val employer: EmployerDTO?, val categoryList: List<CategoryDTO> = listOf())
 
 data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?, val location: LocationDTO)
@@ -20,4 +20,8 @@ data class LocationDTO(val address: String?, val postalCode: String?, val countr
 
 enum class CategoryType {
     STYRK08, PYRK20
+}
+
+enum class PrivacyType {
+    SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER, DONT_SHOW_AUTHOR
 }
