@@ -22,18 +22,21 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper) {
     lateinit var client: RxHttpClient
 
     @Test
-    fun postAdTransfer() {
+    fun `create provider and then transfering an upload`() {
+        // create provider
         val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
         val message = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, message.status)
         val provider = message.body()
+        // start the transfer
         val post  = HttpRequest.POST("/api/v1/transfers/${provider?.id}", objectMapper.transferToAdList())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
         val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, response.status)
     }
+
 
 }

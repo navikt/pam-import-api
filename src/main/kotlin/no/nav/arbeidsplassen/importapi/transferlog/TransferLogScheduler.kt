@@ -19,7 +19,7 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
     @Scheduled(cron="*/10 * * * * *")
     fun startTransferLogTask() {
         LOG.info("starting transferlogtask")
-        transferLogTasks.doTransferLogTask()
+        transferLogTasks.processTransferLogTask()
     }
 
     @Scheduled(cron="05 15 00 * * *")

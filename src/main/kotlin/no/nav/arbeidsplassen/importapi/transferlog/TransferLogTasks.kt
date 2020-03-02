@@ -27,12 +27,12 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         private val LOG = LoggerFactory.getLogger(TransferLogTasks::class.java)
     }
 
-    fun doTransferLogTask() {
+    fun processTransferLogTask():Int {
         val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
-        LOG.debug("received ${transferlogs.size}")
         transferlogs.stream().forEach {
             mapTransferLog(it)
         }
+        return transferlogs.count()
     }
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
