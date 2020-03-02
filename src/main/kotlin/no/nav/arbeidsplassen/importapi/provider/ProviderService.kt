@@ -1,11 +1,14 @@
 package no.nav.arbeidsplassen.importapi.provider
 
+import io.micronaut.cache.annotation.Cacheable
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
+import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import javax.inject.Singleton
 
 @Singleton
+@Open
 class ProviderService(private val providerRepository: ProviderRepository) {
 
 
@@ -13,6 +16,7 @@ class ProviderService(private val providerRepository: ProviderRepository) {
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 
+    @Cacheable
     fun findById(id:Long): ProviderDTO {
         return providerRepository.findById(id).orElseThrow().toDTO()
     }
@@ -30,4 +34,6 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     private fun Provider.toDTO(): ProviderDTO {
         return ProviderDTO(id=id, email = email, identifier = identifier, phone = phone)
     }
+
 }
+

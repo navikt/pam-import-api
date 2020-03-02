@@ -3,10 +3,13 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
+import no.nav.arbeidsplassen.importapi.provider.ProviderService
+
 import javax.inject.Singleton
 
 @Singleton
-class TransferLogService(private val transferLogRepository: TransferLogRepository) {
+class TransferLogService(private val transferLogRepository: TransferLogRepository,
+                         private val providerService: ProviderService) {
 
 
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
@@ -23,11 +26,11 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLogDTO.toEntity(): TransferLog {
-        return TransferLog(providerId = providerId, md5 = md5, payload = payload!!)
+        return TransferLog(providerId = provider.id!! , md5 = md5, payload = payload!!)
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, providerId = providerId, message = message, status = status.name,
+        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId) , message = message, status = status.name,
                 md5 = md5, created = created, updated = updated, payload = payload)
     }
 }

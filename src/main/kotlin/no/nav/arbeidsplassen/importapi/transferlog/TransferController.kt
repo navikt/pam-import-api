@@ -32,7 +32,8 @@ class TransferController(private val transferLogService: TransferLogService,
             }
             val content = objectMapper.writeValueAsString(it)
             val md5 = content.toMD5Hex()
-            val transferLogDTO = TransferLogDTO(providerId=providerId, payload = content, md5 = md5)
+            val provider = providerService.findById(providerId)
+            val transferLogDTO = TransferLogDTO(provider=provider, payload = content, md5 = md5)
             validateContent(providerId, md5, it)
             HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply { this.payload = null })
         }
@@ -50,7 +51,8 @@ class TransferController(private val transferLogService: TransferLogService,
         val ad = adState.ad.copy(expires = LocalDateTime.now().minusSeconds(1))
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
-        val transferLogDTO = TransferLogDTO(providerId = providerId, payload = jsonPayload, md5 = md5)
+        val provider = providerService.findById(providerId)
+        val transferLogDTO = TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5)
         return Single.just(HttpResponse.ok(transferLogService.saveTransfer(transferLogDTO)))
     }
 
