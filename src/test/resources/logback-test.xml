@@ -7,6 +7,7 @@
     </appender>
     <logger name="io.micronaut.data.query" level="DEBUG"/>
     <logger name="io.micronaut.transaction.jdbc.DataSourceTransactionManager" level="DEBUG" />
+    <logger name="io.micronaut.cache.interceptor" level="DEBUG"/>
     <root level="INFO">
         <appender-ref ref="stdout"/>
     </root>

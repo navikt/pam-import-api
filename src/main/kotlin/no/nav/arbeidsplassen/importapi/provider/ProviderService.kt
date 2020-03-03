@@ -1,5 +1,7 @@
 package no.nav.arbeidsplassen.importapi.provider
 
+import io.micronaut.cache.annotation.CacheConfig
+import io.micronaut.cache.annotation.CacheInvalidate
 import io.micronaut.cache.annotation.Cacheable
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
@@ -9,10 +11,12 @@ import javax.inject.Singleton
 
 @Singleton
 @Open
+@CacheConfig("providers")
 class ProviderService(private val providerRepository: ProviderRepository) {
 
 
-    fun save(dto: ProviderDTO): ProviderDTO {
+    @CacheInvalidate(parameters = ["id"])
+    fun save(dto: ProviderDTO, id: Long? = dto.id): ProviderDTO {
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 

@@ -34,7 +34,7 @@ class ProviderController(private val providerService: ProviderService) {
         return provider.map {
             val updated = providerService.findById(id).copy(
                     email=it.email, identifier = it.identifier, phone = it.phone)
-            HttpResponse.created(providerService.save(updated))
+            HttpResponse.ok(providerService.save(updated))
         }
     }
 
