@@ -11,7 +11,7 @@ data class TransferLogDTO(var versionId: Long? = null, val provider: ProviderDTO
                           val message: String? = null, val md5: String, var payload: String?=null, val created: LocalDateTime = LocalDateTime.now(),
                           val updated: LocalDateTime = LocalDateTime.now())
 
-data class AdStateDTO(val uuid: UUID, val providerId: Long, val reference: String, val versionId: Long, val ad: AdDTO,
+data class AdStateDTO(val uuid: UUID, val provider: ProviderDTO, val reference: String, val versionId: Long, val ad: AdDTO,
                       val created: LocalDateTime, val updated: LocalDateTime)
 
 data class ProviderDTO(var id: Long?=null, val identifier: String, val email: String, val phone: String)

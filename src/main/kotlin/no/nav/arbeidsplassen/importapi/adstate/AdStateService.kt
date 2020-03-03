@@ -7,13 +7,15 @@ import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Singleton
 
 @Singleton
 class AdStateService(private val adStateRepository: AdStateRepository,
-                     private val objectMapper: ObjectMapper) {
+                     private val objectMapper: ObjectMapper,
+                     private val providerService: ProviderService) {
 
     fun getAdStates(pageable: Pageable): Slice<AdStateDTO> {
         return adStateRepository.list(pageable).map {
@@ -44,7 +46,7 @@ class AdStateService(private val adStateRepository: AdStateRepository,
     }
 
     private fun AdState.toDTO(): AdStateDTO {
-        return AdStateDTO(uuid = uuid, versionId = versionId, providerId = providerId, reference = reference,
+        return AdStateDTO(uuid = uuid, versionId = versionId, provider = providerService.findById(providerId), reference = reference,
                 ad = objectMapper.readValue(jsonPayload, AdDTO::class.java), updated = updated, created = created)
     }
 
