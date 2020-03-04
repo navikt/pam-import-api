@@ -72,4 +72,10 @@ CREATE TABLE shedlock(
     locked_at TIMESTAMP(3) NULL,
     locked_by  VARCHAR(255),
     PRIMARY KEY (name)
-)
+);
+
+CREATE TABLE feedtask(
+    name VARCHAR(64),
+    lastRun TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY(name)
+);
