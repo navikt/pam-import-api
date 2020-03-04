@@ -47,10 +47,10 @@ CREATE TABLE ad_state(
 CREATE INDEX ad_state_updated_idx ON ad_state(updated);
 CREATE INDEX ad_state_version_id_idx ON ad_state(version_id);
 
-CREATE SEQUENCE ad_admin_status_seq;
+CREATE SEQUENCE admin_status_seq;
 
-CREATE TABLE ad_admin_status(
-    id BIGINT NOT NULL DEFAULT NEXTVAL('ad_admin_status_seq'),
+CREATE TABLE admin_status(
+    id BIGINT NOT NULL DEFAULT NEXTVAL('admin_status_seq'),
     uuid UUID NOT NULL,
     provider_id BIGINT NOT NULL REFERENCES provider(id),
     status VARCHAR(36),
@@ -64,7 +64,7 @@ CREATE TABLE ad_admin_status(
     UNIQUE KEY(provider_id, reference)
 );
 
-CREATE INDEX ad_admin_status_version_id_idx ON ad_admin_status(version_id);
+CREATE INDEX admin_status_version_id_idx ON admin_status(version_id);
 
 CREATE TABLE shedlock(
     name VARCHAR(64),

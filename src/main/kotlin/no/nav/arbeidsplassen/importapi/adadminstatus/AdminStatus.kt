@@ -5,7 +5,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
-data class AdAdminStatus(
+data class AdminStatus(
         @Id
         @GeneratedValue
         var id: Long? = null,
@@ -21,7 +21,7 @@ data class AdAdminStatus(
 )
 
 enum class Status {
-    RECEIVED, ACTIVE, STOPPED, REJECTED
+    RECEIVED, PENDING, DONE, UNKNOWN
 }
 
-fun AdAdminStatus.isNew(): Boolean = id==null
+fun AdminStatus.isNew(): Boolean = id==null

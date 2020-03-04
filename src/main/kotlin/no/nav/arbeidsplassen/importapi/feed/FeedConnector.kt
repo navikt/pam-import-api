@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class FeedConnector(val objectMapper: ObjectMapper,
                     @Client("FeedConnector") val client: RxHttpClient,
-                    @Value("\${feed.ad.pagesize}") val pageSize: Int = 200) {
+                    @Value("\${adminstatussync.pagesize}") val pageSize: Int = 200) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(FeedConnector::class.java)

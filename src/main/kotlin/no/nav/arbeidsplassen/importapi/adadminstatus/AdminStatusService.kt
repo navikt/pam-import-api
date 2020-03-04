@@ -22,7 +22,7 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
         }
     }
 
-    private fun AdAdminStatus.toDTO(): AdAdminStatusDTO {
+    private fun AdminStatus.toDTO(): AdAdminStatusDTO {
         return AdAdminStatusDTO(uuid = uuid, providerId = providerId, reference = reference, created = created,
                 updated = updated, status = status.name, message = message )
     }

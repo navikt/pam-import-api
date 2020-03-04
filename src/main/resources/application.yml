@@ -42,6 +42,11 @@ transferlog:
     months: 6
   scheduler:
     enabled: true
+adminstatussync:
+  scheduler:
+    enabled: true
+  feedurl: "http://localhost:9001/api/v1/ads"
+  pagesize: 200
 shedlock:
   defaults:
     lock-at-most-for: 1m

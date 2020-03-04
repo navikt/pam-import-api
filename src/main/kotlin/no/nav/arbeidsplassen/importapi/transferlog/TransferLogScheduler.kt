@@ -1,12 +1,14 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 
+import io.micronaut.context.annotation.Requires
 import io.micronaut.scheduling.annotation.Scheduled
 import net.javacrumbs.shedlock.micronaut.SchedulerLock
 import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
+@Requires(property = "transferlog.scheduler.enabled", value = "true")
 @Singleton
 @Open
 class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {

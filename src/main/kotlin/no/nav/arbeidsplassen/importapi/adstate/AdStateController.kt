@@ -27,8 +27,8 @@ class AdStateController(private val adStateService: AdStateService) {
     }
 
     @Get("/")
-    fun getAdStates(@QueryValue @Format("yyyy-MM-dd'T'HH:mm:ss.SSS") updated: LocalDateTime, pageable: Pageable): Slice<AdStateDTO> {
-        return adStateService.getAdStatesByUpdated(updated, pageable)
+    fun getAdStates(@QueryValue updated: String, pageable: Pageable): Slice<AdStateDTO> {
+        return adStateService.getAdStatesByUpdated(LocalDateTime.parse(updated), pageable)
     }
 
 }

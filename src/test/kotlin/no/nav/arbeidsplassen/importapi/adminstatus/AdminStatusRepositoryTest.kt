@@ -1,9 +1,10 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.adminstatus
 
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.adadminstatus.AdAdminStatus
+import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
+import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
@@ -20,23 +21,23 @@ class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRe
         val provider = providerRepository.newTestProvider()
         val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
         val transferInDb = transferLogRepository.save(transferLog)
-        val adminStatus = AdAdminStatus(message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
+        val adminStatus = AdminStatus(message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
                 versionId = transferInDb.id!!)
         val created = adminStatusRepository.save(adminStatus)
         assertNotNull(created.id)
         val read = adminStatusRepository.findById(created.id!!).get()
         assertNotNull(read)
         assertEquals("12345", read.reference)
-        val update = read.copy(message = null, status = Status.ACTIVE)
+        val update = read.copy(message = null, status = Status.DONE)
         val updated = adminStatusRepository.save(update)
         assertEquals(created.id!!, updated.id!!)
         assertNull(updated.message)
-        assertEquals(Status.ACTIVE, updated.status)
+        assertEquals(Status.DONE, updated.status)
         println(updated)
         adminStatusRepository.deleteById(updated.id!!)
         val deleted = adminStatusRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
-        val adminStatus2 = AdAdminStatus(message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
+        val adminStatus2 = AdminStatus(message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
                 versionId = transferInDb.id!!)
         val adminStatuses = listOf(adminStatus, adminStatus2)
         adminStatusRepository.saveAll(adminStatuses)

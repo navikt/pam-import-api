@@ -5,7 +5,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 
-@Controller("/api/v1/adstatus")
+@Controller("/api/v1/adminstatus")
 class AdminStatusController(private val adminStatusService: AdminStatusService) {
 
     @Get("/{providerId}/{reference}")

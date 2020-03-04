@@ -11,9 +11,10 @@ class FeedtaskTest(private val feedtaskRepository: FeedtaskRepository) {
     @Test
     fun readwriteFeedTaskTest() {
         feedtaskRepository.save(Feedtask(name = "runSomeMethodName"))
-        val feedtask = feedtaskRepository.findByName("runSomeMethodName")
+        val feedtask = feedtaskRepository.findByName("runSomeMethodName").get()
         assertEquals("runSomeMethodName", feedtask.name)
         assertNotNull(feedtask.lastrun)
+        assertNotNull(feedtaskRepository.update(Feedtask(name="runSomeMethodName")))
     }
 
 }

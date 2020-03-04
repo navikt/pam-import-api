@@ -11,13 +11,13 @@ import java.util.*
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ANSI)
-abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdAdminStatus, Long> {
+abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
 
-    val insertSQL = """INSERT INTO "ad_admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") VALUES(?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ad_admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") VALUES(?,?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
-    override fun <S : AdAdminStatus> save(entity: S): S {
+    override fun <S : AdminStatus> save(entity: S): S {
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
@@ -37,7 +37,7 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     }
 
 
-    private fun PreparedStatement.prepareSQL(entity: AdAdminStatus) {
+    private fun PreparedStatement.prepareSQL(entity: AdminStatus) {
         setObject(1, entity.uuid)
         setString(2, entity.status.name)
         setString(3, entity.message)
@@ -56,14 +56,17 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     }
 
     @Transactional
-    override fun <S : AdAdminStatus> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : AdminStatus> saveAll(entities: Iterable<S>): Iterable<S> {
         return entities.map { save(it) }.toList()
     }
 
     @Transactional
-    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdAdminStatus>
+    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdminStatus>
 
     @Transactional
-    abstract fun findByVersionId(versionId: Long): List<AdAdminStatus>
+    abstract fun findByVersionId(versionId: Long): List<AdminStatus>
+
+    @Transactional
+    abstract fun findByUuid(uuid:UUID): Optional<AdminStatus>
 
 }
