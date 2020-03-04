@@ -6,15 +6,15 @@ import io.micronaut.http.annotation.PathVariable
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 
 @Controller("/api/v1/adstatus")
-class AdAdminStatusController(private val adAdminStatusService: AdAdminStatusService) {
+class AdminStatusController(private val adminStatusService: AdminStatusService) {
 
     @Get("/{providerId}/{reference}")
     fun adAdminStatus(@PathVariable providerId:Long , @PathVariable reference: String): AdAdminStatusDTO {
-        return adAdminStatusService.findByProviderReference(providerId, reference)
+        return adminStatusService.findByProviderReference(providerId, reference)
     }
 
     @Get("/versions/{versionId}")
     fun adAdminStatusByVersion(@PathVariable versionId: Long): List<AdAdminStatusDTO> {
-        return adAdminStatusService.findByVersion(versionId)
+        return adminStatusService.findByVersion(versionId)
     }
 }

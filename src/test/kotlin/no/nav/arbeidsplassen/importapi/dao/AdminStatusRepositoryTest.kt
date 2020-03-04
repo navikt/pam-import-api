@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.dao
 
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdAdminStatus
-import no.nav.arbeidsplassen.importapi.adadminstatus.AdAdminStatusRepository
+import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 @MicronautTest
-class AdAdminStatusRepositoryTest(private val adAdminStatusRepository: AdAdminStatusRepository,
-                                  private val providerRepository: ProviderRepository,
-                                  private val transferLogRepository: TransferLogRepository) {
+class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRepository,
+                                private val providerRepository: ProviderRepository,
+                                private val transferLogRepository: TransferLogRepository) {
 
     @Test
     fun adAdminStatusCRUDTest() {
@@ -22,24 +22,24 @@ class AdAdminStatusRepositoryTest(private val adAdminStatusRepository: AdAdminSt
         val transferInDb = transferLogRepository.save(transferLog)
         val adminStatus = AdAdminStatus(message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
                 versionId = transferInDb.id!!)
-        val created = adAdminStatusRepository.save(adminStatus)
+        val created = adminStatusRepository.save(adminStatus)
         assertNotNull(created.id)
-        val read = adAdminStatusRepository.findById(created.id!!).get()
+        val read = adminStatusRepository.findById(created.id!!).get()
         assertNotNull(read)
         assertEquals("12345", read.reference)
         val update = read.copy(message = null, status = Status.ACTIVE)
-        val updated = adAdminStatusRepository.save(update)
+        val updated = adminStatusRepository.save(update)
         assertEquals(created.id!!, updated.id!!)
         assertNull(updated.message)
         assertEquals(Status.ACTIVE, updated.status)
         println(updated)
-        adAdminStatusRepository.deleteById(updated.id!!)
-        val deleted = adAdminStatusRepository.findById(created.id!!)
+        adminStatusRepository.deleteById(updated.id!!)
+        val deleted = adminStatusRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
         val adminStatus2 = AdAdminStatus(message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
                 versionId = transferInDb.id!!)
         val adminStatuses = listOf(adminStatus, adminStatus2)
-        adAdminStatusRepository.saveAll(adminStatuses)
-        assertEquals(2, adAdminStatusRepository.findAll().count())
+        adminStatusRepository.saveAll(adminStatuses)
+        assertEquals(2, adminStatusRepository.findAll().count())
     }
 }

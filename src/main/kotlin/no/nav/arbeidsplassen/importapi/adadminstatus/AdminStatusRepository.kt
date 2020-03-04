@@ -11,7 +11,7 @@ import java.util.*
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ANSI)
-abstract class AdAdminStatusRepository(private val connection: Connection): CrudRepository<AdAdminStatus, Long> {
+abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdAdminStatus, Long> {
 
     val insertSQL = """INSERT INTO "ad_admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") VALUES(?,?,?,?,?,?,?)"""
     val updateSQL = """UPDATE "ad_admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=? WHERE "id"=?"""

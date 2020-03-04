@@ -6,10 +6,10 @@ import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import javax.inject.Singleton
 
 @Singleton
-class AdAdminStatusService(private val adAdminStatusRepository: AdAdminStatusRepository) {
+class AdminStatusService(private val adminStatusRepository: AdminStatusRepository) {
 
     fun findByProviderReference(providerId: Long, reference: String): AdAdminStatusDTO {
-        return adAdminStatusRepository.findByProviderIdAndReference(providerId, reference)
+        return adminStatusRepository.findByProviderIdAndReference(providerId, reference)
                 .orElseThrow{
                     ImportApiError(message = "AdAdminStatus for $providerId, $reference not found", type = ErrorType.NOT_FOUND)
                 }
@@ -17,7 +17,7 @@ class AdAdminStatusService(private val adAdminStatusRepository: AdAdminStatusRep
     }
 
     fun findByVersion(versionId: Long): List<AdAdminStatusDTO> {
-        return adAdminStatusRepository.findByVersionId(versionId).map {
+        return adminStatusRepository.findByVersionId(versionId).map {
             it.toDTO()
         }
     }
