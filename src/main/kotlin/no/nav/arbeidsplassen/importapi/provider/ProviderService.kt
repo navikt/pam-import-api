@@ -15,6 +15,7 @@ import javax.inject.Singleton
 class ProviderService(private val providerRepository: ProviderRepository) {
 
 
+    // the second parameter is used to cache invalidate, dont remove it.
     @CacheInvalidate(parameters = ["id"])
     fun save(dto: ProviderDTO, id: Long? = dto.id): ProviderDTO {
         return providerRepository.save(dto.toEntity()).toDTO()

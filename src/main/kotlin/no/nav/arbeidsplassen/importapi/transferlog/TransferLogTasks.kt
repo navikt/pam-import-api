@@ -43,8 +43,9 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     @Transactional
     fun mapTransferLog(it: TransferLog) {
         try {
-            LOG.info("mapping transfer ${it.id} from provider ${it.providerId}")
-            adStateRepository.saveAll(mapTransferLogs(it))
+            val adList = mapTransferLogs(it)
+            LOG.info("mapping transfer ${it.id}  for provider ${it.providerId} found ${adList.size} ads ")
+            adStateRepository.saveAll(adList)
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
         } catch (e: Exception) {
             LOG.error("Got exception while handling transfer log ${it.id}", e)
