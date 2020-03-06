@@ -23,7 +23,7 @@ class AdStateRepositoryTest(private val adStateRepository: AdStateRepository,
     fun adStateCrudTest() {
         val provider = providerRepository.newTestProvider()
         val ads = objectMapper.transferToAdList()
-        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
+        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
         val transferInDb = transferLogRepository.save(transferLog)
         val ad = ads[0]
         val adState = AdState(jsonPayload = objectMapper.writeValueAsString(ad), providerId = provider.id!!,

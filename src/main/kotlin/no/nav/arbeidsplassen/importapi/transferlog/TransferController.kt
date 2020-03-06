@@ -24,19 +24,18 @@ class TransferController(private val transferLogService: TransferLogService,
                          @Value("\${adsSize:100}") val adsSize: Int = 100) {
 
     @Post("/{providerId}")
-    fun postTransfer(@PathVariable providerId: Long, @Body upload: Single<List<AdDTO>>): Single<HttpResponse<TransferLogDTO>> {
-        return upload.map {
+    fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
             // TODO authorized provider access here
-            if (it.size>adsSize || it.size<1) {
+            if (ads.size>adsSize || ads.size<1) {
                 throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
             }
-            val content = objectMapper.writeValueAsString(it)
+            val content = objectMapper.writeValueAsString(ads)
             val md5 = content.toMD5Hex()
             val provider = providerService.findById(providerId)
-            val transferLogDTO = TransferLogDTO(provider=provider, payload = content, md5 = md5)
-            validateContent(providerId, md5, it)
-            HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply { this.payload = null })
-        }
+            val transferLogDTO = TransferLogDTO(provider=provider, payload = content, md5 = md5, items = ads.size)
+            validateContent(providerId, md5, ads)
+           return HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply { payload = null })
+
     }
 
     @Get("/{versionId}")
@@ -52,7 +51,7 @@ class TransferController(private val transferLogService: TransferLogService,
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
-        val transferLogDTO = TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5)
+        val transferLogDTO = TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5, items = 1)
         return Single.just(HttpResponse.ok(transferLogService.saveTransfer(transferLogDTO)))
     }
 

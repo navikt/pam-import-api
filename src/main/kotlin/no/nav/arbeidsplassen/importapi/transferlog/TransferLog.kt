@@ -10,6 +10,7 @@ data class TransferLog (
         var id: Long? = null,
         val providerId: Long,
         val md5: String,
+        val items: Int,
         val payload: String,
         @Enumerated(EnumType.STRING)
         val status: TransferLogStatus = TransferLogStatus.RECEIVED,

@@ -26,11 +26,11 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLogDTO.toEntity(): TransferLog {
-        return TransferLog(providerId = provider.id!! , md5 = md5, payload = payload!!)
+        return TransferLog(providerId = provider.id!! , md5 = md5, payload = payload!!, items = items)
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
         return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId) , message = message, status = status.name,
-                md5 = md5, created = created, updated = updated, payload = payload)
+                md5 = md5, created = created, updated = updated, payload = payload, items = items)
     }
 }

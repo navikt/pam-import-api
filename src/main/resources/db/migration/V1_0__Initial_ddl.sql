@@ -16,6 +16,7 @@ CREATE SEQUENCE transfer_log_id_seq;
 CREATE TABLE transfer_log (
     id BIGINT NOT NULL DEFAULT NEXTVAL('transfer_log_id_seq'),
     provider_id BIGINT NOT NULL REFERENCES provider(id),
+    items INTEGER NOT NULL,
     md5 VARCHAR(32) NOT NULL,
     payload TEXT NOT NULL,
     status VARCHAR(36) NOT NULL,

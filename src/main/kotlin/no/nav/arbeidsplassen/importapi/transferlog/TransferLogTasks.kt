@@ -54,7 +54,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
-        val ads = objectMapper.readValue<List<AdDTO>>(transferLog.payload, object: TypeReference<List<AdDTO>>(){})
+        val ads = objectMapper.readValue(transferLog.payload, object: TypeReference<List<AdDTO>>(){})
         return ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
 
     }

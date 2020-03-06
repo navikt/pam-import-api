@@ -19,7 +19,7 @@ class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRe
     @Test
     fun adAdminStatusCRUDTest() {
         val provider = providerRepository.newTestProvider()
-        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring")
+        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
         val transferInDb = transferLogRepository.save(transferLog)
         val adminStatus = AdminStatus(message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
                 versionId = transferInDb.id!!)

@@ -8,7 +8,7 @@ data class AdAdminStatusDTO(val uuid: UUID, val status: String, val message: Str
                             val providerId: Long, val created: LocalDateTime, val updated: LocalDateTime)
 
 data class TransferLogDTO(var versionId: Long? = null, val provider: ProviderDTO, val status: String = TransferLogStatus.RECEIVED.name,
-                          val message: String? = null, val md5: String, var payload: String?=null, val created: LocalDateTime = LocalDateTime.now(),
+                          val message: String? = null, val md5: String, val items: Int, var payload: String?=null, val created: LocalDateTime = LocalDateTime.now(),
                           val updated: LocalDateTime = LocalDateTime.now())
 
 data class AdStateDTO(val uuid: UUID, val provider: ProviderDTO, val reference: String, val versionId: Long, val ad: AdDTO,

@@ -14,8 +14,8 @@ import javax.transaction.Transactional
 @JdbcRepository(dialect = Dialect.ANSI)
 abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
 
-    val insertSQL = """INSERT INTO "transfer_log" ("provider_id", "md5", "payload", "status", "message", "created") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "transfer_log" SET "provider_id"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") VALUES (?,?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "transfer_log" SET "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=? WHERE "id"=?"""
 
     @Transactional
     override fun <S : TransferLog> save(entity: S): S {
@@ -52,16 +52,17 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
 
     private fun PreparedStatement.prepareSQL(entity: TransferLog) {
         setObject(1, entity.providerId)
-        setString(2, entity.md5)
-        setString(3, entity.payload)
-        setString(4, entity.status.name)
-        setString(5, entity.message)
-        setObject(6, entity.created)
+        setInt(2, entity.items)
+        setString(3, entity.md5)
+        setString(4, entity.payload)
+        setString(5, entity.status.name)
+        setString(6, entity.message)
+        setObject(7, entity.created)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(7, entity.id!!)
+            setLong(8, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }

@@ -18,3 +18,4 @@ class AdminStatusController(private val adminStatusService: AdminStatusService) 
         return adminStatusService.findByVersion(versionId)
     }
 }
+

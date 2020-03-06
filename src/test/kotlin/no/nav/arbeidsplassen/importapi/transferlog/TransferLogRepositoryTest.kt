@@ -25,7 +25,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
         val payload = objectMapper.transferJsonString()
         val md5hash = payload.toMD5Hex()
         println ("md5hash: $md5hash")
-        val transferLog = TransferLog(providerId = provider.id!!, md5 = md5hash, payload = payload)
+        val transferLog = TransferLog(providerId = provider.id!!, md5 = md5hash, payload = payload, items = 1)
         val create = transferLogRepository.save(transferLog)
         val read = transferLogRepository.findById(create.id!!).get()
         assertNotNull(read)
@@ -41,7 +41,7 @@ class TransferLogRepositoryTest(private val providerRepository: ProviderReposito
             ads.add(ad.copy(reference=i.toString()))
         }
         val payload2 = objectMapper.writeValueAsString(ads)
-        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = "md5hash", payload = payload2))
+        transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = "md5hash", payload = payload2, items = 100))
         val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED,Pageable.from(0,100, Sort.of(Sort.Order.asc("updated"))))
         assertNotNull(findByStatus)
     }
