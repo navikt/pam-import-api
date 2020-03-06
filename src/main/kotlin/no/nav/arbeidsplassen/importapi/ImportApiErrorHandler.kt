@@ -72,4 +72,4 @@ enum class ErrorType {
 
 class ImportApiError(message: String, val type: ErrorType) : Throwable(message)
 
-data class ErrorMessage (val message : String, val errorType: ErrorType, val errorRef: UUID)
+data class ErrorMessage (val message : String, val errorType: ErrorType, val errorRef: UUID = UUID.randomUUID())
