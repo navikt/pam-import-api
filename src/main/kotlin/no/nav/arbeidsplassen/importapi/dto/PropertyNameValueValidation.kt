@@ -15,7 +15,7 @@ class PropertyNameValueValidation {
     private val WORKDAY = "workday"
     private val WORKHOURS = "workhours"
     private val SECTOR = "sector"
-    private val propertiesToValidate = listOf<String>(EXTENT, ENGAGEMENTTYPE,JOBARRANGEMENT,
+    private val propertiesToValidate = listOf(EXTENT, ENGAGEMENTTYPE,JOBARRANGEMENT,
             WORKDAY, WORKHOURS, SECTOR)
 
     init {
@@ -25,19 +25,19 @@ class PropertyNameValueValidation {
         validValues[WORKDAY] = Arbeidsdager.values().flatMap { it.tekster().values }.toHashSet()
         validValues[WORKHOURS] = Arbeidstid.values().flatMap { it.tekster().values }.toHashSet()
         // does not exist in AnsettelseKodeVerk
-        validValues[SECTOR] = hashSetOf("Privat, Offentlig")
+        validValues[SECTOR] = hashSetOf("Privat", "Offentlig")
 
     }
 
     fun validateProperty(name:String, value: String) {
-        if (!validValues.get(name)!!.contains(value))
+        if (!validValues[name]!!.contains(value))
             throw ImportApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
     }
 
     fun checkOnlyValidValues(properties: HashMap<String, Any>) {
         propertiesToValidate.forEach {
-            if (properties.containsKey("extent"))
-                validateProperty("extent", properties["extent"] as String)
+            if (properties.containsKey(it))
+                validateProperty(it, properties[it] as String)
         }
     }
 
