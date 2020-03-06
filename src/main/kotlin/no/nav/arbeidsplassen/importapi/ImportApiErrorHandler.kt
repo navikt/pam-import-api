@@ -72,20 +72,4 @@ enum class ErrorType {
 
 class ImportApiError(message: String, val type: ErrorType) : Throwable(message)
 
-class ErrorMessage {
-    private val message : String
-    private val errorType: ErrorType
-    private val errorRef: UUID
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(ErrorMessage::class.java)
-    }
-
-    constructor(message: String, errorType: ErrorType, errorRef: UUID = UUID.randomUUID()) {
-        this.message = message
-        this.errorType = errorType
-        this.errorRef = errorRef
-        LOG.error("Got error $message $errorType $errorRef")
-    }
-
-}
+data class ErrorMessage (val message : String, val errorType: ErrorType, val errorRef: UUID)
