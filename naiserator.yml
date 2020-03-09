@@ -1,0 +1,35 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: pam-import-api
+  namespace: default
+  labels:
+    team: teampam
+spec:
+  image: {{ image }}:{{ tag }}
+  port: 9028
+  liveness:
+    path: /importapi/internal/isAlive
+    initialDelay: 20
+  readiness:
+    path: /importapi/internal/isReady
+    initialDelay: 20
+  replicas:
+    min: 1
+    max: 1
+  cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  vault:
+    enabled: true
+  webproxy: false
+  prometheus:
+    enabled: true
+    path: /prometheus
+  ingresses:
+    - {{ ingress }}
