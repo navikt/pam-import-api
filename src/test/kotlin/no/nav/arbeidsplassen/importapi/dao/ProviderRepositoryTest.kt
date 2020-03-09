@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 
 @MicronautTest
-class ProviderRepositoryTest(private val providerRepository: ProviderRepository){
+class clProviderRepositoryTest(private val providerRepository: ProviderRepository){
 
     @Test
     fun providerCRUDTest() {

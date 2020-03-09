@@ -17,7 +17,7 @@ import javax.inject.Inject
 class ProviderControllerTest {
 
     @Inject
-    @field:Client("/")
+    @field:Client("\${micronaut.server.context-path}")
     lateinit var client: RxHttpClient
 
     @Test

@@ -18,7 +18,7 @@ import javax.inject.Inject
 class TransferLogControllerTest(private val objectMapper: ObjectMapper) {
 
     @Inject
-    @field:Client("/")
+    @field:Client("\${micronaut.server.context-path}")
     lateinit var client: RxHttpClient
 
     @Test

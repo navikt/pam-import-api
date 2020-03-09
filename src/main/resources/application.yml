@@ -1,6 +1,9 @@
 micronaut:
   application:
     name: import-api
+  server:
+    port: 9028
+    context-path: /importapi
   http:
     client:
       read-timeout: 300s
