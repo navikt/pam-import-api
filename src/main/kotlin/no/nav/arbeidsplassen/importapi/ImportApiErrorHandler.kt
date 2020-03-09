@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.*
@@ -21,12 +22,14 @@ import javax.inject.Singleton;
 class ImportApiErrorHandler : ExceptionHandler<ImportApiError, HttpResponse<ErrorMessage>> {
 
     override fun handle(request: HttpRequest<*>, error: ImportApiError): HttpResponse<ErrorMessage> {
-        return when (error.type) {
+        val response =  when (error.type) {
             NOT_FOUND -> HttpResponse.notFound(createMessage(error))
             MISSING_PARAMETER, INVALID_VALUE, PARSE_ERROR -> HttpResponse.badRequest(createMessage(error))
             CONFLICT -> HttpResponseFactory.INSTANCE.status<ErrorMessage>(HttpStatus.CONFLICT).body(createMessage(error))
             UNKNOWN -> HttpResponse.serverError(createMessage(error))
         }
+        LOG.error(response.body().toString())
+        return response
     }
     private fun createMessage(error: ImportApiError) = ErrorMessage(message = error.message!!, errorType = error.type)
 }
@@ -36,10 +39,12 @@ class ImportApiErrorHandler : ExceptionHandler<ImportApiError, HttpResponse<Erro
 @Replaces(ConversionErrorHandler::class)
 class ConversionExceptionHandler : ExceptionHandler<ConversionErrorException, HttpResponse<ErrorMessage>> {
     override fun handle(request: HttpRequest<*>?, error: ConversionErrorException): HttpResponse<ErrorMessage> {
-        return when (error.cause) {
+        val response = when (error.cause) {
             is JsonProcessingException -> handleJsonProcessingException(error.cause as JsonProcessingException)
             else -> HttpResponse.serverError(ErrorMessage(error.message!!, UNKNOWN))
         }
+        LOG.error(response.body().toString())
+        return response
     }
 }
 
@@ -49,12 +54,14 @@ class ConversionExceptionHandler : ExceptionHandler<ConversionErrorException, Ht
 class ApiJsonErrorHandler : ExceptionHandler<JsonProcessingException, HttpResponse<ErrorMessage>> {
 
     override fun handle(request: HttpRequest<*>?, error: JsonProcessingException): HttpResponse<ErrorMessage> {
-        return handleJsonProcessingException(error)
+        val response = handleJsonProcessingException(error)
+        LOG.error(response.body().toString())
+        return response
     }
 
 }
 
-private fun handleJsonProcessingException(error: JsonProcessingException): MutableHttpResponse<ErrorMessage> {
+private fun handleJsonProcessingException(error: JsonProcessingException): HttpResponse<ErrorMessage> {
     return when (error) {
         is JsonParseException -> HttpResponse
                 .badRequest(ErrorMessage("Parse error: at ${error.location}", PARSE_ERROR))
@@ -70,6 +77,10 @@ enum class ErrorType {
     PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 }
 
+// Global error logger for errorhandler
+private val LOG = LoggerFactory.getLogger("HttpRequestErrorHandler")
+
 class ImportApiError(message: String, val type: ErrorType) : Throwable(message)
 
 data class ErrorMessage (val message : String, val errorType: ErrorType, val errorRef: UUID = UUID.randomUUID())
+
