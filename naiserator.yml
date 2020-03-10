@@ -9,10 +9,10 @@ spec:
   image: {{ image }}:{{ tag }}
   port: 9028
   liveness:
-    path: /importapi/internal/isAlive
+    path: /stillingsimport/internal/isAlive
     initialDelay: 20
   readiness:
-    path: /importapi/internal/isReady
+    path: /stillingsimport/internal/isReady
     initialDelay: 20
   replicas:
     min: 1

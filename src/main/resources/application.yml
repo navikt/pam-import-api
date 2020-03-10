@@ -3,7 +3,7 @@ micronaut:
     name: import-api
   server:
     port: 9028
-    context-path: /importapi
+    context-path: /stillingsimport
   http:
     client:
       read-timeout: 300s
