@@ -8,7 +8,8 @@ CREATE TABLE provider(
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
-    UNIQUE (identifier));
+    UNIQUE (identifier)
+);
 
 CREATE SEQUENCE transfer_log_id_seq;
 
@@ -55,9 +56,9 @@ CREATE TABLE admin_status(
     id NUMERIC(19,0) DEFAULT admin_status_seq.nextval NOT NULL,
     uuid VARCHAR(36) NOT NULL,
     provider_id NUMERIC(19,0) NOT NULL,
-    status VARCHAR(36),
+    status VARCHAR(36) NOT NULL,
     message VARCHAR(512),
-    reference VARCHAR(255),
+    reference VARCHAR(255) NOT NULL,
     version_id NUMERIC(19,0) NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

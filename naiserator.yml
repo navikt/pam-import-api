@@ -27,6 +27,11 @@ spec:
       memory: 256Mi
   vault:
     enabled: true
+    paths:
+      - kvPath: oracle/data/dev/creds/pamimportapi_q1-user
+        mountPath: /secrets/pamimportapi/oracle/credentials
+      - kvPath: oracle/data/dev/config/pamimportapi_q1
+        mountPath: /secrets/pamimportapi/oracle/config
   webproxy: false
   prometheus:
     enabled: true
