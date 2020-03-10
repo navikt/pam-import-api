@@ -13,21 +13,21 @@ import java.util.*
 import javax.transaction.Transactional
 
 
-@JdbcRepository(dialect = Dialect.ANSI)
+@JdbcRepository(dialect = Dialect.ORACLE)
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
-    val insertSQL = """INSERT INTO "provider" ("identifier", "email", "phone", "created") VALUES (?,?,?,?)"""
-    val updateSQL = """UPDATE "provider" SET "identifier"=?, "email"=?, "phone"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "PROVIDER" ("IDENTIFIER", "EMAIL", "PHONE", "CREATED") VALUES (?,?,?,?)"""
+    val updateSQL = """UPDATE "PROVIDER" SET "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=? WHERE "ID"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong("id")) as S
+                return entity.copy(id = generatedKeys.getLong(1)) as S
             }
         }
         else {

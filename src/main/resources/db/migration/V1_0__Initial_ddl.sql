@@ -1,30 +1,30 @@
 CREATE SEQUENCE provider_id_seq;
 
-CREATE TABLE provider (
-    id BIGINT NOT NULL DEFAULT NEXTVAL('provider_id_seq'),
+CREATE TABLE provider(
+    id NUMERIC(19,0) DEFAULT provider_id_seq.nextval NOT NULL,
     identifier VARCHAR(64) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(32) NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
-    UNIQUE KEY(identifier)
-);
+    UNIQUE (identifier));
 
 CREATE SEQUENCE transfer_log_id_seq;
 
 CREATE TABLE transfer_log (
-    id BIGINT NOT NULL DEFAULT NEXTVAL('transfer_log_id_seq'),
-    provider_id BIGINT NOT NULL REFERENCES provider(id),
+    id NUMERIC(19,0) DEFAULT transfer_log_id_seq.nextval NOT NULL,
+    provider_id NUMERIC(19,0) NOT NULL,
     items INTEGER NOT NULL,
     md5 VARCHAR(32) NOT NULL,
-    payload TEXT NOT NULL,
+    payload CLOB NOT NULL,
     status VARCHAR(36) NOT NULL,
     message VARCHAR(512),
-    created TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
-    UNIQUE KEY(provider_id,md5),
+    UNIQUE (provider_id,md5),
+    CONSTRAINT fk_provider_transfer_log FOREIGN KEY (provider_id) REFERENCES provider(id)
 );
 
 CREATE INDEX transfer_log_status_idx ON transfer_log(status);
@@ -32,17 +32,18 @@ CREATE INDEX transfer_log_status_idx ON transfer_log(status);
 CREATE SEQUENCE adstate_id_seq;
 
 CREATE TABLE ad_state(
-    id BIGINT NOT NULL DEFAULT NEXTVAL('adstate_id_seq'),
-    uuid UUID NOT NULL,
-    provider_id BIGINT NOT NULL REFERENCES provider(id),
+    id NUMERIC(19,0) DEFAULT adstate_id_seq.nextval NOT NULL,
+    uuid VARCHAR(36) NOT NULL,
+    provider_id NUMERIC(19,0) NOT NULL,
     reference VARCHAR(255) NOT NULL,
-    json_payload TEXT NOT NULL,
-    version_id BIGINT NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    json_payload CLOB NOT NULL,
+    version_id NUMERIC(19,0) NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
-    UNIQUE KEY(uuid),
-    UNIQUE KEY(provider_id,reference)
+    UNIQUE (uuid),
+    UNIQUE (provider_id,reference),
+    CONSTRAINT fk_provider_ad_state FOREIGN KEY (provider_id) REFERENCES provider(id)
 );
 
 CREATE INDEX ad_state_updated_idx ON ad_state(updated);
@@ -51,18 +52,19 @@ CREATE INDEX ad_state_version_id_idx ON ad_state(version_id);
 CREATE SEQUENCE admin_status_seq;
 
 CREATE TABLE admin_status(
-    id BIGINT NOT NULL DEFAULT NEXTVAL('admin_status_seq'),
-    uuid UUID NOT NULL,
-    provider_id BIGINT NOT NULL REFERENCES provider(id),
+    id NUMERIC(19,0) DEFAULT admin_status_seq.nextval NOT NULL,
+    uuid VARCHAR(36) NOT NULL,
+    provider_id NUMERIC(19,0) NOT NULL,
     status VARCHAR(36),
     message VARCHAR(512),
     reference VARCHAR(255),
-    version_id BIGINT NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    version_id NUMERIC(19,0) NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
-    UNIQUE KEY(uuid),
-    UNIQUE KEY(provider_id, reference)
+    UNIQUE (uuid),
+    UNIQUE (provider_id, reference),
+    CONSTRAINT fk_provider_admin_status FOREIGN KEY (provider_id) REFERENCES provider(id)
 );
 
 CREATE INDEX admin_status_version_id_idx ON admin_status(version_id);
@@ -77,6 +79,6 @@ CREATE TABLE shedlock(
 
 CREATE TABLE feedtask(
     name VARCHAR(64),
-    lastRun TIMESTAMP NOT NULL DEFAULT NOW(),
+    lastRun TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(name)
 );

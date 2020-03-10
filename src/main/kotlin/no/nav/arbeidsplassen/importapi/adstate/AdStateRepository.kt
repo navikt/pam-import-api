@@ -13,21 +13,21 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ANSI)
+@JdbcRepository(dialect = Dialect.ORACLE)
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
 
-    val insertSQL = """INSERT INTO "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ad_state" SET "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "AD_STATE" ("UUID", "REFERENCE", "PROVIDER_ID", "JSON_PAYLOAD", "VERSION_ID", "CREATED") VALUES (?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "AD_STATE" SET "UUID"=?,"REFERENCE"=?, "PROVIDER_ID"=?, "JSON_PAYLOAD"=?, "VERSION_ID"=?, "CREATED"=? WHERE "ID"=?"""
 
     @Transactional
     override fun <S : AdState> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong("id")) as S
+                return entity.copy(id = generatedKeys.getLong(1)) as S
             }
         }
         else {

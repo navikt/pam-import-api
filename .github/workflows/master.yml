@@ -18,22 +18,22 @@ jobs:
           echo docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api > .docker_image
           echo $(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
           docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
-      - name: push docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-          docker push $(cat .docker_image):$(cat .docker_tag)
-      - name: deploy to dev-sbs
-        uses: navikt/deployment-cli/action@0.4.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWAIT_SECONDS: 0
-        with:
-          cluster: dev-sbs
-          team: teampam
-          resources: naiserator.yml
-          vars: naiserator-dev.json
+#      - name: push docker image
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+#          docker push $(cat .docker_image):$(cat .docker_tag)
+#      - name: deploy to dev-sbs
+#        uses: navikt/deployment-cli/action@0.4.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          AWAIT_SECONDS: 0
+#        with:
+#          cluster: dev-sbs
+#          team: teampam
+#          resources: naiserator.yml
+#          vars: naiserator-dev.json
 #      - name: deploy to prod-sbs
 #        uses: navikt/deployment-cli/action@0.4.1
 #        env:

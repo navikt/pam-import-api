@@ -10,21 +10,21 @@ import java.sql.Statement
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ANSI)
+@JdbcRepository(dialect = Dialect.ORACLE)
 abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
 
-    val insertSQL = """INSERT INTO "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") VALUES(?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "admin_status" SET "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "ADMIN_STATUS" ("UUID", "STATUS", "MESSAGE", "REFERENCE", "PROVIDER_ID", "VERSION_ID", "CREATED") VALUES(?,?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "ADMIN_STATUS" SET "UUID"=?, "STATUS"=?, "MESSAGE"=?, "REFERENCE"=?, "PROVIDER_ID"=?, "VERSION_ID"=?, "CREATED"=? WHERE "ID"=?"""
 
     @Transactional
     override fun <S : AdminStatus> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
-                return entity.copy(id=generatedKeys.getLong("id")) as S
+                return entity.copy(id=generatedKeys.getLong(1)) as S
             }
         }
         else {

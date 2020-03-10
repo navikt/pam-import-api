@@ -31,23 +31,24 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
+    url: ${ORACLE_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=Oracle`}
+    driverClassName: ${ORACLE_DRIVER:org.h2.Driver}
+    username: ${ORACLE_DB_USER:sa}
+    password: ${ORACLE_DB_PASSWORD:''}
 flyway:
   datasources:
     default:
       locations: classpath:db/migration
+      clean-on-validation-error: true
 transferlog:
   size: 50
   delete:
     months: 6
   scheduler:
-    enabled: true
+    enabled: false
 adminstatussync:
   scheduler:
-    enabled: true
+    enabled: false
   feedurl: "http://localhost:9001/api/v1/ads"
   pagesize: 200
 shedlock:

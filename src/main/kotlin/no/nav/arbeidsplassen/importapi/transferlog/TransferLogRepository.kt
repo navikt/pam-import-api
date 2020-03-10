@@ -11,21 +11,21 @@ import java.sql.Statement
 import java.time.LocalDateTime
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ANSI)
+@JdbcRepository(dialect = Dialect.ORACLE)
 abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
 
-    val insertSQL = """INSERT INTO "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") VALUES (?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "transfer_log" SET "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=? WHERE "id"=?"""
+    val insertSQL = """INSERT INTO "TRANSFER_LOG" ("PROVIDER_ID", "ITEMS", "MD5", "PAYLOAD", "STATUS", "MESSAGE", "CREATED") VALUES (?,?,?,?,?,?,?)"""
+    val updateSQL = """UPDATE "TRANSFER_LOG" SET "PROVIDER_ID"=?, "ITEMS"=?, "MD5"=?, "PAYLOAD"=?, "STATUS"=?, "MESSAGE"=?, "CREATED"=? WHERE "ID"=?"""
 
     @Transactional
     override fun <S : TransferLog> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
                 @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong("id")) as S
+                return entity.copy(id = generatedKeys.getLong(1)) as S
             }
         }
         else {

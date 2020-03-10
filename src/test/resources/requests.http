@@ -10,16 +10,29 @@ Content-Type: application/json
   "email": "webcruiter@webcruiter.no",
   "phone": "12345678"
 }
+###
+
+PUT http://localhost:9028/importapi/internal/providers/4
+Accept: application/json
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+"identifier": "webcruiter",
+"email": "webcruiter@webcruiter.no",
+"phone": "12345678"
+}
+
 
 ### GET provider
-GET http://localhost:9028/importapi/internal/providers/1
+GET http://localhost:9028/importapi/internal/providers/4
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 
 ### Upload 2 ads for provider
 
-POST http://localhost:9028/importapi/api/v1/transfers/1
+POST http://localhost:9028/importapi/api/v1/transfers/4
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -28,7 +41,7 @@ Content-Type: application/json
 
 ### Get transfer info
 
-GET http://localhost:9028/importapi/api/v1/transfers/1
+GET http://localhost:9028/importapi/api/v1/transfers/2
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
