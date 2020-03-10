@@ -1,6 +1,6 @@
 
 ### Create provider
-POST http://localhost:9028/importapi/internal/providers
+POST http://localhost:9028/stillingsimport/internal/providers
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 ###
 
-PUT http://localhost:9028/importapi/internal/providers/4
+PUT http://localhost:9028/stillingsimport/internal/providers/4
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -25,14 +25,14 @@ Content-Type: application/json
 
 
 ### GET provider
-GET http://localhost:9028/importapi/internal/providers/4
+GET http://localhost:9028/stillingsimport/internal/providers/4
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 
 ### Upload 2 ads for provider
 
-POST http://localhost:9028/importapi/api/v1/transfers/4
+POST http://localhost:9028/stillingsimport/api/v1/transfers/1
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -41,28 +41,28 @@ Content-Type: application/json
 
 ### Get transfer info
 
-GET http://localhost:9028/importapi/api/v1/transfers/2
+GET http://localhost:9028/stillingsimport/api/v1/transfers/2
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 
 ### Get adstates
 
-GET http://localhost:9028/importapi/api/v1/adstates/versions/1
+GET http://localhost:9028/stillingsimport/api/v1/adstates/versions/1
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 
 ### Get adstates by updated time
 
-GET http://localhost:9028/importapi/api/v1/adstates/?updated=2020-02-27T08:34:50.000&page=0&size=1000&sort=updated,asc
+GET http://localhost:9028/stillingsimport/api/v1/adstates/?updated=2020-02-27T08:34:50.000&page=0&size=1000&sort=updated,asc
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 
 ###
 
-GET http://localhost:9028/importapi/api/v1/adminstatus/versions/1
+GET http://localhost:9028/stillingsimport/api/v1/adminstatus/versions/1
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

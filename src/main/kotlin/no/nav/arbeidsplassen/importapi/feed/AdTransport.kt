@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 
-data class AdTransport(val id: Long, val uuid: UUID, val createdBy: String, val updatedBy: String, val created: LocalDateTime,
+data class AdTransport(val id: Long, val uuid: String, val createdBy: String, val updatedBy: String, val created: LocalDateTime,
                        val updated: LocalDateTime, val contactList: List<Contact> = listOf(), val mediaList: List<Media> = listOf(),
                        val locationList: List<Location> = listOf(), val properties: Map<String, String> = hashMapOf(),
                        val title: String, val status: String, val privacy: String, val source: String,

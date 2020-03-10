@@ -23,7 +23,7 @@ class AdStateService(private val adStateRepository: AdStateRepository,
         }
     }
 
-    fun getAdStateByUuid(uuid: UUID):
+    fun getAdStateByUuid(uuid: String):
             AdStateDTO = adStateRepository.findByUuid(uuid)
             .orElseThrow{ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)}
             .toDTO()

@@ -9,7 +9,7 @@ data class AdminStatus(
         @Id
         @GeneratedValue
         var id: Long? = null,
-        val uuid: UUID = UUID.randomUUID(),
+        val uuid: String,
         @Enumerated(EnumType.STRING)
         val status: Status = Status.RECEIVED,
         val message: String? = null,

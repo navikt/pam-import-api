@@ -38,7 +38,7 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
 
 
     private fun PreparedStatement.prepareSQL(entity: AdminStatus) {
-        setObject(1, entity.uuid)
+        setString(1, entity.uuid)
         setString(2, entity.status.name)
         setString(3, entity.message)
         setString(4, entity.reference)
@@ -67,6 +67,6 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     abstract fun findByVersionId(versionId: Long): List<AdminStatus>
 
     @Transactional
-    abstract fun findByUuid(uuid:UUID): Optional<AdminStatus>
+    abstract fun findByUuid(uuid:String): Optional<AdminStatus>
 
 }

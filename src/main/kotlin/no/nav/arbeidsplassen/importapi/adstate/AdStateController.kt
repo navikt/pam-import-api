@@ -18,7 +18,7 @@ class AdStateController(private val adStateService: AdStateService) {
             = adStateService.getAdStatesByProviderReference(providerId, reference)
 
     @Get("/{uuid}")
-    fun getAdStateByUuid(@PathVariable uuid: UUID): AdStateDTO
+    fun getAdStateByUuid(@PathVariable uuid: String): AdStateDTO
             = adStateService.getAdStateByUuid(uuid)
 
     @Get("/versions/{versionId}")

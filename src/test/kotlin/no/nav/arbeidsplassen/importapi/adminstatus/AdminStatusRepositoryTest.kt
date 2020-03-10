@@ -10,6 +10,7 @@ import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.*
 
 @MicronautTest
 class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRepository,
@@ -22,7 +23,7 @@ class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRe
         val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
         val transferInDb = transferLogRepository.save(transferLog)
         val adminStatus = AdminStatus(message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
-                versionId = transferInDb.id!!)
+                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString())
         val created = adminStatusRepository.save(adminStatus)
         assertNotNull(created.id)
         val read = adminStatusRepository.findById(created.id!!).get()
@@ -38,7 +39,7 @@ class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRe
         val deleted = adminStatusRepository.findById(created.id!!)
         assertTrue(deleted.isEmpty)
         val adminStatus2 = AdminStatus(message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
-                versionId = transferInDb.id!!)
+                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString())
         val adminStatuses = listOf(adminStatus, adminStatus2)
         adminStatusRepository.saveAll(adminStatuses)
         assertEquals(2, adminStatusRepository.findAll().count())

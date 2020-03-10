@@ -40,7 +40,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     }
 
     private fun PreparedStatement.prepareSQL(entity: AdState) {
-        setObject(1, entity.uuid)
+        setString(1, entity.uuid)
         setString(2, entity.reference)
         setLong(3, entity.providerId)
         setString(4, entity.jsonPayload)
@@ -71,7 +71,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<AdState>
 
     @Transactional
-    abstract fun findByUuid(uuid: UUID): Optional<AdState>
+    abstract fun findByUuid(uuid: String): Optional<AdState>
 
     @Transactional
     abstract fun list(versionId: Long, pageable: Pageable): Slice<AdState>
