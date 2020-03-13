@@ -1,14 +1,17 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.micronaut.core.convert.format.Format
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
-import io.micronaut.http.annotation.*
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.QueryValue
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
+import no.nav.arbeidsplassen.importapi.security.Roles
 import java.time.LocalDateTime
-import java.util.*
+import javax.annotation.security.RolesAllowed
 
-
+@RolesAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/adstates")
 class AdStateController(private val adStateService: AdStateService) {
 

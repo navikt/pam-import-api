@@ -5,16 +5,19 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.reactivex.Single
-import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
-import no.nav.arbeidsplassen.importapi.toMD5Hex
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.security.Roles
+import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import java.time.LocalDateTime
+import javax.annotation.security.RolesAllowed
 
-
+@RolesAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/transfers")
 class TransferController(private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
@@ -60,9 +63,9 @@ class TransferController(private val transferLogService: TransferLogService,
             throw ImportApiError("Content already exists", ErrorType.CONFLICT)
         }
         it.stream().forEach {
-            it.categoryList.stream().forEach {
-                styrkCodeConverter.lookup(it.code)
-                        .orElseThrow { ImportApiError("Category code ${it.code} is not found", ErrorType.INVALID_VALUE) }
+            it.categoryList.stream().forEach { cat ->
+                styrkCodeConverter.lookup(cat.code)
+                        .orElseThrow { ImportApiError("Category code ${cat.code} is not found", ErrorType.INVALID_VALUE) }
             }
         }
     }

@@ -6,8 +6,10 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
-import java.util.*
+import no.nav.arbeidsplassen.importapi.security.Roles
+import javax.annotation.security.RolesAllowed
 
+@RolesAllowed(value = [Roles.ROLE_ADMIN])
 @Controller("/internal/providers")
 class ProviderController(private val providerService: ProviderService) {
 

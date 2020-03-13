@@ -2,7 +2,9 @@ package no.nav.arbeidsplassen.importapi
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import javax.annotation.security.PermitAll
 
+@PermitAll
 @Controller("/internal")
 class StatusController {
 

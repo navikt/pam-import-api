@@ -63,7 +63,8 @@ dependencies {
 
     implementation "no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion"
     implementation "no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion"
-    runtimeOnly "com.oracle.ojdbc:ojdbc8:${oracledbVersion}"
+    runtimeOnly "com.oracle.ojdbc:ojdbc8:$oracledbVersion"
+    implementation "io.micronaut:micronaut-security-jwt"
 
 }
 

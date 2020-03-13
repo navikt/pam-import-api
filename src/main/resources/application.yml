@@ -20,6 +20,15 @@ micronaut:
   data:
     pageable:
       max-page-size: 1000
+  security:
+    enabled: true
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          secret:
+            generator:
+              secret: ${JWT_SECRET}
 endpoints:
   metrics:
     enabled: true
