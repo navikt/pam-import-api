@@ -32,6 +32,8 @@ spec:
         mountPath: /secrets/pamimportapi/oracle/credentials
       - kvPath: oracle/data/dev/config/pamimportapi_q1
         mountPath: /secrets/pamimportapi/oracle/config
+      - kvPath: kv/preprod/sbs/pam-import-api/default
+        mountPath: /var/run/secrets/nais.io/vault
   webproxy: false
   prometheus:
     enabled: true
