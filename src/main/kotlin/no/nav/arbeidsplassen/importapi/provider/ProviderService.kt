@@ -33,11 +33,11 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     }
 
     private fun ProviderDTO.toEntity(): Provider {
-        return Provider(id = id, email = email, identifier = identifier, phone = phone)
+        return Provider(id = id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
     }
 
     private fun Provider.toDTO(): ProviderDTO {
-        return ProviderDTO(id=id, email = email, identifier = identifier, phone = phone)
+        return ProviderDTO(id=id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
     }
 
 }

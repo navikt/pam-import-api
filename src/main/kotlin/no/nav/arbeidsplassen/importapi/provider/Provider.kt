@@ -11,6 +11,7 @@ data class Provider(
         @Id
         @GeneratedValue
         var id: Long? = null,
+        val jwtid: String = UUID.randomUUID().toString(),
         val identifier: String,
         val email: String,
         val phone: String,

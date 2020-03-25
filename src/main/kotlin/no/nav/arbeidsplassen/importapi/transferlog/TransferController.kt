@@ -11,6 +11,7 @@ import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.security.ProviderAllow
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
@@ -41,16 +42,16 @@ class TransferController(private val transferLogService: TransferLogService,
 
     }
 
-    @Get("/{versionId}")
-    fun getTransfer(@PathVariable versionId: Long): Single<HttpResponse<TransferLogDTO>> {
+    @Get("/{providerId}/versions/{versionId}")
+    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): Single<HttpResponse<TransferLogDTO>> {
         return Single.just(HttpResponse.ok(transferLogService.findByVersionId(versionId)))
     }
 
     @Delete("/{providerId}/{reference}")
     fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String): Single<HttpResponse<TransferLogDTO>> {
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
-        // set expire to now, so that this ad will be "deleted"
-        val ad = adState.ad.copy(expires = LocalDateTime.now().minusSeconds(1))
+        // set expire to now-5min, so that this ad will be "deleted"
+        val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(5))
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)

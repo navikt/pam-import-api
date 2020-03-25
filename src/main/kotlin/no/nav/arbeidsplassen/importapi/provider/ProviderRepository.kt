@@ -8,16 +8,14 @@ import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
-import java.sql.Statement
-import java.util.*
 import javax.transaction.Transactional
 
 
 @JdbcRepository(dialect = Dialect.ORACLE)
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
-    val insertSQL = """INSERT INTO "PROVIDER" ("IDENTIFIER", "EMAIL", "PHONE", "CREATED") VALUES (?,?,?,?)"""
-    val updateSQL = """UPDATE "PROVIDER" SET "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=? WHERE "ID"=?"""
+    val insertSQL = """INSERT INTO "PROVIDER" ("JWTID", "IDENTIFIER", "EMAIL", "PHONE", "CREATED") VALUES (?,?,?,?,?)"""
+    val updateSQL = """UPDATE "PROVIDER" SET "JWTID"=?, "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=? WHERE "ID"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {
@@ -48,15 +46,16 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     abstract fun list(pageable: Pageable): Slice<Provider>
 
     private fun PreparedStatement.prepareSQL(entity: Provider) {
-        setString(1, entity.identifier)
-        setString(2, entity.email)
-        setString(3, entity.phone)
-        setObject(4, entity.created)
+        setString(1, entity.jwtid)
+        setString(2, entity.identifier)
+        setString(3, entity.email)
+        setString(4, entity.phone)
+        setObject(5, entity.created)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(5, entity.id!!)
+            setLong(6, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
 
         }

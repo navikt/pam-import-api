@@ -36,6 +36,7 @@ POST http://localhost:9028/stillingsimport/api/v1/transfers/1
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
+Authorization: Bearer <token here>
 
 < transfer-ads.json
 

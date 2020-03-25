@@ -16,4 +16,11 @@ class SecretKeyTest(private val jwtTest: JwtTest) {
         println(jwk)
     }
 
+    @Test
+    fun generateToken() {
+        val token = jwtTest.jwtToken(Roles.ROLE_ADMIN)
+        assertNotNull(token)
+        println(token)
+    }
+
 }
