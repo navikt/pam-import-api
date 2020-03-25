@@ -38,6 +38,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         val message = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, message.status)
         val provider = message.body()
+        println(provider)
         // start the transfer
         val post  = HttpRequest.POST("/api/v1/transfers/${provider?.id}", objectMapper.transferToAdList())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -45,7 +46,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
                 .bearerAuth(providertoken)
         val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, response.status)
-        val get = HttpRequest.GET<String>("/api/v1/transfers/${response.body()?.versionId}")
+        val get = HttpRequest.GET<String>("/api/v1/transfers/${provider?.id}/versions/${response.body()?.versionId}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(providertoken)

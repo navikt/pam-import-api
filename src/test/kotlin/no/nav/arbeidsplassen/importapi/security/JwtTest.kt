@@ -29,6 +29,7 @@ class JwtTest(private val secretConfig: SecretSignatureConfiguration) {
                 .jwtID(UUID.randomUUID().toString())
                 .issuer("https://arbeidsplassen.nav.no")
                 .claim("roles",role)
+                .claim("provider", 1)
                 .build()
         val signedJWT = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimsSet)
         signedJWT.sign(signer)

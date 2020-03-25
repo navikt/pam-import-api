@@ -1,43 +1,67 @@
 package no.nav.arbeidsplassen.importapi.provider
-
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.MACSigner
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import io.reactivex.Single
+import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.Roles
+import java.util.*
 import javax.annotation.security.RolesAllowed
 
 @RolesAllowed(value = [Roles.ROLE_ADMIN])
 @Controller("/internal/providers")
-class ProviderController(private val providerService: ProviderService) {
+class ProviderController(private val providerService: ProviderService,
+                         private val secretSignatureConfiguration: SecretSignatureConfiguration) {
 
 
     @Get("/{id}")
-    fun getProvider(@PathVariable id: Long): Single<HttpResponse<ProviderDTO>> {
-        return Single.just(HttpResponse.ok(providerService.findById(id)))
+    fun getProvider(@PathVariable id: Long): HttpResponse<ProviderDTO> {
+        return HttpResponse.ok(providerService.findById(id))
     }
 
     @Get("/")
-    fun getProviders(pageable: Pageable): Single<HttpResponse<Slice<ProviderDTO>>> {
-        return Single.just(HttpResponse.ok(providerService.list(pageable)))
+    fun getProviders(pageable: Pageable): HttpResponse<Slice<ProviderDTO>> {
+        return HttpResponse.ok(providerService.list(pageable))
     }
 
     @Post("/")
-    fun createProvider(@Body provider: Single<ProviderDTO>): Single<HttpResponse<ProviderDTO>> {
-        return provider.map {
-            HttpResponse.created(providerService.save(it))
-        }
+    fun createProvider(@Body provider: ProviderDTO): HttpResponse<ProviderDTO> {
+        return HttpResponse.created(providerService.save(provider))
     }
 
     @Put("/{id}")
-    fun putProvider(@Body provider: Single<ProviderDTO>, @PathVariable id:Long): Single<HttpResponse<ProviderDTO>> {
-        return provider.map {
-            val updated = providerService.findById(id).copy(
-                    email=it.email, identifier = it.identifier, phone = it.phone)
-            HttpResponse.ok(providerService.save(updated))
-        }
+    fun updateProvider(@Body provider: ProviderDTO, @PathVariable id:Long):HttpResponse<ProviderDTO> {
+        val updated = providerService.findById(id).copy(
+                    email=provider.email, identifier = provider.identifier, phone = provider.phone)
+        return HttpResponse.ok(providerService.save(updated))
+    }
+
+    // NOTE set resetKey to true only if you want to disable all previous key.
+    @Put("/{id}/token")
+    fun generateNewTokeForProvider(@PathVariable id: Long, @QueryValue resetKey: Boolean = false): HttpResponse<String> {
+        val provider = if (resetKey) providerService.save(providerService.findById(id).copy(jwtid = UUID.randomUUID().toString()))
+                        else providerService.findById(id)
+        return HttpResponse.ok(token(provider))
+    }
+
+    private fun token(provider: ProviderDTO): String {
+        val signer = MACSigner(secretSignatureConfiguration.secret)
+        val claimsSet = JWTClaimsSet.Builder()
+                .subject(provider.email)
+                .jwtID(provider.jwtid)
+                .issuer("https://arbeidsplassen.nav.no")
+                .claim("roles", Roles.ROLE_PROVIDER)
+                .claim("provider", provider.id)
+                .build()
+        val signedJWT = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimsSet)
+        signedJWT.sign(signer)
+        return signedJWT.serialize()
     }
 
 

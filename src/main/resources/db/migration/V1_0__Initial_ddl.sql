@@ -2,12 +2,14 @@ CREATE SEQUENCE provider_id_seq;
 
 CREATE TABLE provider(
     id NUMERIC(19,0) DEFAULT provider_id_seq.nextval NOT NULL,
+    jwtid VARCHAR(36) NOT NULL,
     identifier VARCHAR(64) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(32) NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY(id),
+    UNIQUE (jwtid),
     UNIQUE (identifier)
 );
 
