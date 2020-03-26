@@ -28,7 +28,7 @@ micronaut:
         signatures:
           secret:
             generator:
-              secret: ${JWT_SECRET}
+              secret: ${JWT_SECRET:Thisisaverylongsecretandcanonlybeusedintest}
 endpoints:
   metrics:
     enabled: true

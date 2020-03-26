@@ -22,10 +22,10 @@ class JwtTest(private val secretConfig: SecretSignatureConfiguration) {
                 .build()
     }
 
-    fun jwtToken(role: String = Roles.ROLE_PROVIDER): String {
+    fun jwtToken(role: String = Roles.ROLE_PROVIDER, sub: String = "user@arbeidsplassen.nav.no"): String {
         val signer = MACSigner(secretConfig.secret)
         val claimsSet = JWTClaimsSet.Builder()
-                .subject("test@test.no")
+                .subject(sub)
                 .jwtID(UUID.randomUUID().toString())
                 .issuer("https://arbeidsplassen.nav.no")
                 .claim("roles",role)

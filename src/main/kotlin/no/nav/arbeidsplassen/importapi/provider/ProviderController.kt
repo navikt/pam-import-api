@@ -11,6 +11,7 @@ import io.micronaut.http.annotation.*
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.Roles
+import org.slf4j.LoggerFactory
 import java.util.*
 import javax.annotation.security.RolesAllowed
 
@@ -18,7 +19,9 @@ import javax.annotation.security.RolesAllowed
 @Controller("/internal/providers")
 class ProviderController(private val providerService: ProviderService,
                          private val secretSignatureConfiguration: SecretSignatureConfiguration) {
-
+    companion object {
+        private val LOG = LoggerFactory.getLogger(ProviderController::class.java)
+    }
 
     @Get("/{id}")
     fun getProvider(@PathVariable id: Long): HttpResponse<ProviderDTO> {
@@ -44,7 +47,8 @@ class ProviderController(private val providerService: ProviderService,
 
     // NOTE set resetKey to true only if you want to disable all previous key.
     @Put("/{id}/token")
-    fun generateNewTokeForProvider(@PathVariable id: Long, @QueryValue resetKey: Boolean = false): HttpResponse<String> {
+    fun generateNewTokeForProvider(@PathVariable id: Long, @QueryValue(defaultValue = "false") resetKey: Boolean): HttpResponse<String> {
+        LOG.info("Token generated for provider $id reset key $resetKey")
         val provider = if (resetKey) providerService.save(providerService.findById(id).copy(jwtid = UUID.randomUUID().toString()))
                         else providerService.findById(id)
         return HttpResponse.ok(token(provider))
