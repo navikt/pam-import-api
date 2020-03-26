@@ -28,6 +28,10 @@ class AdStateService(private val adStateRepository: AdStateRepository,
             .orElseThrow{ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)}
             .toDTO()
 
+    fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long):
+            AdStateDTO = adStateRepository.findByUuidAndProviderId(uuid, providerId)
+            .orElseThrow{ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)}.toDTO()
+
     fun getAdStatesByProviderReference(providerId:Long, reference:String): AdStateDTO =
         adStateRepository.findByProviderIdAndReference(providerId, reference)
                 .orElseThrow { ImportApiError("AdState with $providerId $reference not found", ErrorType.NOT_FOUND) }
@@ -41,6 +45,12 @@ class AdStateService(private val adStateRepository: AdStateRepository,
 
     fun getAdStatesByVersionId(versionId: Long, pageable: Pageable): Slice<AdStateDTO> {
         return adStateRepository.list(versionId, pageable).map{
+            it.toDTO()
+        }
+    }
+
+    fun getAdStatesByVersionIdAndProviderId(versionId: Long, providerId: Long, pageable: Pageable): Slice<AdStateDTO> {
+        return adStateRepository.list(versionId, providerId, pageable).map{
             it.toDTO()
         }
     }

@@ -9,6 +9,7 @@ import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.JwtTest
 import no.nav.arbeidsplassen.importapi.security.Roles
+import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @MicronautTest
 @Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
-class ProviderControllerTest(private val jwtTest: JwtTest) {
+class ProviderControllerTest(private val tokenService: TokenService) {
 
     @Inject
     @field:Client("\${micronaut.server.context-path}")
@@ -25,7 +26,7 @@ class ProviderControllerTest(private val jwtTest: JwtTest) {
     @Test
     fun `create read update provider`() {
         // create provider
-        val adminToken = jwtTest.jwtToken(Roles.ROLE_ADMIN)
+        val adminToken = tokenService.adminToken()
         val create = POST("/internal/providers",
                 ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678"))
                 .contentType(MediaType.APPLICATION_JSON)

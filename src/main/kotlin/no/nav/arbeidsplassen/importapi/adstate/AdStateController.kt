@@ -7,31 +7,25 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
+import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import java.time.LocalDateTime
 import javax.annotation.security.RolesAllowed
 
-@RolesAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
+@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/adstates")
 class AdStateController(private val adStateService: AdStateService) {
-
 
     @Get("/{providerId}/{reference}")
     fun getAdStateByProviderReference(@PathVariable providerId:Long, @PathVariable reference:String): AdStateDTO
             = adStateService.getAdStatesByProviderReference(providerId, reference)
 
-    @Get("/{uuid}")
-    fun getAdStateByUuid(@PathVariable uuid: String): AdStateDTO
-            = adStateService.getAdStateByUuid(uuid)
+    @Get("/{providerId}/uuid/{uuid}")
+    fun getAdStateByUuid(@PathVariable providerId: Long, @PathVariable uuid: String): AdStateDTO
+            = adStateService.getAdStateByUuidAndProviderId(uuid, providerId)
 
-    @Get("/versions/{versionId}")
-    fun getAdStatesByProvider(@PathVariable versionId: Long, pageable: Pageable): Slice<AdStateDTO> {
-        return adStateService.getAdStatesByVersionId(versionId, pageable)
+    @Get("/{providerId}/versions/{versionId}")
+    fun getAdStatesByProvider(@PathVariable providerId: Long, @PathVariable versionId: Long, pageable: Pageable): Slice<AdStateDTO> {
+        return adStateService.getAdStatesByVersionIdAndProviderId(versionId, providerId, pageable)
     }
-
-    @Get("/")
-    fun getAdStates(@QueryValue updated: String, pageable: Pageable): Slice<AdStateDTO> {
-        return adStateService.getAdStatesByUpdated(LocalDateTime.parse(updated), pageable)
-    }
-
 }

@@ -11,14 +11,14 @@ import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
-import no.nav.arbeidsplassen.importapi.security.ProviderAllow
+import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import java.time.LocalDateTime
 import javax.annotation.security.RolesAllowed
 
-@RolesAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
+@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/transfers")
 class TransferController(private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
@@ -29,22 +29,24 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Post("/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
-            // TODO authorized provider access here
-            if (ads.size>adsSize || ads.size<1) {
-                throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
-            }
-            val content = objectMapper.writeValueAsString(ads)
-            val md5 = content.toMD5Hex()
-            val provider = providerService.findById(providerId)
-            val transferLogDTO = TransferLogDTO(provider=provider, payload = content, md5 = md5, items = ads.size)
-            validateContent(providerId, md5, ads)
-           return HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply { payload = null })
+        // TODO authorized provider access here
+        if (ads.size > adsSize || ads.size < 1) {
+            throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
+        }
+        val content = objectMapper.writeValueAsString(ads)
+        val md5 = content.toMD5Hex()
+        val provider = providerService.findById(providerId)
+        val transferLogDTO = TransferLogDTO(provider = provider, payload = content, md5 = md5, items = ads.size)
+        validateContent(providerId, md5, ads)
+        return HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply {
+            payload = null
+        })
 
     }
 
     @Get("/{providerId}/versions/{versionId}")
     fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): Single<HttpResponse<TransferLogDTO>> {
-        return Single.just(HttpResponse.ok(transferLogService.findByVersionId(versionId)))
+        return Single.just(HttpResponse.ok(transferLogService.findByVersionIdAndProviderId(versionId, providerId)))
     }
 
     @Delete("/{providerId}/{reference}")

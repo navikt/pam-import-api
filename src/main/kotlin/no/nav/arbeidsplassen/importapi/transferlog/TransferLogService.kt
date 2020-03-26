@@ -19,8 +19,8 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 
-    fun findByVersionId(versionId:Long): TransferLogDTO {
-       return transferLogRepository.findById(versionId)
+    fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
+       return transferLogRepository.findByIdAndProviderId(versionId, providerId)
                .orElseThrow{ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)}
                .toDTO()
     }

@@ -9,6 +9,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
 import java.time.LocalDateTime
+import java.util.*
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.ORACLE)
@@ -39,6 +40,9 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
 
     @Transactional
     abstract fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
+
+    @Transactional
+    abstract fun findByIdAndProviderId(id: Long, providerId: Long): Optional<TransferLog>
 
     @Transactional
     abstract fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog>

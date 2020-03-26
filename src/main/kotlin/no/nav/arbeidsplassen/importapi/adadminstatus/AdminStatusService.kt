@@ -23,6 +23,12 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
         }
     }
 
+    fun findByVersionAndProviderId(versionId: Long, providerId: Long): List<AdAdminStatusDTO> {
+        return adminStatusRepository.findByVersionIdAndProviderId(versionId, providerId).map {
+            it.toDTO()
+        }
+    }
+
     private fun AdminStatus.toDTO(): AdAdminStatusDTO {
         return AdAdminStatusDTO(uuid = uuid, providerId = providerId, reference = reference, created = created,
                 updated = updated, status = status.name, message = message )

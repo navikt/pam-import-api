@@ -73,7 +73,14 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     @Transactional
     abstract fun findByUuid(uuid: String): Optional<AdState>
 
+
+    @Transactional
+    abstract fun findByUuidAndProviderId(uuid: String, providerId: Long): Optional<AdState>
+
     @Transactional
     abstract fun list(versionId: Long, pageable: Pageable): Slice<AdState>
+
+    @Transactional
+    abstract fun list(versionId: Long, providerId: Long, pageable: Pageable): Slice<AdState>
 
 }

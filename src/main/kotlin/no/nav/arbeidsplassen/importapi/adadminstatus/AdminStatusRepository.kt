@@ -67,6 +67,9 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     abstract fun findByVersionId(versionId: Long): List<AdminStatus>
 
     @Transactional
+    abstract fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus>
+
+    @Transactional
     abstract fun findByUuid(uuid:String): Optional<AdminStatus>
 
 }
