@@ -6,7 +6,7 @@ micronaut:
     context-path: /stillingsimport
   http:
     client:
-      read-timeout: 300s
+      read-timeout: 30s
   metrics:
     enabled: true
     sensitive: false

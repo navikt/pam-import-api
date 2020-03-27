@@ -27,6 +27,12 @@ class ProviderAllowRule(rolesFinder: RolesFinder,
     override fun check(request: HttpRequest<*>, routeMatch: RouteMatch<*>?, claims: MutableMap<String, Any>?): SecurityRuleResult {
         if (routeMatch is MethodBasedRouteMatch<*, *> && !claims.isNullOrEmpty()) {
             if (routeMatch.hasAnnotation(ProviderAllowed::class.java)) {
+                val values = routeMatch.getValue(ProviderAllowed::class.java, Array<String>::class.java).get().toMutableList()
+                val roles = getRoles(claims)
+                if (values.contains(Roles.ROLE_ADMIN) && roles.contains(Roles.ROLE_ADMIN)) {
+                    LOG.debug("Admin request allow")
+                    return SecurityRuleResult.ALLOWED
+                }
                 val providerId = routeMatch.variableValues["providerId"].toString().toLong()
                 if (providerId != claims["providerId"]) {
                     LOG.debug("Rejected because provider id does not match with claims")
@@ -37,11 +43,7 @@ class ProviderAllowRule(rolesFinder: RolesFinder,
                     LOG.debug("Rejected because jwt id does not match with claims")
                     return SecurityRuleResult.REJECTED
                 }
-                val optionalValue = routeMatch.getValue(ProviderAllowed::class.java, Array<String>::class.java)
-                if (optionalValue.isPresent) {
-                    val values =  optionalValue.get().toMutableList()
-                    return compareRoles(values, getRoles(claims))
-                }
+                return compareRoles(values, roles)
             }
         }
         return SecurityRuleResult.UNKNOWN
