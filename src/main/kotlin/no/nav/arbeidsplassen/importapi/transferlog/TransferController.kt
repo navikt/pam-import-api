@@ -45,12 +45,12 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     @Get("/{providerId}/versions/{versionId}")
-    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): Single<HttpResponse<TransferLogDTO>> {
-        return Single.just(HttpResponse.ok(transferLogService.findByVersionIdAndProviderId(versionId, providerId)))
+    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): HttpResponse<TransferLogDTO> {
+        return HttpResponse.ok(transferLogService.findByVersionIdAndProviderId(versionId, providerId))
     }
 
     @Delete("/{providerId}/{reference}")
-    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String): Single<HttpResponse<TransferLogDTO>> {
+    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String): HttpResponse<TransferLogDTO> {
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         // set expire to now-5min, so that this ad will be "deleted"
         val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(5))
@@ -58,7 +58,7 @@ class TransferController(private val transferLogService: TransferLogService,
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
         val transferLogDTO = TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5, items = 1)
-        return Single.just(HttpResponse.ok(transferLogService.saveTransfer(transferLogDTO)))
+        return HttpResponse.ok(transferLogService.saveTransfer(transferLogDTO))
     }
 
     private fun validateContent(providerId: Long, md5: String, it: List<AdDTO>) {
