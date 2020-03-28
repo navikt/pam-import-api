@@ -9,6 +9,7 @@ import no.nav.arbeidsplassen.importapi.ErrorType
 import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.AdStatus
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
@@ -36,8 +37,8 @@ class TransferController(private val transferLogService: TransferLogService,
         val content = objectMapper.writeValueAsString(ads)
         val md5 = content.toMD5Hex()
         val provider = providerService.findById(providerId)
-        val transferLogDTO = TransferLogDTO(provider = provider, payload = content, md5 = md5, items = ads.size)
         validateContent(providerId, md5, ads)
+        val transferLogDTO = TransferLogDTO(provider = provider, payload = content, md5 = md5, items = ads.size)
         return HttpResponse.created(transferLogService.saveTransfer(transferLogDTO).apply {
             payload = null
         })
@@ -50,10 +51,11 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     @Delete("/{providerId}/{reference}")
-    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String): HttpResponse<TransferLogDTO> {
+    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String,
+                                  @QueryValue(defaultValue = "false") delete: Boolean): HttpResponse<TransferLogDTO> {
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
-        // set expire to now-5min, so that this ad will be "deleted"
-        val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(5))
+        val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
+        val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
