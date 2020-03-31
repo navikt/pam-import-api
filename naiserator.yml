@@ -28,11 +28,11 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: oracle/data/dev/creds/pamimportapi_q1-user
+      - kvPath: {{ oracle-credentials }}
         mountPath: /secrets/pamimportapi/oracle/credentials
-      - kvPath: oracle/data/dev/config/pamimportapi_q1
+      - kvPath: {{ oracle-config }}
         mountPath: /secrets/pamimportapi/oracle/config
-      - kvPath: kv/preprod/sbs/pam-import-api/default
+      - kvPath: {{ pamimportapi-env }}
         mountPath: /var/run/secrets/nais.io/vault
   webproxy: false
   prometheus:
@@ -40,3 +40,4 @@ spec:
     path: /prometheus
   ingresses:
     - {{ ingress }}
+    - {{ ingress-tjenester }}
