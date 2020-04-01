@@ -27,6 +27,7 @@ Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3Qubm8iLCJwcm92aWRlcklkIjoxLCJyb2xlcyI6IlJPTEVfUFJPVklERVIiLCJpc3MiOiJodHRwczpcL1wvYXJiZWlkc3BsYXNzZW4ubmF2Lm5vIiwiaWF0IjoxNTg1NjYxMDE4LCJqdGkiOiJ0ZXN0LWtleS1pZC0xIn0.ijVWV3gb3JDgIOvYr1yrdC0p2oIA-5dNp_-yQoqGeHM
+
 < transfer-ads.json
 
 ### Upload 2 ads for provider using stream
