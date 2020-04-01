@@ -15,7 +15,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
             Boolean = transferLogRepository.existsByProviderIdAndMd5(providerId, md5)
 
-    fun saveTransfer(dto: TransferLogDTO): TransferLogDTO {
+    fun save(dto: TransferLogDTO): TransferLogDTO {
         return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 

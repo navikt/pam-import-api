@@ -22,5 +22,5 @@ data class TransferLog (
 fun TransferLog.isNew(): Boolean = id == null
 
 enum class TransferLogStatus {
-        RECEIVED, DONE, ERROR
+        RECEIVED, DONE, ERROR, SKIPPED
 }
