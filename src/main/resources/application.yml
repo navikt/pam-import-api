@@ -48,7 +48,7 @@ flyway:
   datasources:
     default:
       locations: classpath:db/migration
-      clean-on-validation-error: true
+      clean-on-validation-error: false
 transferlog:
   size: 50
   delete:
