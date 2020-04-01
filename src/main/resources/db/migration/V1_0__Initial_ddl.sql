@@ -1,4 +1,4 @@
-CREATE SEQUENCE provider_id_seq;
+CREATE SEQUENCE provider_id_seq START WITH 10000;
 
 CREATE TABLE provider(
     id NUMERIC(19,0) DEFAULT provider_id_seq.nextval NOT NULL,

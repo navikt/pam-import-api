@@ -14,7 +14,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhcmJlaWRzcGxhc3Nlb
 }
 
 ### New token for provider
-PUT http://localhost:9028/stillingsimport/internal/providers/1/token
+PUT http://localhost:9028/stillingsimport/internal/providers/10000/token
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -22,7 +22,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhcmJlaWRzcGxhc3Nlb
 
 ### Upload 2 ads for provider
 
-POST http://localhost:9028/stillingsimport/api/v1/transfers/1
+POST http://localhost:9028/stillingsimport/api/v1/transfers/10000
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -32,7 +32,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3Qubm8iLCJwcm92a
 
 ### Upload 2 ads for provider using stream
 
-POST http://localhost:9028/stillingsimport/api/v1/transfers/1
+POST http://localhost:9028/stillingsimport/api/v1/transfers/10000
 Accept: application/x-json-stream
 Cache-Control: no-cache
 Content-Type: application/x-json-stream
@@ -42,7 +42,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3Qubm8iLCJwcm92a
 
 ### Get transfer info
 
-GET http://localhost:9028/stillingsimport/api/v1/transfers/1/versions/1
+GET http://localhost:9028/stillingsimport/api/v1/transfers/10000/versions/1
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
