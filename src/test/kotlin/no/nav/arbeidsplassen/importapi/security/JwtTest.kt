@@ -11,12 +11,12 @@ import javax.crypto.KeyGenerator
 class JwtTest {
 
     @Test
-    fun generateJwk(): OctetSequenceKey {
+    fun generateJwk()  {
         val hmacKey = KeyGenerator.getInstance("HmacSha256").generateKey()
-        return OctetSequenceKey.Builder(hmacKey)
+        println(OctetSequenceKey.Builder(hmacKey)
                 .keyID(UUID.randomUUID().toString())
                 .algorithm(JWSAlgorithm.HS256)
-                .build()
+                .build().keyValue)
     }
 
 }

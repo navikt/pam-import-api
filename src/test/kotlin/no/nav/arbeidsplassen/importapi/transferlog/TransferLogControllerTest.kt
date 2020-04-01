@@ -158,7 +158,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         val response = strClient.jsonStream(post, TransferLogDTO::class.java)
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
-        assertEquals(future.get().status, TransferLogStatus.RECEIVED.name)
+        assertEquals(future.get().status, TransferLogStatus.RECEIVED)
     }
 
 

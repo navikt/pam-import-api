@@ -10,7 +10,7 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
 
 data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?, val location: LocationDTO)
 
-data class CategoryDTO(val code: String, val categoryType: CategoryType, val name: String?, val description: String?)
+data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String?, val description: String?)
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?)
 

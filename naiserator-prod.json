@@ -1,7 +1,7 @@
 {
   "ingress": "https://pam-import-api.nais.oera.no",
   "ingress-tjenester": "https://tjenester.nav.no/stillingsimport",
-  "oracle-credentials": "oracle/prod/creds/pamimportapi-user",
-  "oracle-config": "oracle/prod/config/pamimportapi",
+  "oracle-credentials": "oracle/data/prod/creds/pamimportapi-user",
+  "oracle-config": "oracle/data/prod/config/pamimportapi",
   "pamimportapi-env": "kv/prod/sbs/pam-import-api/default"
 }

@@ -30,7 +30,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId) , message = message, status = status.name,
+        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId) , message = message, status = status,
                 md5 = md5, created = created, updated = updated, payload = payload, items = items)
     }
 }

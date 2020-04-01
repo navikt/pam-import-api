@@ -48,7 +48,7 @@ flyway:
   datasources:
     default:
       locations: classpath:db/migration
-      clean-on-validation-error: true
+      clean-on-validation-error: false
 transferlog:
   size: 50
   delete:
@@ -58,7 +58,7 @@ transferlog:
 adminstatussync:
   scheduler:
     enabled: false
-  feedurl: "http://localhost:9001/api/v1/ads"
+  feedurl: ${PAM_AD_FEED_URL:http://localhost:9001/api/v1/ads}
   pagesize: 200
 shedlock:
   defaults:

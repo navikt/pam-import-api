@@ -44,7 +44,7 @@ class TransferController(private val transferLogService: TransferLogService,
         val md5 = content.toMD5Hex()
         val provider = providerService.findById(providerId)
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-             return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED.name, items = 1, provider = provider, md5 = md5))
+             return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, provider = provider, md5 = md5))
         }
         ads.stream().forEach { validate(it) }
 
@@ -64,7 +64,7 @@ class TransferController(private val transferLogService: TransferLogService,
             val content = objectMapper.writeValueAsString(it)
             val md5 = content.toMD5Hex()
             if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED.name, items = 1, provider = provider, md5 = md5)
+                TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, provider = provider, md5 = md5)
             }
             else {
                 validate(it)
