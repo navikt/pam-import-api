@@ -129,8 +129,7 @@ If the request was successful you will get a response with a receipt:
 ```
 
 #### JSON Structure
-
-Payloads are Json Objects which be structured as the followin diagram:
+The json structure overview:
 <img src="./json-example-01.svg">
 
 #### Properties
