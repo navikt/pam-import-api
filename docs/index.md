@@ -85,7 +85,6 @@ Authorization: Bearer <your secret key>
   "published": "2019-02-13T12:59:26",
   "expires": "2019-02-24T00:00:00",
   "employer": {
-    "id": 255533,
     "reference": "232151232",
     "businessName": "Sørumsand barnehage",
     "orgnr": "989012088",
@@ -128,16 +127,16 @@ If the request was successful you will get a response with a receipt:
 }
 ```
 
-#### JSON Structure
+### JSON Structure
 The json structure overview:
 <img src="./json-example-01.svg">
 
 #### Main properties
 The main properties are required
 
-|Name           | Type      | Required | Description                       | Value   |
+|Name           | Type      | Required | Description                       | Example   |
 |:------------- |:--------- |:-------- |:--------------------------------- |:------------    |
-| reference     | String    | Yes      | A unique identifier for the jobAd |140095810        |
+| reference     | String    | Yes      | A unique identifier for the jobAd | alfanumber eg. 140095810        |
 | positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
 | title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
 | adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags |Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
@@ -145,12 +144,42 @@ The main properties are required
 | published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
 | expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
 
+#### Employer
+Arbeidsplassen uses [Brønnøysundregistrene](https://brreg.no) 
+organization number to identify the employer (orgNr). If you are not able to send the orgNr, 
+you must at least specify employer name, and postLocation, we also recommended you to use the "reference" field as a 
+unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
+|businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
+|orgnr | Integer | Optional | BRREG. OrgNumber | 989012088
+|location | Object | Yes | Address of the employer | See location table|
+
+Location of Employer
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|address| String | Optional | Street address | Oslo gate 1|
+|postalCode| String | Yes | Postal Code | 0566 |
+|city | String | Optional | City | Oslo |
+|municipal | String | Optional | Municipal | Oslo |
+|county | String | Optional | County | Oslo |
+|country | String | Optional | Country, defaults to Norge | Norge |
+
+ 
 #### Contact List
-Contact informations of the job ad, can be specify in the contactList property.
+Contact informations can be specified in the contactList array property.
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
 
-|Name | Type | Required | Description | Value |
+|Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
+| name | String | Yes | Contact name | Tom Doe |
+| title | String | Optional | Job position title | Regionleder |
+| email | String | Optional | Contact email | tom.doe@somewhere.com |
+| phone | String | Optional | Phone number | +47 010 20 304 | 
+
 
 #### Batch upload
 
