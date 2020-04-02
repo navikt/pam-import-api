@@ -132,7 +132,15 @@ If the request was successful you will get a response with a receipt:
 The json structure overview:
 <img src="./json-example-01.svg">
 
-#### Properties
+#### JSON Properties
+
+
+|Name           | Type      | Required | Example value   |
+|:------------- |:--------- |:-------- |:--------------- |
+| reference     | String    | Yes      | 140095810       |
+| positions     | Integer   | Yes      | 1               |
+| title         | String    | Yes      | Ønsker du å lede en moderne og veletablert barnehage? |
+
 
 #### Batch upload
 
