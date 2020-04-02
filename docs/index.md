@@ -131,7 +131,7 @@ If the request was successful you will get a response with a receipt:
 #### JSON Structure
 
 Payloads are Json Objects which be structured as the followin diagram:
-![Ad Json Structure](./json-example-01.svg)<img src="./json-example-01.svg">
+![Ad Json Structure](./json-example-01.svg)
 
 #### Properties
 
