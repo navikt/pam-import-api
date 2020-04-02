@@ -20,4 +20,5 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter)
     fun getStyrkCategoryMap(): Single<MutableMap<String, Occupation>> {
         return Single.just(styrkCodeConverter.pyrkMap)
     }
+
 }

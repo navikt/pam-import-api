@@ -128,6 +128,7 @@ If the request was successful you will get a response with a receipt:
 ```
 
 ### JSON Structure
+
 The json structure overview:
 <img src="./json-example-01.svg">
 
@@ -168,7 +169,37 @@ Location of Employer
 |county | String | Optional | County | Oslo |
 |country | String | Optional | Country, defaults to Norge | Norge |
 
+#### Properties
+All properties are optional, however the more content the better the job ad will be. 
+Please specify as much as possible on the property fields below
  
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+| sourceurl | URL | Optional | Optional viewing the jobad on another page | eg https://url.to/123456 |
+| applicationdue | String | Optional | due date/time for job applications | 22.03.2020 |
+| applicationemail | String | Optional | applications can be send to this email | apply-here@job.com |  
+| applicationmail | String | Optional | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
+| applicationlabel | String | Optional | A tag for labelling applications | eg. referansenummer 312412 |
+| applicationurl | String | Optional | URL to an online application form | https://url.to.application/form |
+| employerdescription | HTML | Optional | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
+| employerhomepage | URL | Optional | URL to employer home page | https://url.to.homepage/ |
+| engagementtype | String | Optional | type of employee engagement contract | eg. Fast or Engasjement etc. |
+| extent | String | Optional | Full/Part time | Heltid |
+| occupation | String | Optional | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
+| salary | Integer | Optional | Salary | 800000 |
+| starttime | String | Optional | The start date or first day of work | eg. 24.05.2020 |
+| sector | String | Optional | Public of private sector | Offentlig or Privat |
+| location | String | Optional | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
+| jobtitle | String | Optional | title of position | eg. Kontorsjef |
+| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Javautvikler |
+| industry | String | Optional | what kind of industry category this job belongs to | eg. Bygg og anlegg |
+| workhours | String | Optional | what part of the day is work hours | eg. Dagtid |
+| workday | String | Optional | Day of work | eg. Ukedager |
+| facebookpage | String | Optional | facebook share URL | https://url.to.facebook/ |
+| twitteraddress | String | Optional | twitter share URL | https://url.to.twitter/ |
+| jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
+| jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
+
 #### Contact List
 Contact informations can be specified in the contactList array property.
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
