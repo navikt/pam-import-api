@@ -2,7 +2,7 @@
 
 ## Introduction
 With our job import API you will be able to upload and publish jobs to [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no). 
-Arbeidsplassen is a public job vacancy service provided by NAV, a place where you can search for available jobs in Norway. 
+Arbeidsplassen is a public job vacancy service provided by NAV, a place where you can search and apply for jobs in Norway. 
 This API is designed as a lightweight REST API supporting requests with JSON over HTTP.
 
 ## Registration
@@ -129,8 +129,10 @@ If the request was successful you will get a response with a receipt:
 
 ### JSON Structure
 
-The json structure overview:
+The data format is JSON, below is a diagram of the json structure:
 <img src="./json-example-01.svg">
+You can also download kotlin code for the DTOs 
+[here](https://github.com/navikt/pam-import-api/blob/master/src/main/kotlin/no/nav/arbeidsplassen/importapi/dto/TransferDTO.kt)
 
 #### Main properties
 The main properties are required
@@ -140,7 +142,7 @@ The main properties are required
 | reference     | String    | Yes      | A unique identifier for the jobAd | alfanumber eg. 140095810        |
 | positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
 | title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
-| adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags |Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
+| adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
 | privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER |
 | published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
 | expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
@@ -169,9 +171,25 @@ Location of Employer
 |county | String | Optional | County | Oslo |
 |country | String | Optional | Country, defaults to Norge | Norge |
 
-#### Properties
-All properties are optional, however the more content the better the job ad will be. 
-Please specify as much as possible on the property fields below
+#### Category
+Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
+from SSB. You can download STYRK-categories from [here](https://tjenester-q0.nav.no/stillingsimport/api/v1/occupations/styrk08). 
+It is possible to have more than two occupation categories for each ad. 
+Though we don't recommend multi category ads, because it is less user friendly. 
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|code | String | yes | the code of occupation | 234204 |
+| categoryType | ENUM | yes | type of occupation standard | STYRK08 |
+| name | String | optional | name of category | Barnehagelærer |
+
+If you don't support STYRK-occupations, 
+please specify occupations using the "occupation" property (see below).
+
+#### Optional Properties
+An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
+Some of these properties are indexed and so will make the ad easier to search for. 
+Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
@@ -200,8 +218,23 @@ Please specify as much as possible on the property fields below
 | jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
 
-#### Contact List
-Contact informations can be specified in the contactList array property.
+#### Work Address/Location
+
+Work location is the address/place of work. Ad must at least specify one work location, 
+so that it shows up in a location search.
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+| address | String | Optional | Street address | Magnus Sørlis veg. 1 |
+| postalCode | String | Optional | postal/zip code | 1920 |
+| county | String | Optional| County | Viken |
+| municipal | String | Optional | Municipal | Lillestrøm |
+| city | String | Optional | City | Sørumsand |
+| country | String | Optional | defaults to Norge | Norge |
+
+
+#### Contact information
+Contact information can be specified in the contactList array property.
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
 
 |Name | Type | Required | Description | Example |
@@ -212,7 +245,11 @@ It is possible to have many contacts, we recommended at least one contact for ea
 | phone | String | Optional | Phone number | +47 010 20 304 | 
 
 
-#### Batch upload
+#### Uploading using stream
+
+#### Uploading in batches
+You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
+We recommend you to upload in batches, You can group the ads in an array and send then in batches as follows:
 
 ### Receipt/Status
 
