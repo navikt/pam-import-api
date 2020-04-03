@@ -50,7 +50,8 @@ flyway:
       locations: classpath:db/migration
       clean-on-validation-error: false
 transferlog:
-  size: 50
+  batch-size: 500
+  task-size: 500
   delete:
     months: 6
   scheduler:

@@ -188,7 +188,7 @@ please specify occupations using the "occupation" property (see below).
 
 #### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
-Some of these properties are indexed and so will make the ad easier to search for. 
+Some of these properties are indexed and so it will make the ad easier to search for. 
 Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
@@ -234,7 +234,6 @@ so that it shows up in a location search.
 
 
 #### Contact information
-Contact information can be specified in the contactList array property.
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
 
 |Name | Type | Required | Description | Example |
@@ -428,8 +427,8 @@ content-type: application/x-json-stream
 
 ### Posting in batches
 You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
-We recommend you to upload in batches, You can group the ads in an array and send then in batches as follows:
-
+We recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
+may not go over 500 items.
 
 ```
 POST http://localhost:9028/stillingsimport/api/v1/transfers/{providerId}

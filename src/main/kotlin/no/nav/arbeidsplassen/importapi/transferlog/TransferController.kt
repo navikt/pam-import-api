@@ -28,7 +28,7 @@ class TransferController(private val transferLogService: TransferLogService,
                          private val adStateService: AdStateService,
                          private val objectMapper: ObjectMapper,
                          private val styrkCodeConverter: StyrkCodeConverter,
-                         @Value("\${adsSize:100}") val adsSize: Int = 100) {
+                         @Value("\${transferlog.batch-size:500}") val adsSize: Int) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferController::class.java)

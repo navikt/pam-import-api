@@ -20,7 +20,7 @@ import kotlin.streams.toList
 class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val adStateRepository: AdStateRepository,
                        private val objectMapper: ObjectMapper,
-                       @Value("\${transferlog.size:50}") private val logSize: Int,
+                       @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
     companion object {
