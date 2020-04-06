@@ -3,7 +3,7 @@
 ## Introduction
 With our job import API you will be able to upload and publish jobs to [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no). 
 Arbeidsplassen is a public job vacancy service provided by NAV, a place where you can search and apply for jobs in Norway. 
-This API is designed as a lightweight REST API supporting requests with JSON over HTTP.
+
 
 ## Registration
 Before you begin, you must register yourself as a job provider/partner. Please send your registration to this email with the 
@@ -29,7 +29,9 @@ Authorization: Bearer <your secret key>
 ```
 
 # REST API
+This API is designed as a lightweight REST API supporting HTTP requests with JSON.
 
+## Posting an ad
 To upload an ad, use HTTP POST as follow
 
 ```
@@ -188,7 +190,7 @@ please specify occupations using the "occupation" property (see below).
 
 ### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
-Some of these properties are indexed and so it will make the ad easier to search for. 
+Some of these properties are indexed and so will make the ad easier to search for. 
 Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
@@ -594,7 +596,7 @@ connection: keep-alive
 }
 ```
 
-# Ad Status 
+## Ad Status 
 In arbeidsplassen every ad is manually checked, if it doesn't follow NAVs guideline it will be rejected.
 You can check your ad if is is approved or rejected using this:
 
