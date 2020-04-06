@@ -1,0 +1,22 @@
+name: release-prod
+on:
+  release:
+    types:
+      - created
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: deploy to prod
+        run: echo "shall deploy to prod here"
+#      - name: deploy to prod-sbs
+#        uses: navikt/deployment-cli/action@0.4.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          AWAIT_SECONDS: 0
+#        with:
+#          cluster: prod-sbs
+#          team: teampam
+#          resources: naiserator.yml
+#          vars: naiserator-prod.json

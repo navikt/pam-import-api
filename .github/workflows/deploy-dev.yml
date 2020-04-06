@@ -19,6 +19,7 @@ jobs:
           echo $(./gradlew properties -q | grep "version:" | awk '{print $2}') > .version_tag
           echo $(cat .version_tag)-$(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
           cat .docker_tag
+          echo "::set-env name=DOCKER_TAG::$(cat .docker_tag)"
 #          docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
 #      - name: push docker image
 #        env:
@@ -36,11 +37,23 @@ jobs:
 #          team: teampam
 #          resources: naiserator.yml
 #          vars: naiserator-dev.json
-#      - name: create tag
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-#          git tag -f $(cat .docker_tag)
-#          git push -f --tags
-
+      - name: create tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git tag -f $(cat .docker_tag)
+          git push -f --tags
+      - name: draft release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.DOCKER_TAG }}
+          release_name: Release ${{ env.DOCKER_TAG }}
+          body: |
+              Changes in this Release
+              - First Change
+              - Second Change
+            draft: true
+            prerelease: false
