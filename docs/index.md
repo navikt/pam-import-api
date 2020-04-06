@@ -128,124 +128,6 @@ If the request was successful you will get a response with a receipt:
   "updated" : "2020-04-02T09:47:58.521843"
 }
 ```
-
-## JSON Structure
-
-The data format is JSON, below is a diagram of the json structure:
-<img src="./json-example-01.svg">
-You can also download kotlin code for the DTOs 
-[here](https://github.com/navikt/pam-import-api/blob/master/src/main/kotlin/no/nav/arbeidsplassen/importapi/dto/TransferDTO.kt)
-
-### Main properties
-The main properties are required
-
-|Name           | Type      | Required | Description                       | Example   |
-|:------------- |:--------- |:-------- |:--------------------------------- |:------------    |
-| reference     | String    | Yes      | A unique identifier for the jobAd | alfanumber eg. 140095810        |
-| positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
-| title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
-| adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
-| privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER |
-| published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
-| expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
-
-### Employer
-Arbeidsplassen uses [Brønnøysundregistrene](https://brreg.no) 
-organization number to identify the employer (orgNr). If you are not able to send the orgNr, 
-you must at least specify employer name, and postLocation, we also recommended you to use the "reference" field as a 
-unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
-
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
-|businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
-|orgnr | Integer | Optional | BRREG. OrgNumber | 989012088
-|location | Object | Yes | Address of the employer | See location table|
-
-Location of Employer
-
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|address| String | Optional | Street address | Oslo gate 1|
-|postalCode| String | Yes | Postal Code | 0566 |
-|city | String | Optional | City | Oslo |
-|municipal | String | Optional | Municipal | Oslo |
-|county | String | Optional | County | Oslo |
-|country | String | Optional | Country, defaults to Norge | Norge |
-
-### Category
-Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
-from SSB. You can download STYRK-categories from [here](https://tjenester-q0.nav.no/stillingsimport/api/v1/occupations/styrk08). 
-It is possible to have more than two occupation categories for each ad. 
-Though we don't recommend multi category ads, because it is less user friendly. 
-
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|code | String | yes | the code of occupation | 234204 |
-| categoryType | ENUM | yes | type of occupation standard | STYRK08 |
-| name | String | optional | name of category | Barnehagelærer |
-
-If you don't support STYRK-occupations, 
-please specify occupations using the "occupation" property (see below).
-
-### Optional Properties
-An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
-Some of these properties are indexed and so will make the ad easier to search for. 
-Please specify as much data as possible on the property fields below.
- 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| sourceurl | URL | Optional | Optional viewing the jobad on another page | eg https://url.to/123456 |
-| applicationdue | String | Optional | due date/time for job applications | 22.03.2020 |
-| applicationemail | String | Optional | applications can be send to this email | apply-here@job.com |  
-| applicationmail | String | Optional | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
-| applicationlabel | String | Optional | A tag for labelling applications | eg. referansenummer 312412 |
-| applicationurl | String | Optional | URL to an online application form | https://url.to.application/form |
-| employerdescription | HTML | Optional | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
-| employerhomepage | URL | Optional | URL to employer home page | https://url.to.homepage/ |
-| engagementtype | String | Optional | type of employee engagement contract | eg. Fast or Engasjement etc. |
-| extent | String | Optional | Full/Part time | Heltid |
-| occupation | String | Optional | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
-| salary | Integer | Optional | Salary | 800000 |
-| starttime | String | Optional | The start date or first day of work | eg. 24.05.2020 |
-| sector | String | Optional | Public of private sector | Offentlig or Privat |
-| location | String | Optional | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
-| jobtitle | String | Optional | title of position | eg. Kontorsjef |
-| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Javautvikler |
-| industry | String | Optional | what kind of industry category this job belongs to | eg. Bygg og anlegg |
-| workhours | String | Optional | what part of the day is work hours | eg. Dagtid |
-| workday | String | Optional | Day of work | eg. Ukedager |
-| facebookpage | String | Optional | facebook share URL | https://url.to.facebook/ |
-| twitteraddress | String | Optional | twitter share URL | https://url.to.twitter/ |
-| jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
-| jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
-
-### Work Address/Location
-
-Work location is the address/place of work. Ad must at least specify one work location, 
-so that it shows up in a location search.
-
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| address | String | Optional | Street address | Magnus Sørlis veg. 1 |
-| postalCode | String | Optional | postal/zip code | 1920 |
-| county | String | Optional| County | Viken |
-| municipal | String | Optional | Municipal | Lillestrøm |
-| city | String | Optional | City | Sørumsand |
-| country | String | Optional | defaults to Norge | Norge |
-
-
-### Contact information
-It is possible to have many contacts, we recommended at least one contact for each jobAd.
-
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| name | String | Yes | Contact name | Tom Doe |
-| title | String | Optional | Job position title | Regionleder |
-| email | String | Optional | Contact email | tom.doe@somewhere.com |
-| phone | String | Optional | Phone number | +47 010 20 304 | 
-
-
 ## Posting using stream
 Post ads in stream by using Content-Type: application/x-json-stream. Ads are separated by a newline "\n" for
 example:
@@ -433,7 +315,7 @@ We recommend you to upload in batches, You can group the ads in an array and sen
 may not go over 500 items.
 
 ```
-POST http://localhost:9028/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -596,22 +478,151 @@ connection: keep-alive
 }
 ```
 
+# JSON Structure
+
+The data format is JSON, below is a diagram of the json structure:
+<img src="./json-example-01.svg">
+You can also download kotlin code for the DTOs 
+[here](https://github.com/navikt/pam-import-api/blob/master/src/main/kotlin/no/nav/arbeidsplassen/importapi/dto/TransferDTO.kt)
+
+### Main properties
+The main properties are required
+
+|Name           | Type      | Required | Description                       | Example   |
+|:------------- |:--------- |:-------- |:--------------------------------- |:------------    |
+| reference     | String    | Yes      | A unique identifier for the jobAd | alfanumber eg. 140095810        |
+| positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
+| title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
+| adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
+| privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER |
+| published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
+| expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
+
+### Employer
+Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
+organization number to identify the employer (orgNr). This is the registered business (Virksomhet), also
+called for "underenhet" in Brønnøysundregistrene.  If you are not able to send the orgNr, 
+you must specify the employer/business name, and its postLocation. We also recommended you to use the **reference** 
+field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
+|businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
+|orgnr | Integer | Optional | BRREG. OrgNumber | 989012088
+|location | Object | Yes | Address of the employer | See location table|
+
+Location of Employer
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|address| String | Optional | Street address | Oslo gate 1|
+|postalCode| String | Yes | Postal Code | 0566 |
+|city | String | Optional | City | Oslo |
+|municipal | String | Optional | Municipal | Oslo |
+|county | String | Optional | County | Oslo |
+|country | String | Optional | Country, defaults to Norge | Norge |
+
+### Category
+Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
+from SSB. You can download STYRK-categories from [here](https://tjenester-q0.nav.no/stillingsimport/api/v1/occupations/styrk08). 
+It is possible to have more than two occupation categories for each ad. 
+Though we don't recommend multi category ads, because it is less user friendly. 
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+|code | String | yes | the code of occupation | 234204 |
+| categoryType | ENUM | yes | type of occupation standard | STYRK08 |
+| name | String | optional | name of category | Barnehagelærer |
+
+If you don't support STYRK-occupations, 
+please specify occupations using the "occupation" property (see below).
+
+### Optional Properties
+An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
+Some of these properties are indexed and so will make the ad easier to search for. 
+Please specify as much data as possible on the property fields below.
+ 
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+| sourceurl | URL | Optional | Optional viewing the jobad on another page | eg https://url.to/123456 |
+| applicationdue | String | Optional | due date/time for job applications | 22.03.2020 |
+| applicationemail | String | Optional | applications can be send to this email | apply-here@job.com |  
+| applicationmail | String | Optional | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
+| applicationlabel | String | Optional | A tag for labelling applications | eg. referansenummer 312412 |
+| applicationurl | String | Optional | URL to an online application form | https://url.to.application/form |
+| employerdescription | HTML | Optional | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
+| employerhomepage | URL | Optional | URL to employer home page | https://url.to.homepage/ |
+| engagementtype | String | Optional | type of employee engagement contract | eg. Fast or Engasjement etc. |
+| extent | String | Optional | Full/Part time | Heltid |
+| occupation | String | Optional | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
+| salary | Integer | Optional | Salary | 800000 |
+| starttime | String | Optional | The start date or first day of work | eg. 24.05.2020 |
+| sector | String | Optional | Public of private sector | Offentlig or Privat |
+| location | String | Optional | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
+| jobtitle | String | Optional | title of position | eg. Kontorsjef |
+| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Javautvikler |
+| industry | String | Optional | what kind of industry category this job belongs to | eg. Bygg og anlegg |
+| workhours | String | Optional | what part of the day is work hours | eg. Dagtid |
+| workday | String | Optional | Day of work | eg. Ukedager |
+| facebookpage | String | Optional | facebook share URL | https://url.to.facebook/ |
+| twitteraddress | String | Optional | twitter share URL | https://url.to.twitter/ |
+| jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
+| jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
+
+### Work Address/Location
+
+Work location is the address/place of work. Ad must at least specify one work location, 
+so that it shows up in a location search.
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+| address | String | Optional | Street address | Magnus Sørlis veg. 1 |
+| postalCode | String | Optional | postal/zip code | 1920 |
+| county | String | Optional| County | Viken |
+| municipal | String | Optional | Municipal | Lillestrøm |
+| city | String | Optional | City | Sørumsand |
+| country | String | Optional | defaults to Norge | Norge |
+
+
+### Contact information
+It is possible to have many contacts, we recommended at least one contact for each jobAd.
+
+|Name | Type | Required | Description | Example |
+|:----|:-----|:---------|:------------|:------|
+| name | String | Yes | Contact name | Tom Doe |
+| title | String | Optional | Job position title | Regionleder |
+| email | String | Optional | Contact email | tom.doe@somewhere.com |
+| phone | String | Optional | Phone number | +47 010 20 304 | 
+
 ## Ad Status 
 In arbeidsplassen every ad is manually checked, if it doesn't follow 
 [NAVs guideline](https://www.nav.no/no/bedrift/rekruttering/relatert-informasjon/stillingsregistrering) it will be rejected.
 You can check your ad if is is approved or rejected using this:
 
 ```
-GET http://localhost:9028/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
+GET https://tjenester-q0.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer <secret key>
-
 ```
 
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
 You should set a delay of 30min - 1 hour before requesting status again.
+
+## Deactivate/Stopping ad
+
+Ads will follow the expiration date, and will be automatic deactivated when it has expired. 
+You can also deactivate or stop an ad by sending a DELETE request:
+
+```
+DELETE https://tjenester-q0.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
+Accept: application/json
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer <secret key>
+```
 
 # Suggestions/Questions
 If you have any questions/issues or suggestions please feel free to report it as github 
