@@ -52,8 +52,8 @@ jobs:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
           body: |
-              Changes in this Release
-              - First Change
-              - Second Change
-            draft: true
-            prerelease: false
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: true
+          prerelease: false
