@@ -1,1 +1,3 @@
 theme: jekyll-theme-leap-day
+title: Job Ad Import API
+description: A REST API for posting job ads to arbeidsplassen.nav.no

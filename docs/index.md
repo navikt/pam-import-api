@@ -28,7 +28,7 @@ Content-Type: application/json
 Authorization: Bearer <your secret key>
 ```
 
-## Posting a job ad
+# REST API
 
 To upload an ad, use HTTP POST as follow
 
@@ -127,14 +127,14 @@ If the request was successful you will get a response with a receipt:
 }
 ```
 
-### JSON Structure
+## JSON Structure
 
 The data format is JSON, below is a diagram of the json structure:
 <img src="./json-example-01.svg">
 You can also download kotlin code for the DTOs 
 [here](https://github.com/navikt/pam-import-api/blob/master/src/main/kotlin/no/nav/arbeidsplassen/importapi/dto/TransferDTO.kt)
 
-#### Main properties
+### Main properties
 The main properties are required
 
 |Name           | Type      | Required | Description                       | Example   |
@@ -147,7 +147,7 @@ The main properties are required
 | published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
 | expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
 
-#### Employer
+### Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://brreg.no) 
 organization number to identify the employer (orgNr). If you are not able to send the orgNr, 
 you must at least specify employer name, and postLocation, we also recommended you to use the "reference" field as a 
@@ -171,7 +171,7 @@ Location of Employer
 |county | String | Optional | County | Oslo |
 |country | String | Optional | Country, defaults to Norge | Norge |
 
-#### Category
+### Category
 Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
 from SSB. You can download STYRK-categories from [here](https://tjenester-q0.nav.no/stillingsimport/api/v1/occupations/styrk08). 
 It is possible to have more than two occupation categories for each ad. 
@@ -186,7 +186,7 @@ Though we don't recommend multi category ads, because it is less user friendly.
 If you don't support STYRK-occupations, 
 please specify occupations using the "occupation" property (see below).
 
-#### Optional Properties
+### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
 Some of these properties are indexed and so it will make the ad easier to search for. 
 Please specify as much data as possible on the property fields below.
@@ -218,7 +218,7 @@ Please specify as much data as possible on the property fields below.
 | jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
 
-#### Work Address/Location
+### Work Address/Location
 
 Work location is the address/place of work. Ad must at least specify one work location, 
 so that it shows up in a location search.
@@ -233,7 +233,7 @@ so that it shows up in a location search.
 | country | String | Optional | defaults to Norge | Norge |
 
 
-#### Contact information
+### Contact information
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
 
 |Name | Type | Required | Description | Example |
@@ -244,7 +244,7 @@ It is possible to have many contacts, we recommended at least one contact for ea
 | phone | String | Optional | Phone number | +47 010 20 304 | 
 
 
-### Posting using stream
+## Posting using stream
 Post ads in stream by using Content-Type: application/x-json-stream. Ads are separated by a newline "\n" for
 example:
 
@@ -425,7 +425,7 @@ content-type: application/x-json-stream
 }
 ```
 
-### Posting in batches
+## Posting in batches
 You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
 We recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
 may not go over 500 items.
@@ -594,7 +594,7 @@ connection: keep-alive
 }
 ```
 
-### Get administration status for the ad
+# Ad Status 
 In arbeidsplassen every ad is manually checked, if it doesn't follow NAVs guideline it will be rejected.
 You can check your ad if is is approved or rejected using this:
 
@@ -610,6 +610,6 @@ Authorization: Bearer <secret key>
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
 You should set a delay of 30min - 1 hour before requesting status again.
 
-## Suggestions/Questions
+# Suggestions/Questions
 If you have any questions/issues or suggestions please feel free to report it as github 
 [issues](https://github.com/navikt/pam-import-api/issues)
