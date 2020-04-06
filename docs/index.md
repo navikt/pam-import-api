@@ -617,7 +617,7 @@ Ads will follow the expiration date, and will be automatic deactivated when it h
 You can also deactivate or stop an ad by sending a DELETE request:
 
 ```
-DELETE https://tjenester-q0.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
+DELETE https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

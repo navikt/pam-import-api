@@ -11,14 +11,14 @@ import javax.annotation.security.PermitAll
 @Controller("/api/v1/categories")
 class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter) {
 
-    @Get("/occupations")
-    fun getPyrkCategoryMap(): Single<MutableMap<String, Occupation>> {
-        return Single.just(styrkCodeConverter.occupationMap)
+    @Get("/pyrk/occupations")
+    fun getPyrkCategoryMap():MutableMap<String, Occupation> {
+        return styrkCodeConverter.pyrkMap
     }
 
     @Get("/styrk/occupations")
-    fun getStyrkCategoryMap(): Single<MutableMap<String, Occupation>> {
-        return Single.just(styrkCodeConverter.pyrkMap)
+    fun getStyrkCategoryMap(): MutableMap<String, Occupation> {
+        return styrkCodeConverter.occupationMap
     }
 
 }
