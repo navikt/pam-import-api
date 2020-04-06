@@ -1,7 +1,8 @@
 name: release-prod
 on:
   release:
-    types: published
+    types:
+      - published
 jobs:
   build:
     runs-on: ubuntu-latest
