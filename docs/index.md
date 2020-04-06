@@ -597,7 +597,8 @@ connection: keep-alive
 ```
 
 ## Ad Status 
-In arbeidsplassen every ad is manually checked, if it doesn't follow NAVs guideline it will be rejected.
+In arbeidsplassen every ad is manually checked, if it doesn't follow 
+[NAVs guideline](https://www.nav.no/no/bedrift/rekruttering/relatert-informasjon/stillingsregistrering) it will be rejected.
 You can check your ad if is is approved or rejected using this:
 
 ```
