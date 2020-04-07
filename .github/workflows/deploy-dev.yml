@@ -11,49 +11,56 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.x'
-      - name: build and test
-        run: ./gradlew test build
-      - name: build docker image
-        run: |
-          echo docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api > .docker_image
-          echo $(./gradlew properties -q | grep "version:" | awk '{print $2}') > .version_tag
-          echo $(cat .version_tag)-$(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
-          cat .docker_tag
-          echo "::set-env name=DOCKER_TAG::$(cat .docker_tag)"
-          docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
-      - name: push docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-          docker push $(cat .docker_image):$(cat .docker_tag)
-      - name: deploy to dev-sbs
-        uses: navikt/deployment-cli/action@0.4.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWAIT_SECONDS: 0
+#      - name: build and test
+#        run: ./gradlew test build
+#      - name: build docker image
+#        run: |
+#          echo docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api > .docker_image
+#          echo $(./gradlew properties -q | grep "version:" | awk '{print $2}') > .version_tag
+#          echo $(cat .version_tag)-$(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
+#          cat .docker_tag
+#          echo "::set-env name=DOCKER_TAG::$(cat .docker_tag)"
+#          docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
+#      - name: push docker image
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+#          docker push $(cat .docker_image):$(cat .docker_tag)
+#      - name: deploy to dev-sbs
+#        uses: navikt/deployment-cli/action@0.4.1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          AWAIT_SECONDS: 0
+#        with:
+#          cluster: dev-sbs
+#          team: teampam
+#          resources: naiserator.yml
+#          vars: naiserator-dev.json
+#      - name: create tag
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+#          git tag -f $(cat .docker_tag)
+#          git push -f --tags
+      - name: create changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
-          cluster: dev-sbs
-          team: teampam
-          resources: naiserator.yml
-          vars: naiserator-dev.json
-      - name: create tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git tag -f $(cat .docker_tag)
-          git push -f --tags
-      - name: draft release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: ${{ env.DOCKER_TAG }}
-          release_name: Release ${{ env.DOCKER_TAG }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: true
-          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+     - name: echo changelog
+       run: |
+         echo $changelog
+#      - name: draft release
+#        uses: actions/create-release@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+#        with:
+#          tag_name: ${{ env.DOCKER_TAG }}
+#          release_name: Release ${{ env.DOCKER_TAG }}
+#          body: |
+#            Changes in this Release
+#            - First Change
+#            - Second Change
+#          draft: true
+#          prerelease: false
