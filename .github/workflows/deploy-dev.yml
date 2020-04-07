@@ -50,7 +50,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: echo changelog
         run: |
-          echo $changelog
+          cat CHANGELOG.md
 #      - name: draft release
 #        uses: actions/create-release@latest
 #        env:
