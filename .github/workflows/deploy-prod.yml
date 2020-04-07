@@ -1,15 +1,15 @@
-name: release-prod
+name: deploy-prod
 on:
   release:
-    types:
-      - published
+    types: [published]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: deploy to prod
-        run: echo "shall deploy to prod here"
+        run: |
+          echo "shall deploy to prod here"
 #      - name: deploy to prod-sbs
 #        uses: navikt/deployment-cli/action@0.4.1
 #        env:
