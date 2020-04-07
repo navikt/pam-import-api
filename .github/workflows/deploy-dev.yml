@@ -48,9 +48,9 @@ jobs:
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-     - name: echo changelog
-       run: |
-         echo $changelog
+      - name: echo changelog
+        run: |
+          echo $changelog
 #      - name: draft release
 #        uses: actions/create-release@latest
 #        env:
