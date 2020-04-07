@@ -1,5 +1,4 @@
-![Build](https://github.com/navikt/pam-import-api/workflows/Build/badge.svg?branch=master)
-
+![build-deploy-dev](https://github.com/navikt/pam-import-api/workflows/build-deploy-dev/badge.svg)
 # Import api
 
 Build and run
