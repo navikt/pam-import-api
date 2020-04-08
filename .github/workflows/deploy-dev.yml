@@ -20,6 +20,7 @@ jobs:
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
           echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
       - name: build docker image
+        id: image
         run: |
           DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
@@ -38,6 +39,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: deploy to nais
+        env:
+          IMAGE: ${{ jobs.build.image.env.IMAGE }}
         run: echo $IMAGE
 #      - uses: nais/deploy/actions/deploy@v1
 #        env:
