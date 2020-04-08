@@ -69,6 +69,6 @@ jobs:
         with:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
-          body: ${{ env.CHANGELOG }}
+          body: ${{ env.CHANGE_LOG }}
           draft: true
           prerelease: false
