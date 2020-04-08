@@ -2,9 +2,10 @@ name: deploy-prod
 on:
   release:
     types: [published]
+
 jobs:
-  if: github.ref == 'refs/heads/master'
   deploy-prod:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

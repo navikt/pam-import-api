@@ -50,7 +50,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: ${{ env.LATEST_TAG }}
-          dueTag: ${{ env.DOCKER_TAG }}
           stripGeneratorNotice: true
       - name: prepare change log
         run: |
