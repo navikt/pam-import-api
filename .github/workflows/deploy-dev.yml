@@ -22,8 +22,9 @@ jobs:
       - name: build docker image
         run: |
           DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api
-          echo "::set-env name=IMAGE::$DOCKER_IMAGE:$DOCKER_TAG"
+          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
           docker build . --pull -t $IMAGE
+          echo "::set-env name=IMAGE::$IMAGE"
 #      - name: push docker image
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
