@@ -1,6 +1,7 @@
 name: tag-release
 on:
-  deployment_status: [created]
+  deployment_status:
+
 jobs:
   tag-release:
     runs-on: ubuntu-latest
