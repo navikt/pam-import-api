@@ -41,7 +41,6 @@ jobs:
       - name: latest release
         run: |
           echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
-          echo $LATEST_TAG
 #      - name: create tag
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,6 +61,6 @@ jobs:
         with:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
-          bodyFile: CHANGELOG.md
+          body: $(cat CHANGELOG.md)
           draft: true
           prerelease: false
