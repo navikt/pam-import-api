@@ -1,14 +1,13 @@
 name: tag-release
 on:
   deployment_status:
-
 jobs:
   tag-release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: create tag and release
         if: github.event.deployment_status.state == 'success'
-        uses: actions/checkout@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
