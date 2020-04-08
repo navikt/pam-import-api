@@ -2,7 +2,7 @@ name: build-deploy-dev
 on:
   push:
     branches:
-      - workflow_test
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,9 +18,7 @@ jobs:
           VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
           DOCKER_TAG=$VERSION_TAG-$(echo $GITHUB_SHA | cut -c1-7)
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
-          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
       - name: build docker image
-        id: image
         run: |
           DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
@@ -33,10 +31,9 @@ jobs:
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
           docker push $IMAGE
       - name: deploy to test
-        run: echo $IMAGE
-#      - uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: dev-sbs
-#          RESOURCE: naiserator.yml
-#          VARS: naiserator-dev.json
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: naiserator.yml
+          VARS: naiserator-dev.json
