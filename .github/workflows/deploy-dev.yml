@@ -55,8 +55,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: ${{ env.LATEST_TAG }}
           dueTag: 0.1-78c3c4e
-      - name: cat changelog
-        run: cat CHANGELOG.md
+      - name: prepare change log
+        run: |
+          CHANGELOG = $(cat CHANGELOG.md)
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo "::set-env name=CHANGE_LOG::$CHANGELOG"
       - name: draft release
         uses: actions/create-release@latest
         env:
@@ -64,7 +69,6 @@ jobs:
         with:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
-          body: |
-            ${{ steps.create_changelog.outputs.changelog }}
+          body: ${{ env.CHANGELOG }}
           draft: true
           prerelease: false
