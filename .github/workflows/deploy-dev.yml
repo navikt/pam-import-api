@@ -55,6 +55,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: ${{ env.LATEST_TAG }}
           dueTag: 0.1-78c3c4e
+      - name: cat changelog
+        run: cat CHANGELOG.md
       - name: draft release
         uses: actions/create-release@latest
         env:
