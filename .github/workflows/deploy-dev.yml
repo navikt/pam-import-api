@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: deploy to nais
         env:
-          IMAGE: ${{ jobs.build.image.env.IMAGE }}
+          IMAGE: ${{ jobs.build.env.IMAGE }}
         run: echo $IMAGE
 #      - uses: nais/deploy/actions/deploy@v1
 #        env:
