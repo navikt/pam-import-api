@@ -13,13 +13,14 @@ jobs:
           java-version: '11.x'
 #      - name: build and test
 #        run: ./gradlew test build
+      - name: versions and tag
+        run: |
+          echo $(./gradlew properties -q | grep "version:" | awk '{print $2}') > .version_tag
+          echo $(cat .version_tag)-$(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
+          echo "::set-env name=DOCKER_TAG::$(cat .docker_tag)"
 #      - name: build docker image
 #        run: |
 #          echo docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api > .docker_image
-#          echo $(./gradlew properties -q | grep "version:" | awk '{print $2}') > .version_tag
-#          echo $(cat .version_tag)-$(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
-#          cat .docker_tag
-#          echo "::set-env name=DOCKER_TAG::$(cat .docker_tag)"
 #          docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
 #      - name: push docker image
 #        env:
@@ -37,6 +38,10 @@ jobs:
 #          team: teampam
 #          resources: naiserator.yml
 #          vars: naiserator-dev.json
+      - name: latest release
+        run: |
+          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
+          echo $LATEST_TAG
 #      - name: create tag
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,19 +53,15 @@ jobs:
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: echo changelog
-        run: |
-          cat CHANGELOG.md
-#      - name: draft release
-#        uses: actions/create-release@latest
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-#        with:
-#          tag_name: ${{ env.DOCKER_TAG }}
-#          release_name: Release ${{ env.DOCKER_TAG }}
-#          body: |
-#            Changes in this Release
-#            - First Change
-#            - Second Change
-#          draft: true
-#          prerelease: false
+          sinceTag: ${{ env.LATEST_TAG }}
+          dueTag: 0.1-78c3c4e
+      - name: draft release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          tag_name: ${{ env.DOCKER_TAG }}
+          release_name: Release ${{ env.DOCKER_TAG }}
+          bodyFile: CHANGELOG.md
+          draft: true
+          prerelease: false
