@@ -57,7 +57,7 @@ jobs:
           dueTag: 0.1-78c3c4e
       - name: prepare change log
         run: |
-          CHANGELOG = $(cat CHANGELOG.md)
+          CHANGELOG=$(cat CHANGELOG.md)
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
