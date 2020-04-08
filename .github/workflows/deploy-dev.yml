@@ -2,7 +2,7 @@ name: build-deploy-dev
 on:
   push:
     branches:
-      - master
+      - workflow_test
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,6 +49,7 @@ jobs:
 #          git tag -f $(cat .docker_tag)
 #          git push -f --tags
       - name: create changelog
+        id: create_changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -61,6 +62,6 @@ jobs:
         with:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
-          body: $(cat CHANGELOG.md)
+          body: ${{ steps.create_changelog.outputs.changelog }}
           draft: true
           prerelease: false
