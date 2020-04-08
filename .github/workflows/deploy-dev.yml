@@ -26,21 +26,13 @@ jobs:
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
           docker build . --pull -t $IMAGE
           echo "::set-env name=IMAGE::$IMAGE"
-#      - name: push docker image
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-#          docker push $IMAGE
-  deploy:
-    name: deploy to test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: deploy to nais
+      - name: push docker image
         env:
-          IMAGE: ${{ jobs.build.env.IMAGE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+          docker push $IMAGE
+      - name: deploy to test
         run: echo $IMAGE
 #      - uses: nais/deploy/actions/deploy@v1
 #        env:
