@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: deploy to nais
         run: echo $IMAGE
 #      - uses: nais/deploy/actions/deploy@v1
 #        env:
