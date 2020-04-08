@@ -3,14 +3,22 @@ on:
   release:
     types: [published]
 jobs:
+  if: github.ref == 'refs/heads/master'
   deploy-prod:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: deploy to prod-sbs
-        uses: nais/deploy/actions/deploy@v1
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-sbs
-          RESOURCE: naiserator.yml
-          VARS: naiserator-prod.json
+          DOCKER_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api
+          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
+          echo "::set-env name=IMAGE::$IMAGE"
+          echo $IMAGE
+#        uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: prod-sbs
+#          RESOURCE: naiserator.yml
+#          VARS: naiserator-prod.json
