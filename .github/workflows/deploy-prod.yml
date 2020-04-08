@@ -3,17 +3,14 @@ on:
   release:
     types: [published]
 jobs:
-  build:
+  deploy-prod:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: deploy to prod-sbs
-        uses: navikt/deployment-cli/action@0.4.1
+        uses: nais/deploy/actions/deploy@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWAIT_SECONDS: 0
-        with:
-          cluster: prod-sbs
-          team: teampam
-          resources: naiserator.yml
-          vars: naiserator-prod.json
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-sbs
+          RESOURCE: naiserator.yml
+          VARS: naiserator-prod.json
