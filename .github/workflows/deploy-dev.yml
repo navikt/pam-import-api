@@ -64,6 +64,7 @@ jobs:
         with:
           tag_name: ${{ env.DOCKER_TAG }}
           release_name: Release ${{ env.DOCKER_TAG }}
-          body: ${{ steps.create_changelog.outputs.changelog }}
+          body: |
+            ${{ steps.create_changelog.outputs.changelog }}
           draft: true
           prerelease: false
