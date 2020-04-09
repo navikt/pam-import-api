@@ -12,8 +12,8 @@ jobs:
         env:
           DOCKER_TAG: ${{ github.event.release.tag_name }}
         run: |
-          PROJECT=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$PROJECT
+          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
           echo "::set-env name=IMAGE::$IMAGE"
           echo $IMAGE

@@ -16,14 +16,14 @@ jobs:
       - name: versions and tag
         run: |
           echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
-          PROJECT=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
           DOCKER_TAG=$VERSION_TAG-$(echo $GITHUB_SHA | cut -c1-7)
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
-          echo "::set-env name=PROJECT::$PROJECT"
+          echo "::set-env name=APPLICATION::$APPLICATION"
       - name: build docker image
         run: |
-          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$PROJECT
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
           docker build . --pull -t $IMAGE
           echo "::set-env name=IMAGE::$IMAGE"
@@ -40,13 +40,18 @@ jobs:
           CLUSTER: dev-sbs
           RESOURCE: naiserator.yml
           VARS: naiserator-dev.json
+      - name: create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git tag -f $DOCKER_TAG
+          git push -f --tags
       - name: create changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
-          token: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           sinceTag: ${{ env.LATEST_TAG }}
-          stripGeneratorNotice: true
-          stripHeaders: true
           pullRequests: true
           releaseBranch: master
       - name: prepare change log
@@ -56,13 +61,6 @@ jobs:
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
           echo "::set-env name=CHANGE_LOG::$CHANGELOG"
-      - name: create and push tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git tag -f $DOCKER_TAG
-          git push -f --tags
       - name: draft release
         uses: actions/create-release@latest
         env:
