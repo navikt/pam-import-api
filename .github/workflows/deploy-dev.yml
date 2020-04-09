@@ -15,56 +15,60 @@ jobs:
         run: ./gradlew test build
       - name: versions and tag
         run: |
+          PROJECT=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
           DOCKER_TAG=$VERSION_TAG-$(echo $GITHUB_SHA | cut -c1-7)
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
+          echo "::set-env name=PROJECT::$PROJECT"
       - name: build docker image
         run: |
-          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/pam-import-api
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$PROJECT
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
-          docker build . --pull -t $IMAGE
-          echo "::set-env name=IMAGE::$IMAGE"
-      - name: push docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-          docker push $IMAGE
-      - name: deploy to dev-sbs
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
-          RESOURCE: naiserator.yml
-          VARS: naiserator-dev.json
-      - name: create and push tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
-          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git tag -f $DOCKER_TAG
-          git push -f --tags
-      - name: create changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sinceTag: ${{ env.LATEST_TAG }}
-          stripGeneratorNotice: true
-      - name: prepare change log
-        run: |
-          CHANGELOG=$(cat CHANGELOG.md)
-          CHANGELOG="${CHANGELOG//'%'/'%25'}"
-          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
-          echo "::set-env name=CHANGE_LOG::$CHANGELOG"
-      - name: draft release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: ${{ env.DOCKER_TAG }}
-          release_name: Release ${{ env.DOCKER_TAG }}
-          body: ${{ env.CHANGE_LOG }}
-          draft: true
-          prerelease: false
+          echo $IMAGE
+#          docker build . --pull -t $IMAGE
+#          echo "::set-env name=IMAGE::$IMAGE"
+#      - name: push docker image
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+#          docker push $IMAGE
+#      - name: deploy to dev-sbs
+#        uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: dev-sbs
+#          RESOURCE: naiserator.yml
+#          VARS: naiserator-dev.json
+#      - name: create and push tag
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
+#          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+#          git tag -f $DOCKER_TAG
+#          git push -f --tags
+#      - name: create changelog
+#        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          sinceTag: ${{ env.LATEST_TAG }}
+#          stripGeneratorNotice: true
+#          stripHeaders: true
+#      - name: prepare change log
+#        run: |
+#          CHANGELOG=$(cat CHANGELOG.md)
+#          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+#          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+#          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+#          echo "::set-env name=CHANGE_LOG::$CHANGELOG"
+#      - name: draft release
+#        uses: actions/create-release@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+#        with:
+#          tag_name: ${{ env.DOCKER_TAG }}
+#          release_name: Release ${{ env.DOCKER_TAG }}
+#          body: ${{ env.CHANGE_LOG }}
+#          draft: true
+#          prerelease: false
