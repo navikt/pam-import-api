@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: deploy to prod-sbs
+      - name: get release tag
         env:
           DOCKER_TAG: ${{ github.event.release.tag_name }}
         run: |
@@ -16,9 +16,10 @@ jobs:
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
           echo "::set-env name=IMAGE::$IMAGE"
           echo $IMAGE
-#        uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: prod-sbs
-#          RESOURCE: naiserator.yml
-#          VARS: naiserator-prod.json
+      - uses: nais/deploy/actions/deploy@v1
+        name: deploy to prod-sbs
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-sbs
+          RESOURCE: naiserator.yml
+          VARS: naiserator-prod.json
