@@ -15,6 +15,7 @@ jobs:
         run: ./gradlew test build
       - name: versions and tag
         run: |
+          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
           PROJECT=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
           DOCKER_TAG=$VERSION_TAG-$(echo $GITHUB_SHA | cut -c1-7)
@@ -46,6 +47,7 @@ jobs:
           sinceTag: ${{ env.LATEST_TAG }}
           stripGeneratorNotice: true
           stripHeaders: true
+          pullRequests: true
       - name: prepare change log
         run: |
           CHANGELOG=$(cat CHANGELOG.md)
@@ -57,7 +59,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::set-env name=LATEST_TAG::$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')"
           git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git tag -f $DOCKER_TAG
           git push -f --tags
