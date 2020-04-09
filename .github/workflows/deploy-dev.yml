@@ -43,11 +43,12 @@ jobs:
       - name: create changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN }}
           sinceTag: ${{ env.LATEST_TAG }}
           stripGeneratorNotice: true
           stripHeaders: true
           pullRequests: true
+          releaseBranch: master
       - name: prepare change log
         run: |
           CHANGELOG=$(cat CHANGELOG.md)
