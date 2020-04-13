@@ -48,12 +48,12 @@ jobs:
           git tag -f $DOCKER_TAG
           git push -f --tags
       - name: create changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        uses: navikt/pam-generate-release-action@v1
+        env:
           sinceTag: ${{ env.LATEST_TAG }}
-          pullRequests: true
-          releaseBranch: master
+        with:
+          token:  ${{ secrets.GITHUB_TOKEN }}
+          cmd: "--since-tag ${{ env.sinceTag }} --header-label   --exclude-labels 'status: stale,closed: notabug,closed: duplicate,closed: question,closed: invalid,closed: won't fix' --usernames-as-github-logins"
       - name: prepare change log
         run: |
           CHANGELOG=$(cat CHANGELOG.md)
