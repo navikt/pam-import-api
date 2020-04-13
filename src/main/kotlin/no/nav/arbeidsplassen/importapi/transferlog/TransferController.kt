@@ -94,10 +94,9 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     private fun validate(ad: AdDTO) {
-        // validate category
         ad.categoryList.stream().forEach { cat ->
-            styrkCodeConverter.lookup(cat.code)
-                    .orElseThrow { ImportApiError("Category code ${cat.code} is not found", ErrorType.INVALID_VALUE) }
+            val optCat = styrkCodeConverter.lookup(cat.code)
+            if (optCat.isEmpty) LOG.warn("Category not found: $cat")
         }
     }
 
