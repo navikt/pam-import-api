@@ -41,7 +41,7 @@ class FeedConnector(val objectMapper: ObjectMapper,
     }
 
     private fun buildURI(uri: String, updatedSince: LocalDateTime): String {
-        val template = "$uri{?updatedSince,size,sort}"
+        val template = if (uri.indexOf("?")>0) "$uri{&updatedSince,size,sort}" else "$uri{?updatedSince,size,sort}"
         val arguments: MutableMap<String, Any> = HashMap()
         arguments["size"] = pageSize
         arguments["updatedSince"] = updatedSince

@@ -14,7 +14,7 @@ import javax.inject.Singleton
 class AdminStatusSync(private val feedConnector: FeedConnector,
                       private val feedtaskRepository: FeedtaskRepository,
                       private val adminStatusRepository: AdminStatusRepository,
-                      @Value("\${adminstatussync.feedurl}") private val feedUrl: String = "http://localhost:9001/api/v1/ads/feed") {
+                      @Value("\${adminstatussync.feedurl}") private val feedUrl: String = "http://localhost:9001/api/v1/ads/feed?source=IMPORTAPI") {
 
 
     companion object {

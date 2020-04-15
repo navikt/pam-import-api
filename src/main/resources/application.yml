@@ -59,7 +59,7 @@ transferlog:
 adminstatussync:
   scheduler:
     enabled: true
-  feedurl: ${PAM_AD_FEED_URL:http://localhost:9001/api/v1/ads}
+  feedurl: ${PAM_AD_FEED_URL:http://localhost:9001/api/v1/ads?source=IMPORTAPI}
   pagesize: 200
 shedlock:
   defaults:
