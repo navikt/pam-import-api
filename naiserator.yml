@@ -37,7 +37,7 @@ spec:
   webproxy: false
   prometheus:
     enabled: true
-    path: /prometheus
+    path: /stillingsimport/prometheus
   ingresses:
     - {{ ingress }}
     - {{ ingress-tjenester }}
