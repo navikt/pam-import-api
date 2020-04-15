@@ -11,17 +11,19 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.x'
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: build and test
-        run: ./gradlew test build
+        run: mvn clean install
       - name: versions and tag
         run: |
-          LATEST_TAG=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq '.tag_name' | sed -e 's/"//g')
-          if [ "$LATEST_TAG" = "null" ]; then LATEST_TAG=$(git describe --abbrev=0 --tags);fi;
-          echo $LATEST_TAG
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
+          VERSION_TAG=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           DOCKER_TAG=$VERSION_TAG-$(echo $GITHUB_SHA | cut -c1-7)
-          echo "::set-env name=LATEST_TAG::$LATEST_TAG"
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
           echo "::set-env name=APPLICATION::$APPLICATION"
       - name: build docker image
@@ -51,12 +53,11 @@ jobs:
           git tag -f $DOCKER_TAG
           git push -f --tags
       - name: create changelog
-        uses: navikt/pam-generate-release-action@v1
-        env:
-          sinceTag: ${{ env.LATEST_TAG }}
+        uses: navikt/pam-generate-release-action@v1.3
         with:
+          useLatestReleaseTag: true
           token:  ${{ secrets.GITHUB_TOKEN }}
-          cmd: "--since-tag ${{ env.sinceTag }} --header-label   --exclude-labels 'status: stale,closed: notabug,closed: duplicate,closed: question,closed: invalid,closed: won't fix' --usernames-as-github-logins"
+          cmd: "--header-label   --exclude-labels 'status: stale,closed: notabug,closed: duplicate,closed: question,closed: invalid,closed: won't fix' --usernames-as-github-logins"
       - name: prepare change log
         run: |
           CHANGELOG=$(cat CHANGELOG.md)
