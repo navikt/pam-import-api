@@ -18,7 +18,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: build and test
-        run: mvn clean install
+        run: ./gradlew test build
       - name: versions and tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
