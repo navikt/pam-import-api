@@ -55,10 +55,10 @@ transferlog:
   delete:
     months: 6
   scheduler:
-    enabled: false
+    enabled: true
 adminstatussync:
   scheduler:
-    enabled: false
+    enabled: true
   feedurl: ${PAM_AD_FEED_URL:http://localhost:9001/api/v1/ads}
   pagesize: 200
 shedlock:
