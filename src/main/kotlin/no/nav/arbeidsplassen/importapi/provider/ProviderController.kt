@@ -1,22 +1,15 @@
 package no.nav.arbeidsplassen.importapi.provider
-import com.nimbusds.jose.JWSAlgorithm
-import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.crypto.MACSigner
-import com.nimbusds.jwt.JWTClaimsSet
-import com.nimbusds.jwt.SignedJWT
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
-import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
 import java.util.*
-import javax.annotation.security.RolesAllowed
+import javax.annotation.security.PermitAll
 
-@RolesAllowed(value = [Roles.ROLE_ADMIN])
+@PermitAll
 @Controller("/internal/providers")
 class ProviderController(private val providerService: ProviderService,
                          private val tokenService: TokenService) {
@@ -36,6 +29,7 @@ class ProviderController(private val providerService: ProviderService,
 
     @Post("/")
     fun createProvider(@Body provider: ProviderDTO): HttpResponse<ProviderDTO> {
+        LOG.info("Creating provider ${provider.identifier}")
         return HttpResponse.created(providerService.save(provider))
     }
 
