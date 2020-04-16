@@ -1,6 +1,10 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
@@ -12,6 +16,7 @@ import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus
+import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
@@ -36,7 +41,6 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Post("/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
-        // TODO authorized provider access here
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
@@ -56,41 +60,52 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
-    fun postStream(@PathVariable providerId: Long, @Body ad: Flowable<AdDTO>): Flowable<TransferLogDTO> {
+    fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
         LOG.debug("Streaming for provider $providerId")
-        return ad.subscribeOn(Schedulers.io()).map {
-            LOG.info("Got ad ${it.reference} for $providerId")
-            val content = objectMapper.writeValueAsString(it)
-            val md5 = content.toMD5Hex()
-            if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, provider = provider, md5 = md5)
-            }
-            else {
-                validate(it)
-                transferLogService.save(TransferLogDTO(provider = provider, payload = content, md5 = md5, items = 1)).apply {
-                    payload = null
+        return json.subscribeOn(Schedulers.io()).map {
+            runCatching {
+                val ad = objectMapper.treeToValue(it, AdDTO::class.java)
+                LOG.info("Got ad ${ad.reference} for $providerId")
+                val content = objectMapper.writeValueAsString(ad)
+                val md5 = content.toMD5Hex()
+                if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
+                    TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, provider = provider, md5 = md5)
                 }
-            }
+                else {
+                    validate(ad)
+                    transferLogService.save(TransferLogDTO(provider = provider, payload = content, md5 = md5, items = 1)).apply {
+                        payload = null
+                    }
+                }
+            }.getOrElse { handleError(it, provider) }
+        }
+    }
+
+    private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
+       return when (error) {
+            is JsonParseException -> TransferLogDTO(message="Parse error: at ${error.location}", status = TransferLogStatus.ERROR, provider = provider)
+            is MissingKotlinParameterException -> TransferLogDTO(message="Missing parameter: ${error.parameter.name}", status = TransferLogStatus.ERROR, provider = provider)
+            is InvalidFormatException ->TransferLogDTO(message="Invalid value: ${error.value} at ${error.pathReference}", status = TransferLogStatus.ERROR, provider = provider)
+            else -> TransferLogDTO(message="Error: ${error.localizedMessage}", status = TransferLogStatus.ERROR, provider = provider)
         }
     }
 
     @Get("/{providerId}/versions/{versionId}")
-    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): HttpResponse<TransferLogDTO> {
-        return HttpResponse.ok(transferLogService.findByVersionIdAndProviderId(versionId, providerId))
+    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): TransferLogDTO {
+        return transferLogService.findByVersionIdAndProviderId(versionId, providerId)
     }
 
     @Delete("/{providerId}/{reference}")
     fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String,
-                                  @QueryValue(defaultValue = "false") delete: Boolean): HttpResponse<TransferLogDTO> {
+                                  @QueryValue(defaultValue = "false") delete: Boolean): TransferLogDTO {
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
         val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
-        val transferLogDTO = TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5, items = 1)
-        return HttpResponse.ok(transferLogService.save(transferLogDTO))
+        return transferLogService.save(TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5, items = 1))
     }
 
     private fun validate(ad: AdDTO) {
