@@ -17,7 +17,6 @@ PUT http://localhost:9028/stillingsimport/internal/providers/10000/token
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhcmJlaWRzcGxhc3Nlbi5uYXYubm8iLCJwcm92aWRlciI6MSwicm9sZXMiOiJST0xFX0FETUlOIiwiaXNzIjoiaHR0cHM6XC9cL2FyYmVpZHNwbGFzc2VuLm5hdi5ubyIsImp0aSI6IjJlZGVmYmY0LWUyNTgtNDUzOC1hYzMwLTY0NjhmZWUwMzQ0MSJ9.aIJsH2fOEq-4r38W75G5IV1HaLZ9KRi4bC2q4rBHt9U
 
 ### Upload 2 ads in batch for provider
 
