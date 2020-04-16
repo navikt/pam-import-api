@@ -12,7 +12,7 @@ import no.nav.arbeidsplassen.importapi.security.Roles
 import java.time.LocalDateTime
 import javax.annotation.security.RolesAllowed
 
-@ProviderAllowed(value = [Roles.ROLE_ADMIN])
+@ProviderAllowed(value = [Roles.ROLE_PROVIDER,Roles.ROLE_ADMIN])
 @Controller("/api/v1/adstates")
 class AdStateController(private val adStateService: AdStateService) {
 
