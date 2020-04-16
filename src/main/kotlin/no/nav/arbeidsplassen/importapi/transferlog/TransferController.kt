@@ -105,7 +105,9 @@ class TransferController(private val transferLogService: TransferLogService,
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
-        return transferLogService.save(TransferLogDTO(provider = provider, payload = jsonPayload, md5 = md5, items = 1))
+        return transferLogService.save(TransferLogDTO(message = "DELETED", provider = provider, payload = jsonPayload, md5 = md5, items = 1)).apply {
+            payload = null
+        }
     }
 
     private fun validate(ad: AdDTO) {
