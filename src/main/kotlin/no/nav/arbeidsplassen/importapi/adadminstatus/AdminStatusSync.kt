@@ -31,6 +31,10 @@ class AdminStatusSync(private val feedConnector: FeedConnector,
         if (adList.isNotEmpty()) {
             LOG.info("Got ${adList.size} to sync adminstatus ")
             val last = adList.last()
+            if (adList.size == 1 && last.updated == feedtask.lastrun) {
+                LOG.info("Skipping this because last updated ${last.updated} is equal with last run")
+                return
+            }
             val adminList = adList.stream()
                     .filter{ "IMPORTAPI" == it.source }
                     .map { it.toAdminStatus() }
