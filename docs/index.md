@@ -542,7 +542,7 @@ let us know, we might support it later. You can also specify occupations using t
 ### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
 Some of these properties are indexed and so will make the ad easier to search for. All supported properties names
-is also defined [here](https://tjenester.nav.no/stillingsimport/api/v1/properties/names)
+are also defined [here](https://tjenester.nav.no/stillingsimport/api/v1/properties/names)
 Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
