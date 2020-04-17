@@ -1,9 +1,7 @@
-package no.nav.arbeidsplassen.importapi.fields
+package no.nav.arbeidsplassen.importapi.properties
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import no.nav.arbeidsplassen.importapi.dto.PropertyNameValueValidation
-import no.nav.arbeidsplassen.importapi.dto.PropertyNames
 import javax.annotation.security.PermitAll
 
 @PermitAll

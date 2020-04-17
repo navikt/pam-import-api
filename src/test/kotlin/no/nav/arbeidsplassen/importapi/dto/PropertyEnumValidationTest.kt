@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.dto
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows

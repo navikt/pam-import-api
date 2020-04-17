@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.dto
 
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import java.time.LocalDateTime
 
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
