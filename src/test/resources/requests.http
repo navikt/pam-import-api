@@ -65,7 +65,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3Qubm8iLCJwcm92a
 
 ### Get adstates by updated time
 
-GET http://localhost:9028/stillingsimport/internal/adstates/?updated=2020-04-16T19:14:10.013&page=0&size=1000&sort=updated,asc
+GET http://localhost:9028/stillingsimport/internal/adstates/?updated=2020-04-17T07:47:50.035&page=0&size=1000&sort=updated,asc
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

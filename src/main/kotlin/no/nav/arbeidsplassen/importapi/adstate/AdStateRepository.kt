@@ -17,7 +17,7 @@ import javax.transaction.Transactional
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
 
     val insertSQL = """INSERT INTO "AD_STATE" ("UUID", "REFERENCE", "PROVIDER_ID", "JSON_PAYLOAD", "VERSION_ID", "CREATED") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "AD_STATE" SET "UUID"=?,"REFERENCE"=?, "PROVIDER_ID"=?, "JSON_PAYLOAD"=?, "VERSION_ID"=?, "CREATED"=? WHERE "ID"=?"""
+    val updateSQL = """UPDATE "AD_STATE" SET "UUID"=?,"REFERENCE"=?, "PROVIDER_ID"=?, "JSON_PAYLOAD"=?, "VERSION_ID"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
 
     @Transactional
     override fun <S : AdState> save(entity: S): S {

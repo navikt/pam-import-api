@@ -48,7 +48,7 @@ flyway:
   datasources:
     default:
       locations: classpath:db/migration
-      clean-on-validation-error: false
+      clean-on-validation-error: true
 transferlog:
   batch-size: 500
   task-size: 500
