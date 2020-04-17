@@ -8,7 +8,6 @@ import javax.inject.Singleton
 @Singleton
 class PropertyNameValueValidation {
 
-    private val validValues = HashMap<String,Set<String>>()
     private val EXTENT = "extent"
     private val ENGAGEMENTTYPE = "engagementtype"
     private val JOBARRANGEMENT = "jobarrangement"
@@ -17,6 +16,8 @@ class PropertyNameValueValidation {
     private val SECTOR = "sector"
     private val propertiesToValidate = listOf(EXTENT, ENGAGEMENTTYPE,JOBARRANGEMENT,
             WORKDAY, WORKHOURS, SECTOR)
+
+    val validValues = HashMap<String,Set<String>>()
 
     init {
         validValues[EXTENT] = Omfang.values().flatMap{ it.tekster().values }.toHashSet()
@@ -40,5 +41,6 @@ class PropertyNameValueValidation {
                 validateProperty(it, properties[it] as String)
         }
     }
+
 
 }

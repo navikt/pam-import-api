@@ -21,7 +21,7 @@ the HTTP bearer authorization header.
 
 Example:
 ```
-POST https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -35,7 +35,7 @@ This API is designed as a lightweight REST API supporting HTTP requests with JSO
 To upload an ad, use HTTP POST as follow
 
 ```
-POST https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/x-json-stream
 Cache-Control: no-cache
 Content-Type: application/x-json-stream
@@ -101,7 +101,7 @@ Authorization: Bearer <your secret key>
   },
   "categoryList": [
     {
-      "code": "234204",
+      "code": "2342",
       "categoryType": "STYRK08",
       "name": "Barnehagelærer"
     }
@@ -133,7 +133,7 @@ Post ads in stream by using Content-Type: application/x-json-stream. Ads are sep
 example:
 
 ```
-POST https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/x-json-stream
 Cache-Control: no-cache
 Content-Type: application/x-json-stream
@@ -198,7 +198,7 @@ Authorization: Bearer <your secret key>
   },
   "categoryList": [
     {
-      "code": "234204",
+      "code": "2342",
       "categoryType": "STYRK08",
       "name": "Barnehagelærer"
     }
@@ -315,7 +315,7 @@ We recommend you to upload in batches, You can group the ads in an array and sen
 may not go over 500 items.
 
 ```
-POST https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -382,7 +382,7 @@ Authorization: Bearer <secret key>
       },
       "categoryList": [
         {
-          "code": "234204",
+          "code": "2342",
           "categoryType": "STYRK08",
           "name": "Barnehagelærer"
         }
@@ -525,22 +525,24 @@ Location of Employer
 
 ### Category
 Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
-from SSB. You can download STYRK-categories from [here](https://tjenester-q0.nav.no/stillingsimport/api/v1/occupations/styrk08). 
-It is possible to have more than two occupation categories for each ad. 
-Though we don't recommend multi category ads, because it is less user friendly. 
+from SSB. You can download all STYRK08-categories from [here](https://tjenester.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
+another simplified version of STYRK-08, can also be [used](https://tjenester.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
+  
+It is possible to have more than two occupation categories for each ad.
 
 |Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
-|code | String | yes | the code of occupation | 234204 |
+|code | String | yes | the code of occupation | 2342 |
 | categoryType | ENUM | yes | type of occupation standard | STYRK08 |
 | name | String | optional | name of category | Barnehagelærer |
 
-If you don't support STYRK-occupations, 
-please specify occupations using the "occupation" property (see below).
+If you don't or can not support STYRK-occupations, and you are using another occupations category standard, please
+let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
 
 ### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
-Some of these properties are indexed and so will make the ad easier to search for. 
+Some of these properties are indexed and so will make the ad easier to search for. All supported properties names
+is also defined [here](https://tjenester.nav.no/stillingsimport/api/v1/properties/names)
 Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
@@ -569,6 +571,9 @@ Please specify as much data as possible on the property fields below.
 | twitteraddress | String | Optional | twitter share URL | https://url.to.twitter/ |
 | jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
+
+Some property only allows for a set of valid values, they are listed 
+[here](https://tjenester.nav.no/stillingsimport/api/v1/properties/values)
 
 ### Work Address/Location
 
@@ -601,7 +606,7 @@ In arbeidsplassen every ad is manually checked, if it doesn't follow
 You can check your ad if is is approved or rejected using this:
 
 ```
-GET https://tjenester-q0.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
+GET https://tjenester.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -617,7 +622,7 @@ Ads will follow the expiration date, and will be automatic deactivated when it h
 You can also deactivate or stop an ad by sending a DELETE request:
 
 ```
-DELETE https://tjenester-q0.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}
+DELETE https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
