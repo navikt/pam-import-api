@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dto
+package no.nav.arbeidsplassen.importapi.properties
 
 import no.nav.arbeid.pam.kodeverk.ansettelse.*
 import no.nav.arbeidsplassen.importapi.ImportApiError

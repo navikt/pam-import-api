@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.dto
+package no.nav.arbeidsplassen.importapi.properties
 
 enum class PropertyNames(val type: PropertyType) {
     sourceurl(PropertyType.URL),
