@@ -15,7 +15,7 @@ import javax.transaction.Transactional
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
     val insertSQL = """INSERT INTO "PROVIDER" ("JWTID", "IDENTIFIER", "EMAIL", "PHONE", "CREATED") VALUES (?,?,?,?,?)"""
-    val updateSQL = """UPDATE "PROVIDER" SET "JWTID"=?, "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=? WHERE "ID"=?"""
+    val updateSQL = """UPDATE "PROVIDER" SET "JWTID"=?, "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {

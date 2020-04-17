@@ -14,7 +14,7 @@ import javax.transaction.Transactional
 abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
 
     val insertSQL = """INSERT INTO "ADMIN_STATUS" ("UUID", "STATUS", "MESSAGE", "REFERENCE", "PROVIDER_ID", "VERSION_ID", "CREATED") VALUES(?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ADMIN_STATUS" SET "UUID"=?, "STATUS"=?, "MESSAGE"=?, "REFERENCE"=?, "PROVIDER_ID"=?, "VERSION_ID"=?, "CREATED"=? WHERE "ID"=?"""
+    val updateSQL = """UPDATE "ADMIN_STATUS" SET "UUID"=?, "STATUS"=?, "MESSAGE"=?, "REFERENCE"=?, "PROVIDER_ID"=?, "VERSION_ID"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
 
     @Transactional
     override fun <S : AdminStatus> save(entity: S): S {

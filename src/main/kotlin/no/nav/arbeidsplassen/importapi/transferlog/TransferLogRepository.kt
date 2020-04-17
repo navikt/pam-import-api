@@ -16,7 +16,7 @@ import javax.transaction.Transactional
 abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
 
     val insertSQL = """INSERT INTO "TRANSFER_LOG" ("PROVIDER_ID", "ITEMS", "MD5", "PAYLOAD", "STATUS", "MESSAGE", "CREATED") VALUES (?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "TRANSFER_LOG" SET "PROVIDER_ID"=?, "ITEMS"=?, "MD5"=?, "PAYLOAD"=?, "STATUS"=?, "MESSAGE"=?, "CREATED"=? WHERE "ID"=?"""
+    val updateSQL = """UPDATE "TRANSFER_LOG" SET "PROVIDER_ID"=?, "ITEMS"=?, "MD5"=?, "PAYLOAD"=?, "STATUS"=?, "MESSAGE"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
 
     @Transactional
     override fun <S : TransferLog> save(entity: S): S {
