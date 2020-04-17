@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.fields
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
