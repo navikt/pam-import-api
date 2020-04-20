@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class AdAdminStatusDTO(val uuid: String, val status: Status = Status.RECEIVED, val message: String?, val reference: String,
+                            val url: String = "https://arbeidsplassen.nav.no/stillinger/intern/${uuid}",
                             val providerId: Long, val created: LocalDateTime, val updated: LocalDateTime)
 
 data class TransferLogDTO(var versionId: Long? = null, val provider: ProviderDTO, val status: TransferLogStatus = TransferLogStatus.RECEIVED,
