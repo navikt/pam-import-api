@@ -1,6 +1,11 @@
 name: build-deploy-dev
 on:
   push:
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENCE"
+      - "CODEOWNERS"
     branches:
       - master
 jobs:

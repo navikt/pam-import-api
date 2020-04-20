@@ -611,6 +611,16 @@ Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer <secret key>
+
+{
+  "uuid" : "2afe26f3-9aef-4a12-97eb-20d6c06c513a",
+  "status" : "DONE",
+  "reference" : "12345",
+  "url" : "https://arbeidsplassen.nav.no/stillinger/intern/12345",
+  "providerId" : 10000,
+  "created" : "2020-04-20T13:18:41.04",
+  "updated" : "2020-04-20T13:18:41.05"
+}
 ```
 
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.

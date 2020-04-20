@@ -46,7 +46,6 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
         val message = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, message.status)
         val provider = message.body()
