@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
 import io.micronaut.data.model.Pageable
 import no.nav.arbeidsplassen.importapi.Open
@@ -20,6 +21,7 @@ import kotlin.streams.toList
 class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val adStateRepository: AdStateRepository,
                        private val objectMapper: ObjectMapper,
+                       private val meterRegistry: MeterRegistry,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
@@ -47,6 +49,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             LOG.info("mapping transfer ${it.id} for provider ${it.providerId} found ${adList.size} ads ")
             adStateRepository.saveAll(adList)
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
+            meterRegistry.counter("ads_received", "provider", it.providerId.toString()).increment(adList.size.toDouble())
         } catch (e: Exception) {
             LOG.error("Got exception while handling transfer log ${it.id}", e)
             transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))
