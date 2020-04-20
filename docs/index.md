@@ -616,7 +616,7 @@ Authorization: Bearer <secret key>
   "uuid" : "2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "status" : "DONE",
   "reference" : "12345",
-  "url" : "https://arbeidsplassen.nav.no/stillinger/intern/12345",
+  "url" : "https://arbeidsplassen.nav.no/stillinger/intern/2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "providerId" : 10000,
   "created" : "2020-04-20T13:18:41.04",
   "updated" : "2020-04-20T13:18:41.05"
