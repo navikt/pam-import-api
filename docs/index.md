@@ -563,7 +563,7 @@ Please specify as much data as possible on the property fields below.
 | sector | String | Optional | Public of private sector | Offentlig or Privat |
 | location | String | Optional | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
 | jobtitle | String | Optional | title of position | eg. Kontorsjef |
-| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Javautvikler |
+| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Java;Kotlin |
 | industry | String | Optional | what kind of industry category this job belongs to | eg. Bygg og anlegg |
 | workhours | String | Optional | what part of the day is work hours | eg. Dagtid |
 | workday | String | Optional | Day of work | eg. Ukedager |
