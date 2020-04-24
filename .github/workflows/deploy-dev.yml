@@ -22,8 +22,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: build and test
-        run: ./gradlew test build
+#      - name: build and test
+#        run: ./gradlew test build
       - name: versions and tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
@@ -69,7 +69,6 @@ jobs:
           COMPARE_LINK="[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$LATEST_RELEASE...$DOCKER_TAG)"
           GIT_LOG=$(git log $LATEST_RELEASE..$DOCKER_TAG --no-merges --pretty=format:"* %ad %s" -50 --date=short | sed "/^\\s*$/d")
           CHANGELOG="$GIT_TREE%0A$COMPARE_LINK%0A$GIT_LOG"
-          CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
           echo "::set-env name=CHANGE_LOG::$CHANGELOG"
