@@ -27,9 +27,7 @@ jobs:
       - name: versions and tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          VERSION_TAG=$(./gradlew properties -q | grep "version:" | awk '{print $2}')
-          BUILD=$(expr $GITHUB_RUN_NUMBER % 1000)
-          DOCKER_TAG=$VERSION_TAG.$BUILD-$(echo $GITHUB_SHA | cut -c1-7)
+          DOCKER_TAG=$(date +"%y.%j.%H%M%S")
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
           echo "::set-env name=APPLICATION::$APPLICATION"
 #      - name: build docker image
