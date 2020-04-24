@@ -32,25 +32,25 @@ jobs:
           DOCKER_TAG=$VERSION_TAG.$BUILD-$(echo $GITHUB_SHA | cut -c1-7)
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
           echo "::set-env name=APPLICATION::$APPLICATION"
-      - name: build docker image
-        run: |
-          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
-          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
-          docker build . --pull -t $IMAGE
-          echo "::set-env name=IMAGE::$IMAGE"
-      - name: push docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-          docker push $IMAGE
-      - name: deploy to dev-sbs
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
-          RESOURCE: naiserator.yml
-          VARS: naiserator-dev.json
+#      - name: build docker image
+#        run: |
+#          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
+#          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
+#          docker build . --pull -t $IMAGE
+#          echo "::set-env name=IMAGE::$IMAGE"
+#      - name: push docker image
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+#          docker push $IMAGE
+#      - name: deploy to dev-sbs
+#        uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: dev-sbs
+#          RESOURCE: naiserator.yml
+#          VARS: naiserator-dev.json
       - name: create and push tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,18 +58,21 @@ jobs:
           git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git tag -f $DOCKER_TAG
           git push -f --tags
-      - name: create changelog
-        uses: navikt/pam-generate-release-action@v1.3
-        with:
-          useLatestReleaseTag: true
-          token:  ${{ secrets.GITHUB_TOKEN }}
-          cmd: "--header-label   --exclude-labels 'status: stale,closed: notabug,closed: duplicate,closed: question,closed: invalid,closed: won't fix' --usernames-as-github-logins"
-      - name: prepare change log
+      - name: create change log
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          CHANGELOG=$(cat CHANGELOG.md)
+          LATEST_RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq -r '.tag_name')
+          if [ "$LATEST_RELEASE" = "null" ]; then LATEST_RELEASE=$(git describe --abbrev=0 --tags);fi;
+          echo "Found latest release: $LATEST_RELEASE"
+          GIT_TREE="[$DOCKER_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$DOCKER_TAG)"
+          COMPARE_LINK="[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$LATEST_RELEASE...$DOCKER_TAG)"
+          GIT_LOG=$(git log $LATEST_RELEASE..$DOCKER_TAG --no-merges --pretty=format:"* %ad %s" -50 --date=short | sed "/^\\s*$/d")
+          CHANGELOG="$GIT_TREE\n$COMPARE_LINK\n$GIT_LOG"
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo $CHANGELOG
           echo "::set-env name=CHANGE_LOG::$CHANGELOG"
       - name: draft release
         uses: actions/create-release@latest
