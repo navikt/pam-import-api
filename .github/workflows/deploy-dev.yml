@@ -68,7 +68,7 @@ jobs:
           GIT_TREE="[$DOCKER_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$DOCKER_TAG)"
           COMPARE_LINK="[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$LATEST_RELEASE...$DOCKER_TAG)"
           GIT_LOG=$(git log $LATEST_RELEASE..$DOCKER_TAG --no-merges --pretty=format:"* %ad %s" -50 --date=short | sed "/^\\s*$/d")
-          CHANGELOG="$GIT_TREE\n$COMPARE_LINK\n$GIT_LOG"
+          CHANGELOG="$GIT_TREE  $COMPARE_LINK  $GIT_LOG"
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
