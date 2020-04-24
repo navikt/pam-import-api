@@ -22,33 +22,33 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-#      - name: build and test
-#        run: ./gradlew test build
+      - name: build and test
+        run: ./gradlew test build
       - name: versions and tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           DOCKER_TAG=$(date +"%y.%j.%H%M%S")
           echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
           echo "::set-env name=APPLICATION::$APPLICATION"
-#      - name: build docker image
-#        run: |
-#          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
-#          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
-#          docker build . --pull -t $IMAGE
-#          echo "::set-env name=IMAGE::$IMAGE"
-#      - name: push docker image
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-#          docker push $IMAGE
-#      - name: deploy to dev-sbs
-#        uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: dev-sbs
-#          RESOURCE: naiserator.yml
-#          VARS: naiserator-dev.json
+      - name: build docker image
+        run: |
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
+          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
+          docker build . --pull -t $IMAGE
+          echo "::set-env name=IMAGE::$IMAGE"
+      - name: push docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+          docker push $IMAGE
+      - name: deploy to dev-sbs
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-sbs
+          RESOURCE: naiserator.yml
+          VARS: naiserator-dev.json
       - name: create and push tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
