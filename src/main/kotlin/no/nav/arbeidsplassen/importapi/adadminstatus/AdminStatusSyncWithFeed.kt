@@ -12,15 +12,15 @@ import java.util.stream.Collectors
 import javax.inject.Singleton
 
 @Singleton
-class AdminStatusSync(private val feedConnector: FeedConnector,
-                      private val feedtaskRepository: FeedtaskRepository,
-                      private val adminStatusRepository: AdminStatusRepository,
-                      private val meterRegistry: MeterRegistry,
-                      @Value("\${adminstatussync.feedurl}") private val feedUrl: String = "http://localhost:9001/api/v1/ads/feed?source=IMPORTAPI") {
+class AdminStatusSyncWithFeed(private val feedConnector: FeedConnector,
+                              private val feedtaskRepository: FeedtaskRepository,
+                              private val adminStatusRepository: AdminStatusRepository,
+                              private val meterRegistry: MeterRegistry,
+                              @Value("\${adminstatussync.feedurl}") private val feedUrl: String = "http://localhost:9001/api/v1/ads/feed?source=IMPORTAPI") {
 
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(AdminStatusSync::class.java)
+        private val LOG = LoggerFactory.getLogger(AdminStatusSyncWithFeed::class.java)
         private val ADMINSTATUSSYNC_TASK = "AdminStatusSyncTask"
         private val _providerid = "_providerid"
         private val _versionid = "_versionid"

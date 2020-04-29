@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 @Open
 @Requires(property = "adminstatussync.scheduler.enabled", value="true")
-class AdminStatusSyncScheduler(private val adminStatusSync: AdminStatusSync) {
+class AdminStatusSyncScheduler(private val adminStatusSyncWithFeed: AdminStatusSyncWithFeed) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdminStatusSyncScheduler::class.java)
@@ -20,7 +20,7 @@ class AdminStatusSyncScheduler(private val adminStatusSync: AdminStatusSync) {
     @SchedulerLock(name = "adminStatusSyncTask")
     fun startAdminStatusSyncTask() {
         LOG.info("Starting AdminStatusSync Task")
-        adminStatusSync.syncAdminStatus()
+        adminStatusSyncWithFeed.syncAdminStatus()
     }
 
 }

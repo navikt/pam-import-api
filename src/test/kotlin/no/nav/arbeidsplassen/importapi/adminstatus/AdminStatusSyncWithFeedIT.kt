@@ -1,16 +1,16 @@
 package no.nav.arbeidsplassen.importapi.adminstatus
 
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusSync
+import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusSyncWithFeed
 import org.junit.jupiter.api.Test
 
 @MicronautTest
-class AdminStatusSyncIT(private val adminStatusSync: AdminStatusSync) {
+class AdminStatusSyncWithFeedIT(private val adminStatusSyncWithFeed: AdminStatusSyncWithFeed) {
 
 
     @Test
     fun `get ads from feed and sync with adminstatus`() {
-        adminStatusSync.syncAdminStatus()
+        adminStatusSyncWithFeed.syncAdminStatus()
     }
 
 }
