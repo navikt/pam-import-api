@@ -24,7 +24,7 @@ spec:
       memory: 2048Mi
     requests:
       cpu: 200m
-      memory: 256Mi
+      memory: 512Mi
   vault:
     enabled: true
     paths:
