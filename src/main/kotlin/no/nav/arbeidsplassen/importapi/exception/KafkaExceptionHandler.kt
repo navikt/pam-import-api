@@ -48,12 +48,12 @@ class KafkaExceptionHandler : KafkaListenerExceptionHandler {
                 val partition = Integer.valueOf(matcher.group(2))
                 val offset = Integer.valueOf(matcher.group(3))
                 val tp = TopicPartition(topic, partition)
-                LOG.warn("Seeking past unserializable consumer record for partition {}-{} and offset {}", topic, partition, offset)
+                LOG.warn("Seeking past undeserializable consumer record for partition {}-{} and offset {}", topic, partition, offset)
                 kafkaConsumer.seek(tp, offset + 1.toLong())
 
             }
         } catch (e: Throwable) {
-            LOG.error("Kafka consumer [" + consumerBean + "] failed to seek past unserializable value: " + e.message, e)
+            LOG.error("Kafka consumer [" + consumerBean + "] failed to seek past undeserializable value: " + e.message, e)
         }
     }
 
