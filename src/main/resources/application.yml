@@ -58,9 +58,9 @@ transferlog:
     enabled: true
 adminstatussync:
   scheduler:
-    enabled: true
-  kafka:
     enabled: false
+  kafka:
+    enabled: true
 #    offsettimestamp: "2020-01-01T00:00:00Z"
   feedurl: ${PAM_AD_FEED_URL:`http://localhost:9001/api/v1/ads?source=IMPORTAPI`}
   pagesize: 200
