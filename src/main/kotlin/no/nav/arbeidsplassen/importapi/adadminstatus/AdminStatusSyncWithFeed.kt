@@ -22,8 +22,6 @@ class AdminStatusSyncWithFeed(private val feedConnector: FeedConnector,
     companion object {
         private val LOG = LoggerFactory.getLogger(AdminStatusSyncWithFeed::class.java)
         private val ADMINSTATUSSYNC_TASK = "AdminStatusSyncTask"
-        private val _providerid = "_providerid"
-        private val _versionid = "_versionid"
     }
 
     fun syncAdminStatus() {
@@ -39,37 +37,12 @@ class AdminStatusSyncWithFeed(private val feedConnector: FeedConnector,
             }
             val adminList = adList.stream()
                     .filter{ "IMPORTAPI" == it.source }
-                    .map { it.toAdminStatus() }
+                    .map { it.toAdminStatus(adminStatusRepository) }
                     .collect(Collectors.toList())
             adminStatusRepository.saveAll(adminList)
             meterRegistry.counter("ads_admin_sync").increment(adminList.size.toDouble())
             LOG.info("Saved feed task $ADMINSTATUSSYNC_TASK with lastrun date ${last.updated}")
             feedtaskRepository.update(feedtask.copy(lastrun = last.updated))
-        }
-    }
-
-    private fun AdTransport.toAdminStatus(): AdminStatus {
-        return adminStatusRepository.findByUuid(uuid)
-                .map { it.copy(status = mapStatus(), versionId = properties[_versionid]?.toLong()!!,
-                        message = mapMessage()) }
-                .orElseGet{ AdminStatus(uuid = uuid, status = mapStatus(), versionId =
-                properties[_versionid]?.toLong()!!, providerId = properties[_providerid]?.toLong()!!,
-                        reference = reference, message = mapMessage()) }
-    }
-
-    private fun AdTransport.mapMessage(): String? {
-        if ("REJECTED".equals(status)) {
-            return administration.remarks.toString()
-        }
-        return null
-    }
-
-    private fun AdTransport.mapStatus(): Status {
-        return when (administration.status) {
-            "DONE" -> Status.DONE
-            "PENDING" -> Status.PENDING
-            "RECEIVED" -> Status.RECEIVED
-            else -> Status.UNKNOWN
         }
     }
 }

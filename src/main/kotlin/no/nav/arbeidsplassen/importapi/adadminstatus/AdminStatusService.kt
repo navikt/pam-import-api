@@ -1,9 +1,8 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
-import no.nav.arbeidsplassen.importapi.ErrorType
-import no.nav.arbeidsplassen.importapi.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
-import java.util.*
 import javax.inject.Singleton
 
 @Singleton

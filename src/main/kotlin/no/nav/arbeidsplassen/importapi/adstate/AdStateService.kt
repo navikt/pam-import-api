@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
-import no.nav.arbeidsplassen.importapi.ImportApiError
-import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import java.time.LocalDateTime
-import java.util.*
 import javax.inject.Singleton
 
 @Singleton
@@ -25,12 +24,12 @@ class AdStateService(private val adStateRepository: AdStateRepository,
 
     fun getAdStateByUuid(uuid: String):
             AdStateDTO = adStateRepository.findByUuid(uuid)
-            .orElseThrow{ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)}
+            .orElseThrow{ ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND) }
             .toDTO()
 
     fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long):
             AdStateDTO = adStateRepository.findByUuidAndProviderId(uuid, providerId)
-            .orElseThrow{ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)}.toDTO()
+            .orElseThrow{ ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND) }.toDTO()
 
     fun getAdStatesByProviderReference(providerId:Long, reference:String): AdStateDTO =
         adStateRepository.findByProviderIdAndReference(providerId, reference)

@@ -28,6 +28,8 @@ spec:
   vault:
     enabled: true
     paths:
+      - kvPath: {{ serviceuser-credentials }}
+        mountPath: /secrets/pamimportapi/serviceuser/credentials
       - kvPath: {{ oracle-credentials }}
         mountPath: /secrets/pamimportapi/oracle/credentials
       - kvPath: {{ oracle-config }}

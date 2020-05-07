@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi
 
+import io.micronaut.configuration.kafka.ConsumerRegistry
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -23,8 +24,9 @@ class StatusController(private val secretSignatureConfiguration: SecretSignature
     }
 
     @Get("/isAlive")
-    fun isAlive(): String {
-        return "Alive"
+    fun isAlive(): HttpResponse<String> {
+        return HttpResponse.ok("Alive")
     }
+
 
 }
