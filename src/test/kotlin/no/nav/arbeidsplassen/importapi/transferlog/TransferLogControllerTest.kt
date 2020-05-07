@@ -2,27 +2,20 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Property
-import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.http.client.exceptions.HttpClientException
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.ImportApiError
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.security.JwtTest
-import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.reactivestreams.Subscriber
 import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 

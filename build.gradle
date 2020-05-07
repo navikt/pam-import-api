@@ -52,6 +52,7 @@ dependencies {
     implementation "io.micronaut.configuration:micronaut-micrometer-core:1.3.0"
     implementation "io.micronaut.configuration:micronaut-micrometer-registry-prometheus:1.3.0"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
+    implementation "io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}"
 
     annotationProcessor "io.micronaut.data:micronaut-data-processor:$micronautDataVersion"
     implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
@@ -64,7 +65,7 @@ dependencies {
 
     implementation "no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion"
     implementation "no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion"
-    runtimeOnly "com.oracle.ojdbc:ojdbc8:$oracledbVersion"
+    runtimeOnly "com.oracle.ojdbc:ojdbc10:$oracledbVersion"
     implementation "io.micronaut:micronaut-security-jwt"
 
 

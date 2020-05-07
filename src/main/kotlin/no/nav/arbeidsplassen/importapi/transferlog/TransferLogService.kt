@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import no.nav.arbeidsplassen.importapi.ImportApiError
-import no.nav.arbeidsplassen.importapi.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 
@@ -21,7 +21,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
        return transferLogRepository.findByIdAndProviderId(versionId, providerId)
-               .orElseThrow{ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)}
+               .orElseThrow{ ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
                .toDTO()
     }
 

@@ -11,8 +11,8 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
-import no.nav.arbeidsplassen.importapi.ErrorType
-import no.nav.arbeidsplassen.importapi.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus

@@ -1,10 +1,9 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.exception
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import io.micronaut.aop.Around
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.*
@@ -12,7 +11,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.server.exceptions.ConversionErrorHandler
 import io.micronaut.http.server.exceptions.ExceptionHandler;
 import io.micronaut.http.server.exceptions.JsonExceptionHandler
-import no.nav.arbeidsplassen.importapi.ErrorType.*
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.*
 import org.slf4j.LoggerFactory
 import java.util.*
 import javax.inject.Singleton;

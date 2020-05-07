@@ -6,6 +6,7 @@ import net.javacrumbs.shedlock.micronaut.SchedulerLock
 import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
+import javax.transaction.Transactional
 
 @Singleton
 @Open
@@ -18,6 +19,7 @@ class AdminStatusSyncScheduler(private val adminStatusSyncWithFeed: AdminStatusS
 
     @Scheduled(cron = "30 * * * * *")
     @SchedulerLock(name = "adminStatusSyncTask")
+    @Transactional
     fun startAdminStatusSyncTask() {
         LOG.info("Starting AdminStatusSync Task")
         adminStatusSyncWithFeed.syncAdminStatus()
