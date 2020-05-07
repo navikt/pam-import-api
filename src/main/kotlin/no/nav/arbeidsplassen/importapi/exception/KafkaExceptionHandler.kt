@@ -15,8 +15,6 @@ import javax.inject.Singleton
 @Replaces(bean = DefaultKafkaListenerExceptionHandler::class)
 class KafkaExceptionHandler : KafkaListenerExceptionHandler {
 
-    private val skipRecordOnDeserializationFailure = true
-
     override fun handle(exception: KafkaListenerException) {
         val cause = exception.cause!!
         val consumerBean = exception.kafkaListener
@@ -24,9 +22,7 @@ class KafkaExceptionHandler : KafkaListenerExceptionHandler {
 
         if (cause is SerializationException) {
             LOG.error("Kafka consumer [" + consumerBean + "] failed to deserialize value: " + cause.message, cause)
-            if (skipRecordOnDeserializationFailure) {
-                seekPastDeserializationError(cause, consumerBean, kafkaConsumer)
-            }
+            seekPastDeserializationError(cause, consumerBean, kafkaConsumer)
         } else {
             val consumerRecord = exception.consumerRecord
             if (consumerRecord.isPresent) {
