@@ -34,7 +34,7 @@ class KafkaExceptionHandler : KafkaListenerExceptionHandler {
             } else {
                 LOG.error("Kafka consumer [" + consumerBean + "] produced error: " + cause.message, cause)
             }
-            LOG.warn("Pausing consumer, need further investigation.")
+            LOG.error("Pausing consumer, need further investigation.")
             kafkaConsumer.pause(kafkaConsumer.assignment())
         }
     }

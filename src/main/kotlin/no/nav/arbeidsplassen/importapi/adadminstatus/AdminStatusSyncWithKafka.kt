@@ -49,9 +49,9 @@ class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRep
     override fun onPartitionsAssigned(partitions: MutableCollection<TopicPartition>) {
         if (offsetTimeStamp!=null) {
             LOG.info("Resetting offset for timestamp {}", offsetTimeStamp)
-            val topiPartionTimestamp = partitions.map { it to offsetTimeStamp.toMillis() }.toMap()
-            val partionOffsetMap = consumer.offsetsForTimes(topiPartionTimestamp)
-            partionOffsetMap.forEach { topic, timestamp -> consumer.seek(topic, timestamp.offset()) }
+            val topicPartionTimestamp = partitions.map { it to offsetTimeStamp.toMillis() }.toMap()
+            val partitionOffsetMap = consumer.offsetsForTimes(topicPartionTimestamp)
+            partitionOffsetMap.forEach { (topic, timestamp) -> consumer.seek(topic, timestamp.offset()) }
         }
     }
 
