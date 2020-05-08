@@ -32,7 +32,7 @@ class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRep
 
     @Topic("\${adminstatus.kafka.topic:StillingIntern}")
     fun kakfkaAdminStatusSyncWithAd(adList: List<AdTransport>, offsets: List<Long>) {
-        LOG.info("received kafka {}", adList.size)
+        LOG.info("received from kafka with batch size of {} ads", adList.size)
         val adminList = adList.stream()
                 .filter{ "IMPORTAPI" == it.source }
                 .map { it.toAdminStatus(adminStatusRepository) }
