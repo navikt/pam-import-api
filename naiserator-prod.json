@@ -3,5 +3,6 @@
   "ingress-tjenester": "https://tjenester.nav.no/stillingsimport",
   "oracle-credentials": "oracle/data/prod/creds/pamimportapi-user",
   "oracle-config": "oracle/data/prod/config/pamimportapi",
-  "pamimportapi-env": "kv/prod/sbs/pam-import-api/default"
+  "pamimportapi-env": "kv/prod/sbs/pam-import-api/default",
+  "serviceuser-credentials": "serviceuser/data/prod/srvpamimportapi"
 }
