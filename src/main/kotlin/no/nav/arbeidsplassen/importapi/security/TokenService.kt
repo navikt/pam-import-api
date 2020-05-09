@@ -6,7 +6,7 @@ import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
+import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import java.util.*
 import javax.inject.Singleton
 

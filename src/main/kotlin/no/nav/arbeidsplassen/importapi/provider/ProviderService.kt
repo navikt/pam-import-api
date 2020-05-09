@@ -6,7 +6,6 @@ import io.micronaut.cache.annotation.Cacheable
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.Open
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import javax.inject.Singleton
 
 @Singleton
@@ -39,6 +38,5 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     private fun Provider.toDTO(): ProviderDTO {
         return ProviderDTO(id=id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
     }
-
 }
 

@@ -6,9 +6,6 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
-import no.nav.arbeidsplassen.importapi.security.JwtTest
-import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

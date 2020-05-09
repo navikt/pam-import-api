@@ -3,7 +3,6 @@ import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
 import java.util.*

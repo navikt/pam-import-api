@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.provider.info
 import java.time.LocalDateTime
 import javax.inject.Singleton
 
@@ -55,7 +56,7 @@ class AdStateService(private val adStateRepository: AdStateRepository,
     }
 
     private fun AdState.toDTO(): AdStateDTO {
-        return AdStateDTO(uuid = uuid, versionId = versionId, provider = providerService.findById(providerId), reference = reference,
+        return AdStateDTO(uuid = uuid, versionId = versionId, provider = providerService.findById(providerId).info(), reference = reference,
                 ad = objectMapper.readValue(jsonPayload, AdDTO::class.java), updated = updated, created = created)
     }
 

@@ -4,6 +4,7 @@ import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.provider.info
 
 import javax.inject.Singleton
 
@@ -30,7 +31,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId) , message = message, status = status,
+        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId).info() , message = message, status = status,
                 md5 = md5, created = created, updated = updated, payload = payload, items = items)
     }
 }
