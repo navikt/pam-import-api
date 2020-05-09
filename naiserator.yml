@@ -17,7 +17,7 @@ spec:
   replicas:
     min: 2
     max: 2
-  cpuThresholdPercentage: 50
+    cpuThresholdPercentage: 50
   resources:
     limits:
       cpu: 1000m
@@ -39,7 +39,7 @@ spec:
   webproxy: false
   prometheus:
     enabled: true
-    path: /stillingsimport/prometheus
+    path: /stillingsimport/internal/prometheus
   ingresses:
     - {{ ingress }}
     - {{ ingress-tjenester }}

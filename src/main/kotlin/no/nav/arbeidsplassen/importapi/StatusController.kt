@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi
 
-import io.micronaut.configuration.kafka.ConsumerRegistry
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
