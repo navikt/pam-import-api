@@ -2,12 +2,12 @@ name: CI
 on:
   push:
     paths-ignore:
-      - "**.md"
-      - ".gitignore"
-      - "LICENCE"
-      - "CODEOWNERS"
+    - "**.md"
+    - ".gitignore"
+    - "LICENCE"
+    - "CODEOWNERS"
     branches:
-      - '!master'
+    - '!master'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
