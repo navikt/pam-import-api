@@ -11,8 +11,8 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
+import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

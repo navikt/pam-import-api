@@ -7,9 +7,10 @@ on:
       - "LICENCE"
       - "CODEOWNERS"
     branches:
+      - '*'
       - '!master'
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

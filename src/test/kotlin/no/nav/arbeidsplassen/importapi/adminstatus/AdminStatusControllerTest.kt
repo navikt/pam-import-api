@@ -14,7 +14,6 @@ import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog

@@ -14,11 +14,9 @@ import io.reactivex.schedulers.Schedulers
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
-import no.nav.arbeidsplassen.importapi.dto.AdDTO
-import no.nav.arbeidsplassen.importapi.dto.AdStatus
-import no.nav.arbeidsplassen.importapi.dto.ProviderDTO
-import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
+import no.nav.arbeidsplassen.importapi.dto.*
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.provider.info
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.toMD5Hex
@@ -46,7 +44,7 @@ class TransferController(private val transferLogService: TransferLogService,
         }
         val content = objectMapper.writeValueAsString(ads)
         val md5 = content.toMD5Hex()
-        val provider = providerService.findById(providerId)
+        val provider = providerService.findById(providerId).info()
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
              return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, provider = provider, md5 = md5))
         }
@@ -61,7 +59,7 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
-        val provider = providerService.findById(providerId)
+        val provider = providerService.findById(providerId).info()
         LOG.debug("Streaming for provider $providerId")
         return json.subscribeOn(Schedulers.io()).map {
             runCatching {
@@ -82,7 +80,7 @@ class TransferController(private val transferLogService: TransferLogService,
         }
     }
 
-    private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
+    private fun handleError(error: Throwable, provider: ProviderInfo): TransferLogDTO {
        return when (error) {
             is JsonParseException -> TransferLogDTO(message="Parse error: at ${error.location}", status = TransferLogStatus.ERROR, provider = provider)
             is MissingKotlinParameterException -> TransferLogDTO(message="Missing parameter: ${error.parameter.name}", status = TransferLogStatus.ERROR, provider = provider)
@@ -104,7 +102,7 @@ class TransferController(private val transferLogService: TransferLogService,
         val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
-        val provider = providerService.findById(providerId)
+        val provider = providerService.findById(providerId).info()
         return transferLogService.save(TransferLogDTO(message = "DELETED", provider = provider, payload = jsonPayload, md5 = md5, items = 1)).apply {
             payload = null
         }

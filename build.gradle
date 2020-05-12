@@ -17,7 +17,7 @@ repositories {
 }
 
 configurations {
-    developmentOnly 
+    developmentOnly
 }
 
 dependencies {
@@ -33,10 +33,8 @@ dependencies {
     kapt "io.micronaut:micronaut-validation"
     kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion")
     kaptTest "io.micronaut:micronaut-inject-java"
-    kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
+    kapt("io.micronaut.data:micronaut-data-processor")
 
-
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8"
     runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
     runtimeOnly "net.logstash.logback:logstash-logback-encoder:6.2"
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
@@ -47,15 +45,16 @@ dependencies {
     developmentOnly "com.h2database:h2:1.4.199"
     testImplementation 'io.micronaut.configuration:micronaut-flyway'
     testImplementation "io.micronaut.configuration:micronaut-jdbc-hikari"
-    testImplementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
+    testImplementation "io.micronaut.data:micronaut-data-jdbc"
 
-    implementation "io.micronaut.configuration:micronaut-micrometer-core:1.3.0"
-    implementation "io.micronaut.configuration:micronaut-micrometer-registry-prometheus:1.3.0"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3"
+    implementation "io.micronaut.configuration:micronaut-micrometer-core:$micronautMicrometerVersion"
+    implementation "io.micronaut.configuration:micronaut-micrometer-registry-prometheus:$micronautMicrometerVersion"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
     implementation "io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}"
 
-    annotationProcessor "io.micronaut.data:micronaut-data-processor:$micronautDataVersion"
-    implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
+    annotationProcessor "io.micronaut.data:micronaut-data-processor"
+    implementation "io.micronaut.data:micronaut-data-jdbc"
     implementation "io.micronaut.configuration:micronaut-jdbc-hikari"
     compileOnly "jakarta.persistence:jakarta.persistence-api:2.2.2"
     implementation "io.micronaut.configuration:micronaut-flyway"
@@ -91,14 +90,14 @@ compileKotlin {
 	kotlinOptions {
 	    jvmTarget = "11"
 	    //Will retain parameter names for Java reflection
-	    javaParameters = true 
+	    javaParameters = true
 	}
 }
 
 compileTestKotlin {
 	kotlinOptions {
 	    jvmTarget = "11"
-	    javaParameters = true 
+	    javaParameters = true
 	}
 }
 
