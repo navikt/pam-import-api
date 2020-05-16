@@ -4,4 +4,4 @@ RUN apt-get update && apt-get install -y curl
 
 COPY scripts/init-import-api.sh /init-scripts/init-import-api.sh
 COPY build/libs/pam-import-api-*-all.jar ./app.jar
-ENV JAVA_OPTS="-Xms256m -Xmx1536m"
+ENV JAVA_OPTS="-Xms256m -Xmx1536m -Doracle.jdbc.autoCommitSpecCompliant=false"
