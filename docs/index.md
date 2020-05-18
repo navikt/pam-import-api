@@ -15,6 +15,10 @@ following information:
 
 We will send you your provider identity including a secret key that gives you access to our API
 
+## Test environment
+To test the integration, you can use https://tjenester-q0.nav.no/stillingsimport. This is behind a firewall, 
+and you need to give us your ip-range of where you are testing from. 
+
 ## Authentication/Authorization
 The API is not publicly open, all requests need to be authenticated using 
 the HTTP bearer authorization header. 
