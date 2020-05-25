@@ -34,7 +34,6 @@ class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRep
     fun kakfkaAdminStatusSyncWithAd(adList: List<AdTransport>, offsets: List<Long>) {
         LOG.info("received from kafka with batch size of {} ads", adList.size)
         val adminList = adList.stream()
-                .peek { LOG.info("source is: ${it.source} and ad ${it.uuid}")}
                 .filter{ "IMPORTAPI" == it.source }
                 .map {
                     LOG.info("Mapping import api ad ${it.uuid}")
