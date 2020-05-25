@@ -1,0 +1,44 @@
+{
+  "uuid": "39c9675c-2a6f-457a-b97f-a7657890df33",
+  "contactList":[{"name":"Clark Kent","email":"superman@net","phone":"88888888","role":"organization","title":"Superman"}],
+  "properties": {
+    "_noorgnr": "true",
+    "workhours": "Fast",
+    "applicationdue": "24.10.2017",
+    "applicationlabel": "akva-123",
+    "_versionid": "1",
+    "_providerid": "10000",
+    "applicationurl": "http://www.sokher.no/akva-123",
+    "externalref": "3561269477",
+    "adtext": "Vår Forsøks- og innovasjonsstasjon Kraknes (FISK) er sentral i utvikling av vår\n                    forskning og rådgivning for en bærekraftig framtid. Vi ønsker å supplere vårt dyktige team på FISK\n                    med en akvatekniker som kan være med på utviklingen.&lt;br /&gt;&lt;br /&gt;Vi kan tilby interessante og\n                    allsidige arbeidsoppgaver i et spennende, internasjonalt og dynamisk miljø. Vi ser for oss at vår\n                    nye kollega har følgende kvalifikasjoner:\n                &lt;h2&gt;Arbeidsoppgaver&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Røkting og daglig stell av akvatiske organismer&lt;/li&gt;&lt;li&gt;Rigging\n                    og oppfølging av forsøk&lt;/li&gt;&lt;li&gt;Deltagelse i FoU prosjekt&lt;/li&gt;&lt;li&gt;Delta i vedlikehold og\n                    utvikling av anlegget&lt;/li&gt;&lt;/ul&gt;\n                &lt;h2&gt;Kvalifikasjoner&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Fagutdanning eller relevant høyere utdanning innenfor\n                    akvakultur/teknologi&lt;/li&gt;&lt;li&gt;Erfaring fra akvakultur og/eller forsøksvirksomhet&lt;/li&gt;&lt;li&gt;Fordel\n                    med dyreforsøkskurs, truckførerbevis og førerkort klasse B&lt;/li&gt;&lt;li&gt;Beherske norsk både\n                    skriftlig og muntlig samt excel&lt;/li&gt;&lt;/ul&gt;\n                &lt;h2&gt;Egenskaper&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Teknisk anlagt med evne til å finne gode løsninger&lt;/li&gt;&lt;li&gt;Selvstendig\n                    og systematisk&lt;/li&gt;&lt;li&gt;Positiv og god på samarbeid&lt;/li&gt;&lt;li&gt;Fleksibel&lt;/li&gt;&lt;li&gt;Lærevillig\n                    og trives med å skape nye muligheter i team&lt;/li&gt;&lt;/ul&gt;\n                &lt;h2&gt;Vi tilbyr&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Stillingsbrøk: 100%&lt;/li&gt;&lt;li&gt;100% fast stilling som inngår i\n                    anleggets vaktordning&lt;/li&gt;&lt;li&gt;Jobb i et utviklingsorientert og ekspanderende forskningsbasert\n                    selskap&lt;/li&gt;&lt;li&gt;Lønn etter avtale&lt;/li&gt;&lt;li&gt;Tjenestested: Forsknings- og\n                    innovasjonsstasjonen Kraknes (FISK)&lt;/li&gt;&lt;/ul&gt;\n                ",
+    "tags":	"[\"TEST_DUGNAD\",\"STATLIG_INKLUDERINGSDUGNAD\"]"
+  },
+  "title": "Akvatekniker",
+  "status": "ACTIVE",
+  "privacy": "SHOW_ALL",
+  "published": "2018-01-31T10:36:05.019",
+  "created": "2018-01-31T10:36:05.019",
+  "updated": "2018-01-31T10:36:05.019",
+  "expires": "2018-03-31T10:36:05.019",
+  "employer": null,
+  "source": "IMPORTAPI",
+  "medium": "websystemer",
+  "reference": "135792468",
+  "createdBy": "test",
+  "updatedBy": "test",
+  "categoryList": [
+    {
+      "id": 728,
+      "code": "1345.26",
+      "categoryType": "STYRK08NAV",
+      "name": "Daglig leder (utdanning og undervisning)",
+      "parentId": 702
+    }
+  ],
+  "businessName": "Stiftelsen Museum Vest",
+  "administration": {
+    "status": "DONE",
+    "reportee": "Tester",
+    "remarks": []
+  }
+}

@@ -34,16 +34,19 @@ class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRep
     fun kakfkaAdminStatusSyncWithAd(adList: List<AdTransport>, offsets: List<Long>) {
         LOG.info("received from kafka with batch size of {} ads", adList.size)
         val adminList = adList.stream()
+                .peek { LOG.info("source is: ${it.source} and ad ${it.uuid}")}
                 .filter{ "IMPORTAPI" == it.source }
-                .map { it.toAdminStatus(adminStatusRepository) }
+                .map {
+                    LOG.info("Mapping import api ad ${it.uuid}")
+                    it.toAdminStatus(adminStatusRepository)
+                }
                 .collect(Collectors.toList())
 
-        if (adminList.size>0) {
-            LOG.info("{} was import-api ads ", adminList.size)
+        if (adminList.isNotEmpty()) {
+            LOG.info("{} was saved as import-api ads ", adminList.size)
             adminStatusRepository.saveAll(adminList)
         }
         LOG.info("committing latest offset {} with ad {}", offsets.last(), adList.last().uuid)
-
     }
 
     override fun onPartitionsAssigned(partitions: MutableCollection<TopicPartition>) {
