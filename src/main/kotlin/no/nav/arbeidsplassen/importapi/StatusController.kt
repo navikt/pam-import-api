@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi
 
+import io.micronaut.configuration.kafka.ConsumerRegistry
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -9,7 +10,8 @@ import javax.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/internal")
-class StatusController(private val secretSignatureConfiguration: SecretSignatureConfiguration) {
+class StatusController(private val secretSignatureConfiguration: SecretSignatureConfiguration,
+                       private val consumerRegistry: ConsumerRegistry) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(StatusController::class.java)
@@ -24,6 +26,12 @@ class StatusController(private val secretSignatureConfiguration: SecretSignature
 
     @Get("/isAlive")
     fun isAlive(): HttpResponse<String> {
+        consumerRegistry.consumerIds.forEach {
+            if ( consumerRegistry.isPaused(it)) {
+                LOG.error("Kafka is not responding for consumer $it")
+                return HttpResponse.serverError("Kafka is not responding for consumer $it")
+            }
+        }
         return HttpResponse.ok("Alive")
     }
 
