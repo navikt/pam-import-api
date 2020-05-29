@@ -36,7 +36,8 @@ Authorization: Bearer <your secret key>
 This API is designed as a lightweight REST API supporting HTTP requests with JSON.
 
 ## Open API
-Open api specification is now available [here in test](https://tjenester-q0.nav.no/stillingsimport/swagger-ui/)
+Open api specification is now available [here in test](https://tjenester-q0.nav.no/stillingsimport/swagger-ui/), and in
+[prod](https://tjenester.nav.no/stillingsimport/swagger-ui/).
 
 ## Posting an ad
 To upload an ad, use HTTP POST as follow
