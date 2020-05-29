@@ -35,6 +35,9 @@ Authorization: Bearer <your secret key>
 # REST API
 This API is designed as a lightweight REST API supporting HTTP requests with JSON.
 
+## Open API
+Open api specification is now available [here in test](https://tjenester-q0.nav.no/stillingsimport/swagger-ui/)
+
 ## Posting an ad
 To upload an ad, use HTTP POST as follow
 
@@ -316,10 +319,10 @@ content-type: application/x-json-stream
 ## Posting in batches
 You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
 We recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
-may not go over 500 items.
+may not go over 100 items.
 
 ```
-POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/batch/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

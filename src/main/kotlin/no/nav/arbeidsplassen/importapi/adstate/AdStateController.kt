@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
@@ -14,6 +15,7 @@ import javax.annotation.security.RolesAllowed
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER,Roles.ROLE_ADMIN])
 @Controller("/api/v1/adstates")
+@SecurityRequirement(name = "bearer-auth")
 class AdStateController(private val adStateService: AdStateService) {
 
     @Get("/{providerId}/{reference}")
