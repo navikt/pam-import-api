@@ -91,3 +91,6 @@ kafka:
     enabled: false
   bootstrap:
     servers: ${KAFKA_BOOTSTRAP_SERVERS:`localhost:9092`}
+ad:
+  preview:
+    url: ${AD_PREVIEW_URL:`http://localhost:8080/stillinger/intern`}

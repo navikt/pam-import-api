@@ -646,7 +646,8 @@ Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer <secret key>
 ```
-
+# FAQ
+1. 
 # Suggestions/Questions
 If you have any questions/issues or suggestions please feel free to report it as github 
 [issues](https://github.com/navikt/pam-import-api/issues)
