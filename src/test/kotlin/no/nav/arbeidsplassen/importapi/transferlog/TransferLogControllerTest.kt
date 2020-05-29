@@ -46,7 +46,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         println(provider)
 
         // start the transfer
-        val post  = HttpRequest.POST("/api/v1/transfers/${provider.id}", objectMapper.transferToAdList())
+        val post  = HttpRequest.POST("/api/v1/transfers/batch/${provider.id}", objectMapper.transferToAdList())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(providertoken)

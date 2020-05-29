@@ -11,6 +11,7 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
@@ -26,18 +27,19 @@ import java.time.LocalDateTime
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/transfers")
+@SecurityRequirement(name = "bearer-auth")
 class TransferController(private val transferLogService: TransferLogService,
                          private val providerService: ProviderService,
                          private val adStateService: AdStateService,
                          private val objectMapper: ObjectMapper,
                          private val styrkCodeConverter: StyrkCodeConverter,
-                         @Value("\${transferlog.batch-size:500}") val adsSize: Int) {
+                         @Value("\${transferlog.batch-size:100}") val adsSize: Int) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferController::class.java)
     }
 
-    @Post("/{providerId}")
+    @Post("/batch/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
