@@ -68,8 +68,8 @@ dependencies {
     runtimeOnly "com.oracle.ojdbc:ojdbc10:$oracledbVersion"
     implementation "io.micronaut:micronaut-security-jwt"
     implementation("io.swagger.core.v3:swagger-annotations")
-
-
+    implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1"
+    implementation "org.apache.commons:commons-text:1.8"
 }
 
 test.classpath += configurations.developmentOnly
