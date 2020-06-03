@@ -9,6 +9,8 @@ import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
+import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
@@ -64,9 +66,21 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
     private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
         val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
-        return inDb.map { it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad)) }
-                .orElseGet{ AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(ad),
+        return inDb.map {
+            it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(htmlSanitizeAd(ad))) }
+                .orElseGet{ AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(htmlSanitizeAd(ad)),
                         providerId = transferLog.providerId, reference = ad.reference)}
+    }
+
+    private fun htmlSanitizeAd(ad: AdDTO): AdDTO {
+        val text = sanitize(ad.adText)
+        val props = ad.properties.map { (key, value) ->
+            when (key.type) {
+                PropertyType.HTML -> key to sanitize(value.toString())
+                else -> key to value
+            }
+        }.toMap()
+        return ad.copy(adText = text, properties = props)
     }
 
 }
