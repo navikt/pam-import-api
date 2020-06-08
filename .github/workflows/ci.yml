@@ -10,6 +10,13 @@ on:
       - '*'
       - '!master'
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: snyk/actions/gradle-jdk11@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_READ_TOKEN }}
+
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -17,9 +24,6 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.x'
-      - uses: snyk/actions/gradle-jdk11@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_READ_TOKEN }}
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
