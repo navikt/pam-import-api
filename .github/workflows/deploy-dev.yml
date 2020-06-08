@@ -9,7 +9,18 @@ on:
     branches:
       - master
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses:  snyk/actions/gradle@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test --severity-threshold=high
+
   build-and-deploy:
+    needs: security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
