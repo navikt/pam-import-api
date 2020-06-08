@@ -43,7 +43,7 @@ dependencies {
     testImplementation "io.micronaut.test:micronaut-test-junit5:1.1.2"
     testImplementation "org.mockito:mockito-junit-jupiter:2.22.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.1.0"
-    testImplementation "com.h2database:h2:1.4.199"
+    testImplementation "com.h2database:h2:1.4.200"
     developmentOnly "com.h2database:h2:1.4.199"
     testImplementation 'io.micronaut.configuration:micronaut-flyway'
     testImplementation "io.micronaut.configuration:micronaut-jdbc-hikari"
