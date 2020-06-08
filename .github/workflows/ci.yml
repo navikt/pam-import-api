@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses:  snyk/actions/gradle@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_READ_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   build-and-test:
     runs-on: ubuntu-latest
