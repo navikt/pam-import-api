@@ -17,6 +17,9 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.x'
+      - uses: snyk/actions/gradle-jdk11@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_READ_TOKEN }}
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
