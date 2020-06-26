@@ -24,7 +24,7 @@ enum class CategoryType {
 }
 
 enum class PrivacyType {
-    SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER
+    SHOW_ALL, INTERNAL_NOT_SHOWN
 }
 
 enum class AdStatus {

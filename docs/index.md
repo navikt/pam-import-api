@@ -502,7 +502,7 @@ The main properties are required
 | positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
 | title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
 | adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
-| privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN, DONT_SHOW_EMPLOYER |
+| privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN |
 | published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
 | expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
 
