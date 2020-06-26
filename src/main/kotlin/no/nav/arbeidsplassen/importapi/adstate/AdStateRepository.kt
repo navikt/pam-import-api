@@ -13,16 +13,16 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ORACLE)
+@JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
 
-    val insertSQL = """INSERT INTO "AD_STATE" ("UUID", "REFERENCE", "PROVIDER_ID", "JSON_PAYLOAD", "VERSION_ID", "CREATED") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "AD_STATE" SET "UUID"=?,"REFERENCE"=?, "PROVIDER_ID"=?, "JSON_PAYLOAD"=?, "VERSION_ID"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
+    val insertSQL = """insert into "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") values (?,?,?,?,?,?)"""
+    val updateSQL = """update "ad_state" set "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : AdState> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
+            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())

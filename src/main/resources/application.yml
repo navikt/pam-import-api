@@ -59,15 +59,16 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${ORACLE_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=Oracle`}
-    driverClassName: ${ORACLE_DRIVER:org.h2.Driver}
-    username: ${ORACLE_DB_USER:sa}
-    password: ${ORACLE_DB_PASSWORD:''}
+    url: ${DB_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL`}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:''}
+    defaultAutoCommit: "false"
 flyway:
   datasources:
     default:
       locations: classpath:db/migration
-      #clean-on-validation-error: false
+      #clean-on-validation-error: true
 transferlog:
   batch-size: 100
   task-size: 500

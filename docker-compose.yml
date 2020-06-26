@@ -1,5 +1,5 @@
 ---
-version: '2'
+version: '3'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.0
@@ -41,4 +41,14 @@ services:
       KAFKA_BROKERCONNECT: "broker:29092"
       JVM_OPTS: "-Xms32M -Xmx64M"
       SERVER_SERVLET_CONTEXTPATH: "/"
+  postgres:
+    hostname: postgres
+    container_name: postgres
+    image: postgres:11
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+    - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
 

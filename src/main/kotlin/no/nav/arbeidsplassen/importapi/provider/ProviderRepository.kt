@@ -8,19 +8,20 @@ import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.Statement
 import javax.transaction.Transactional
 
 
-@JdbcRepository(dialect = Dialect.ORACLE)
+@JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
 
-    val insertSQL = """INSERT INTO "PROVIDER" ("JWTID", "IDENTIFIER", "EMAIL", "PHONE", "CREATED") VALUES (?,?,?,?,?)"""
-    val updateSQL = """UPDATE "PROVIDER" SET "JWTID"=?, "IDENTIFIER"=?, "EMAIL"=?, "PHONE"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
+    val insertSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
+    val updateSQL = """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : Provider> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
+            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())

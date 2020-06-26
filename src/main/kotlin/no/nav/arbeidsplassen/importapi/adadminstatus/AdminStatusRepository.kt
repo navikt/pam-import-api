@@ -10,16 +10,16 @@ import java.sql.Statement
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ORACLE)
+@JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
 
-    val insertSQL = """INSERT INTO "ADMIN_STATUS" ("UUID", "STATUS", "MESSAGE", "REFERENCE", "PROVIDER_ID", "VERSION_ID", "CREATED") VALUES(?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "ADMIN_STATUS" SET "UUID"=?, "STATUS"=?, "MESSAGE"=?, "REFERENCE"=?, "PROVIDER_ID"=?, "VERSION_ID"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
+    val insertSQL = """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") values(?,?,?,?,?,?,?)"""
+    val updateSQL = """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : AdminStatus> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
+            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())

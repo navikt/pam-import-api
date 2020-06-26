@@ -1,0 +1,3 @@
+CREATE USER importapi;
+CREATE DATABASE importapi;
+GRANT ALL PRIVILEGES ON DATABASE importapi TO importapi;

@@ -65,7 +65,7 @@ dependencies {
 
     implementation "no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion"
     implementation "no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion"
-    runtimeOnly "com.oracle.ojdbc:ojdbc10:$oracledbVersion"
+    runtimeOnly "org.postgresql:postgresql:$postgresqlVersion"
     implementation "io.micronaut:micronaut-security-jwt"
     implementation("io.swagger.core.v3:swagger-annotations")
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1"
