@@ -24,7 +24,7 @@ enum class CategoryType {
 }
 
 enum class PrivacyType {
-    SHOW_ALL, INTERNAL_NOT_SHOWN
+    SHOW_ALL, INTERNAL_NOT_SHOWN, @Deprecated("not_supported") DONT_SHOW_EMPLOYER
 }
 
 enum class AdStatus {
