@@ -6,6 +6,7 @@ import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
@@ -45,7 +46,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         setLong(3, entity.providerId)
         setString(4, entity.jsonPayload)
         setLong(5, entity.versionId)
-        setObject(6, entity.created)
+        setTimestamp(6, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }

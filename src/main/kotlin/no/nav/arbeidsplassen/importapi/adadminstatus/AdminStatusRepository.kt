@@ -4,6 +4,7 @@ import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
@@ -44,7 +45,7 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
         setString(4, entity.reference)
         setLong(5, entity.providerId)
         setLong(6, entity.versionId)
-        setObject(7, entity.created)
+        setTimestamp(7, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }

@@ -59,11 +59,11 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${DB_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL`}
+    url: ${DB_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
     driverClassName: ${DB_DRIVER:org.h2.Driver}
     username: ${DB_USER:sa}
     password: ${DB_PASSWORD:''}
-    defaultAutoCommit: "false"
+    auto-commit: false
 flyway:
   datasources:
     default:
