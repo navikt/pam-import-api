@@ -53,6 +53,6 @@ spec:
         diskAutoresize: true
         autoBackupTime: "03:00"
         databases:
-          - name: import-api
+          - name: importapi
             envVarPrefix: DB
         cascadingDelete: false
