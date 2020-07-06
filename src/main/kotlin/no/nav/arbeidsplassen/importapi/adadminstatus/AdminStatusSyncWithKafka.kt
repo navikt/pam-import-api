@@ -18,7 +18,7 @@ import java.util.stream.Collectors
 
 
 @Requires(property = "adminstatussync.kafka.enabled", value="true")
-@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync}", threads = 1, offsetReset = OffsetReset.EARLIEST,
+@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}", threads = 1, offsetReset = OffsetReset.EARLIEST,
         batch = true, offsetStrategy = OffsetStrategy.SYNC)
 class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRepository,
                                @Value("\${adminstatussync.kafka.offsettimestamp}")
