@@ -6,7 +6,8 @@
         </encoder>
     </appender>
 <!--    <logger name="io.micronaut.data.query" level="DEBUG"/>-->
-<!--    <logger name="io.micronaut.transaction.jdbc.DataSourceTransactionManager" level="DEBUG" />-->
+    <logger name="io.micronaut.transaction.jdbc.DataSourceTransactionManager" level="DEBUG" />
+    <logger name="io.micronaut.transaction.support" level="DEBUG" />
 <!--    <logger name="io.micronaut.cache.interceptor" level="DEBUG"/>-->
     <logger name="io.micronaut.security" level="DEBUG" />
     <logger name="no.nav.arbeidsplassen" level="DEBUG" />
