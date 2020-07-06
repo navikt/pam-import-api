@@ -38,6 +38,9 @@ spec:
   filesFrom:
     - secret: pam-import-api-env-secret
       mountPath: /var/run/secrets/nais.io/vault
+  env:
+    - name: DB_DRIVER
+      value: "org.postgresql.Driver"
   gcp:
     sqlInstances:
       - name: import-api-stilling

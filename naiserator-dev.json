@@ -1,3 +1,3 @@
 {
-  "ingresses": ["https://pam-import-api.dev-gcp.nais.io"]
+  "ingress": ["https://pam-import-api.dev-gcp.nais.io"]
 }
