@@ -19,7 +19,6 @@ class AdminStatusSyncScheduler(private val adminStatusSyncWithFeed: AdminStatusS
 
     @Scheduled(cron = "30 * * * * *")
     @SchedulerLock(name = "adminStatusSyncTask")
-    @Transactional
     fun startAdminStatusSyncTask() {
         LOG.info("Starting AdminStatusSync Task")
         adminStatusSyncWithFeed.syncAdminStatus()

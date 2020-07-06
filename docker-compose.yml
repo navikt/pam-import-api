@@ -51,4 +51,16 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
     - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
-
+  import_api:
+    image: pam-import-api
+    depends_on:
+      - postgres
+      - broker
+    ports:
+      - "9028:9028"
+    environment:
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+      DB_DRIVER: org.postgresql.Driver
+      DB_HOST: 'postgres'
+      KAFKA_BOOTSTRAP_SERVERS: 'broker:29092'

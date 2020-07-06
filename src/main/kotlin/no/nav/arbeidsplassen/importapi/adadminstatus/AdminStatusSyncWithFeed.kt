@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.adadminstatus
 
 import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
+import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.feed.AdTransport
 import no.nav.arbeidsplassen.importapi.feed.FeedConnector
 import no.nav.arbeidsplassen.importapi.feed.Feedtask
@@ -10,8 +11,10 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.stream.Collectors
 import javax.inject.Singleton
+import javax.transaction.Transactional
 
 @Singleton
+@Open
 class AdminStatusSyncWithFeed(private val feedConnector: FeedConnector,
                               private val feedtaskRepository: FeedtaskRepository,
                               private val adminStatusRepository: AdminStatusRepository,
@@ -24,6 +27,7 @@ class AdminStatusSyncWithFeed(private val feedConnector: FeedConnector,
         private val ADMINSTATUSSYNC_TASK = "AdminStatusSyncTask"
     }
 
+    @Transactional
     fun syncAdminStatus() {
         val feedtask = feedtaskRepository.findByName(ADMINSTATUSSYNC_TASK).orElseGet{
             feedtaskRepository.save(Feedtask(name=ADMINSTATUSSYNC_TASK, lastrun = LocalDateTime.now().minusDays(1)))}
