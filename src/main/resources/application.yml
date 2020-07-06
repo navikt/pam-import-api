@@ -64,6 +64,8 @@ datasources:
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
     auto-commit: false
+    maximum-pool-size: 10
+    minimum-idle: 2
 flyway:
   datasources:
     default:
