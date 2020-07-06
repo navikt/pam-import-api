@@ -76,7 +76,7 @@ transferlog:
   delete:
     months: 6
   scheduler:
-    enabled: false
+    enabled: true
 adminstatussync:
   scheduler:
     enabled: false
