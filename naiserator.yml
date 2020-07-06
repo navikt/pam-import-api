@@ -26,20 +26,28 @@ spec:
       cpu: 200m
       memory: 512Mi
   vault:
-    enabled: true
-    paths:
-      - kvPath: {{ serviceuser-credentials }}
-        mountPath: /secrets/pamimportapi/serviceuser/credentials
-      - kvPath: {{ oracle-credentials }}
-        mountPath: /secrets/pamimportapi/oracle/credentials
-      - kvPath: {{ oracle-config }}
-        mountPath: /secrets/pamimportapi/oracle/config
-      - kvPath: {{ pamimportapi-env }}
-        mountPath: /var/run/secrets/nais.io/vault
+    enabled: false
   webproxy: false
   prometheus:
     enabled: true
     path: /stillingsimport/internal/prometheus
   ingresses:
-    - {{ ingress }}
-    - {{ ingress-tjenester }}
+  {{#each ingress as |url|}}
+     - {{url}}
+  {{/each}}
+  filesFrom:
+    - secret: pam-er-import-env-secret
+      mountPath: /var/run/secrets/nais.io/vault
+  gcp:
+    sqlInstances:
+      - name: import-api-stilling
+        type: POSTGRES_11
+        diskType: SSD
+        highAvailability: true
+        diskSize: 20
+        diskAutoresize: true
+        autoBackupTime: "03:00"
+        databases:
+          - name: import-api
+            envVarPrefix: DB
+        cascadingDelete: false
