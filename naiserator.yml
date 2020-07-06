@@ -41,6 +41,8 @@ spec:
   env:
     - name: DB_DRIVER
       value: "org.postgresql.Driver"
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: {{ kafka_bootstrap_servers }}
   gcp:
     sqlInstances:
       - name: import-api-stilling

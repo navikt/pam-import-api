@@ -1,3 +1,4 @@
 {
-  "ingress": ["https://pam-import-api.dev-gcp.nais.io"]
+  "ingress": ["https://pam-import-api.dev-gcp.nais.io"],
+  "kafka_bootstrap_servers":"b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443"
 }
