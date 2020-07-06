@@ -33,7 +33,6 @@ dependencies {
     kapt "io.micronaut:micronaut-validation"
     kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion")
     kaptTest "io.micronaut:micronaut-inject-java"
-    kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
     kapt("io.micronaut.configuration:micronaut-openapi:$micronauOpenApiVersion")
     kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
 
