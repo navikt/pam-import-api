@@ -10,10 +10,10 @@ spec:
   port: 9028
   liveness:
     path: /stillingsimport/internal/isAlive
-    initialDelay: 20
+    initialDelay: 40
   readiness:
     path: /stillingsimport/internal/isReady
-    initialDelay: 20
+    initialDelay: 40
   replicas:
     min: 2
     max: 2
