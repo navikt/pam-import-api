@@ -36,7 +36,7 @@ spec:
      - {{url}}
   {{/each}}
   filesFrom:
-    - secret: pam-er-import-env-secret
+    - secret: pam-import-api-env-secret
       mountPath: /var/run/secrets/nais.io/vault
   gcp:
     sqlInstances:
