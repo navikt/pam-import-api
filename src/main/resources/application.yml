@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: import-api
+    name: import
   server:
     port: 9028
     context-path: /stillingsimport
@@ -65,6 +65,13 @@ datasources:
     password: ${DB_PASSWORD:''}
     maximum-pool-size: 10
     minimum-idle: 2
+  shedlock:
+    url: ${DB_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:''}
+    maximum-pool-size: 2
+    minimum-idle: 1
 flyway:
   datasources:
     default:

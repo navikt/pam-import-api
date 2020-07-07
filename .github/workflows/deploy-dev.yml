@@ -34,7 +34,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: build and test
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
       - name: pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v1
         env:

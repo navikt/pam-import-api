@@ -39,7 +39,7 @@ dependencies {
     runtimeOnly "ch.qos.logback:logback-classic:1.2.3"
     runtimeOnly "net.logstash.logback:logstash-logback-encoder:6.2"
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-    testImplementation "io.micronaut.test:micronaut-test-junit5:1.1.2"
+    testImplementation "io.micronaut.test:micronaut-test-junit5:1.2.0"
     testImplementation "org.mockito:mockito-junit-jupiter:2.22.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.1.0"
     testImplementation "com.h2database:h2:1.4.199"
