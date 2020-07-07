@@ -45,7 +45,7 @@ dependencies {
     testImplementation "com.h2database:h2:1.4.199"
     developmentOnly "com.h2database:h2:1.4.199"
     testImplementation 'io.micronaut.configuration:micronaut-flyway'
-    testImplementation "io.micronaut.configuration:micronaut-jdbc-hikari"
+    testImplementation "io.micronaut.sql:micronaut-jdbc-hikari:$micronautSQLVersion"
     testImplementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
 
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.3"
@@ -55,7 +55,7 @@ dependencies {
     implementation "io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}"
 
     implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
-    implementation "io.micronaut.configuration:micronaut-jdbc-hikari"
+    implementation "io.micronaut.sql:micronaut-jdbc-hikari:$micronautSQLVersion"
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.2"
     implementation "io.micronaut.configuration:micronaut-flyway"
 
