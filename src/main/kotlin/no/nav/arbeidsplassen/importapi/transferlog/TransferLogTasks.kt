@@ -7,15 +7,12 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
 import io.micronaut.transaction.annotation.TransactionalEventListener
-import io.reactivex.functions.Consumer
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
 import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import org.apache.kafka.clients.producer.RecordMetadata
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
@@ -31,6 +28,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val meterRegistry: MeterRegistry,
                        private val kafkaSender: AdstateKafkaSender,
                        private val eventPublisher: ApplicationEventPublisher,
+                       @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
@@ -93,11 +91,13 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
     @TransactionalEventListener
     fun onNewAdEvent(event: AdStateEvent) {
-        LOG.info("sending batch of ${event.adList.count()} adstates for provider ${event.providerId}")
-        kafkaSender.send(event.adList).subscribe(
-                { LOG.info("Successfully sent to kafka adstates with uuid ${event.adList.map { it.uuid+" " }}") },
-                { LOG.error("Got error while sending to kafka adstates with uuid: ${event.adList.map { it.uuid+" " }}", it) }
-        )
+        if (adStateKafkaSend) {
+            LOG.info("sending batch of ${event.adList.count()} adstates for provider ${event.providerId}")
+            kafkaSender.send(event.adList).subscribe(
+                    { LOG.info("Successfully sent to kafka adstates with uuid ${event.adList.map { it.uuid + " " }}") },
+                    { LOG.error("Got error while sending to kafka adstates with uuid: ${event.adList.map { it.uuid + " " }}", it) }
+            )
+        }
     }
 
     data class AdStateEvent(val adList: Iterable<AdState>, val providerId: Long)
