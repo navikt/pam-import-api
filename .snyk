@@ -5,5 +5,5 @@ ignore:
   SNYK-JAVA-COMH2DATABASE-31685:
     - '*':
         reason: Test dependency, and not fixable
-        expires: 2020-07-08T06:14:39.494Z
+        expires: 2025-07-08T06:14:39.494Z
 patch: {}
