@@ -65,13 +65,6 @@ datasources:
     password: ${DB_PASSWORD:''}
     maximum-pool-size: 10
     minimum-idle: 1
-  shedlock:
-    url: ${DB_JDBC_URL:`jdbc:h2:mem:devDb2;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
-    driverClassName: ${DB_DRIVER:org.h2.Driver}
-    username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:''}
-    maximum-pool-size: 2
-    minimum-idle: 1
 flyway:
   datasources:
     default:
@@ -92,11 +85,11 @@ adminstatussync:
     enabled: false
   kafka:
     enabled: true
-#    offsettimestamp: "2020-01-01T00:00:00Z"
+  #    offsettimestamp: "2020-01-01T00:00:00Z"
   feedurl: ${PAM_AD_FEED_URL:`http://localhost:9001/api/v1/ads?source=IMPORTAPI`}
   pagesize: 200
 shedlock:
-  datasource: shedlock
+  datasource: default
   defaults:
     lock-at-most-for: 1m
 kafka:
@@ -107,3 +100,4 @@ kafka:
 ad:
   preview:
     url: ${AD_PREVIEW_URL:`http://localhost:8080/stillinger/intern`}
+

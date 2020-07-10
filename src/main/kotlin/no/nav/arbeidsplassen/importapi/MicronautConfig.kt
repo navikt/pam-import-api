@@ -10,7 +10,7 @@ import javax.inject.Singleton
 import javax.sql.DataSource
 
 @Factory
-class MicronautConfig(private val dataSource: DataSource) {
+class MicronautConfig(@Named("\${shedlock.datasource}") private val dataSource: DataSource) {
 
     @Singleton
     fun lockProvider(): LockProvider {

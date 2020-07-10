@@ -21,7 +21,6 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
 
     @SchedulerLock(name = "doTransferLogTask")
     @Scheduled(cron="*/30 * * * * *")
-    @Transactional(TxType.NEVER)
     fun startTransferLogTask() {
         LOG.info("starting transferlogtask")
         transferLogTasks.processTransferLogTask()
@@ -29,7 +28,6 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
 
     @Scheduled(cron="05 15 00 * * *")
     @SchedulerLock(name="deleteTransferLogTask")
-    @Transactional(TxType.NEVER)
     fun startDeleteTransferLogTask() {
         LOG.info("starting deletTransferLogTask")
         transferLogTasks.deleteTransferLogTask()
