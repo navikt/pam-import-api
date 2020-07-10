@@ -51,6 +51,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
     - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
+    command: ["postgres", "-c", "log_statement=all"]
   import_api:
     image: pam-import-api
     depends_on:

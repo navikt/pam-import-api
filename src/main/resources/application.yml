@@ -65,6 +65,7 @@ datasources:
     password: ${DB_PASSWORD:''}
     maximum-pool-size: 10
     minimum-idle: 1
+    pool-name: default
   shedlock:
     url: ${DB_JDBC_URL:`jdbc:h2:mem:devDb2;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
     driverClassName: ${DB_DRIVER:org.h2.Driver}
@@ -72,6 +73,7 @@ datasources:
     password: ${DB_PASSWORD:''}
     maximum-pool-size: 2
     minimum-idle: 1
+    pool-name: shedlock
 flyway:
   datasources:
     default:
