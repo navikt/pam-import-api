@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-if [[ -n $NAV_TRUSTSTORE_PATH ]]; then
+if test -r "${NAV_TRUSTSTORE_PATH}"; then
   export KAFKA_SSL_TRUSTSTORE_LOCATION=${NAV_TRUSTSTORE_PATH}
   export KAFKA_SSL_TRUSTSTORE_PASSWORD=${NAV_TRUSTSTORE_PASSWORD}
   export KAFKA_SASL_JAAS_CONFIG="org.apache.kafka.common.security.plain.PlainLoginModule required username=\"${SERVICEUSER}\" password=\"${SERVICEUSER_PASSWORD}\";"
