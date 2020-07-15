@@ -1,15 +1,14 @@
 package no.nav.arbeidsplassen.importapi
 
-import com.zaxxer.hikari.HikariDataSource
 import io.micronaut.context.annotation.Factory
 import net.javacrumbs.shedlock.core.LockProvider
 import net.javacrumbs.shedlock.provider.jdbc.JdbcLockProvider
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
-import javax.inject.Named
 import javax.inject.Singleton
+import javax.sql.DataSource
 
 @Factory
-class MicronautConfig(@Named("\${shedlock.datasource}") private val dataSource: HikariDataSource) {
+class MicronautConfig(private val dataSource: DataSource) {
 
     @Singleton
     fun lockProvider(): LockProvider {

@@ -18,6 +18,7 @@ import java.lang.Exception
 import java.time.LocalDateTime
 import javax.inject.Singleton
 import javax.transaction.Transactional
+import javax.transaction.Transactional.TxType
 import kotlin.streams.toList
 
 @Singleton
@@ -36,6 +37,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         private val LOG = LoggerFactory.getLogger(TransferLogTasks::class.java)
     }
 
+    @Transactional(TxType.REQUIRES_NEW)
     fun processTransferLogTask():Int {
         val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
         transferlogs.stream().forEach {
@@ -44,6 +46,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         return transferlogs.count()
     }
 
+    @Transactional(TxType.REQUIRES_NEW)
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
         LOG.info("Deleting transferlog before $date")
         transferLogRepository.deleteByUpdatedBefore(date)
