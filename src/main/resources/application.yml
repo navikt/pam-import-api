@@ -90,7 +90,6 @@ adminstatussync:
   feedurl: ${PAM_AD_FEED_URL:`http://localhost:9001/api/v1/ads?source=IMPORTAPI`}
   pagesize: 200
 shedlock:
-  datasource: shedlock
   defaults:
     lock-at-most-for: 1m
 kafka:

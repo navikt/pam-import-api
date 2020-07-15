@@ -4,12 +4,15 @@ import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import io.swagger.v3.oas.annotations.Hidden
+import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
+import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
 import java.util.*
 import javax.annotation.security.PermitAll
 
-@PermitAll
+
+@ProviderAllowed(value = [Roles.ROLE_ADMIN])
 @Controller("/internal/providers")
 @Hidden
 class ProviderController(private val providerService: ProviderService,
