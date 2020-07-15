@@ -19,7 +19,6 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
         private val LOG = LoggerFactory.getLogger(TransferLogScheduler::class.java)
     }
 
-    @Transactional(TxType.NOT_SUPPORTED)
     @SchedulerLock(name = "doTransferLogTask")
     @Scheduled(cron="*/30 * * * * *")
     fun startTransferLogTask() {
@@ -27,7 +26,6 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
         transferLogTasks.processTransferLogTask()
     }
 
-    @Transactional(TxType.NOT_SUPPORTED)
     @Scheduled(cron="05 15 00 * * *")
     @SchedulerLock(name="deleteTransferLogTask")
     fun startDeleteTransferLogTask() {
