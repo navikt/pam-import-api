@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Replaces(bean = DefaultKafkaListenerExceptionHandler::class)
-class KafkaExceptionHandler : KafkaListenerExceptionHandler {
+class KafkaExceptionHandler(private val kafkaStateRegistry: KafkaStateRegistry) : KafkaListenerExceptionHandler {
 
     override fun handle(exception: KafkaListenerException) {
         val cause = exception.cause!!
@@ -32,6 +32,7 @@ class KafkaExceptionHandler : KafkaListenerExceptionHandler {
             }
             LOG.error("Pausing consumer, need further investigation.")
             kafkaConsumer.pause(kafkaConsumer.assignment())
+            kafkaStateRegistry.setConsumerToError(consumerBean.javaClass.simpleName)
         }
     }
 
