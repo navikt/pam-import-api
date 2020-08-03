@@ -40,4 +40,11 @@ KAFKA_SASL_JAAS_CONFIG='org.apache.kafka.common.security.plain.PlainLoginModule 
 KAFKA_SECURITY_PROTOKOL=SASL_SSL
 ```
 
+### Creating new provider in test
 
+````
+curl -k -XPOST -H "Accept: application/json" -H "Cache-Control: no-cache" -H "Content-Type: applic
+ation/json" -d '{"identifier":"jobnorge-test","email":"test@jobnorge.no", "phone":"12345678"}' https://
+pam-import-api.nais.oera-q.local/stillingsimport/internal/providers
+
+````
