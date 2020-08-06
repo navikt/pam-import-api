@@ -1,4 +1,4 @@
 {
-  "ingress": ["https://arbeidsplassen-api.labs.nais.io/stillingsimport"],
+  "ingress": ["https://arbeidsplassen-api.dev.nav.no/stillingsimport"],
   "kafka_bootstrap_servers":"b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443"
 }
