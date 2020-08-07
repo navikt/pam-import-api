@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
-import javax.annotation.security.RolesAllowed
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/adminstatus")

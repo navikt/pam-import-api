@@ -9,8 +9,7 @@ import no.nav.arbeidsplassen.importapi.provider.info
 import javax.inject.Singleton
 
 @Singleton
-class TransferLogService(private val transferLogRepository: TransferLogRepository,
-                         private val providerService: ProviderService) {
+class TransferLogService(private val transferLogRepository: TransferLogRepository) {
 
 
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
@@ -27,11 +26,11 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLogDTO.toEntity(): TransferLog {
-        return TransferLog(providerId = provider.id!! , md5 = md5, payload = payload!!, items = items)
+        return TransferLog(providerId = providerId, md5 = md5, payload = payload!!, items = items)
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, provider = providerService.findById(providerId).info() , message = message, status = status,
-                md5 = md5, created = created, updated = updated, payload = payload, items = items)
+        return TransferLogDTO(versionId = id!!, message = message, status = status,
+                md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId)
     }
 }

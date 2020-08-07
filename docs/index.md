@@ -122,13 +122,6 @@ If the request was successful you will get a response with a receipt:
 ```
 {
   "versionId" : 1,
-  "provider" : {
-    "id" : 10000,
-    "jwtid" : "test-key-id-1",
-    "identifier" : "tester",
-    "email" : "test@test.no",
-    "phone" : "12345678"
-  },
   "status" : "RECEIVED",
   "md5" : "3D5A0C23BC12D58D5865CF3CFC086F11",
   "items" : 1,
@@ -288,13 +281,6 @@ content-type: application/x-json-stream
 
 {
   "versionId" : 1,
-  "provider" : {
-    "id" : 10000,
-    "jwtid" : "test-key-id-1",
-    "identifier" : "tester",
-    "email" : "test@test.no",
-    "phone" : "12345678"
-  },
   "status" : "RECEIVED",
   "md5" : "3D5A0C23BC12D58D5865CF3CFC086F11",
   "items" : 1,
@@ -302,13 +288,6 @@ content-type: application/x-json-stream
   "updated" : "2020-04-03T12:37:07.830203"
 }{
   "versionId" : 2,
-  "provider" : {
-    "id" : 10000,
-    "jwtid" : "test-key-id-1",
-    "identifier" : "tester",
-    "email" : "test@test.no",
-    "phone" : "12345678"
-  },
   "status" : "RECEIVED",
   "md5" : "CA41CC694F62E14F72FDE43B66C9821B",
   "items" : 1,
@@ -471,13 +450,6 @@ connection: keep-alive
 
 {
   "versionId": 1,
-  "provider": {
-    "id": 10000,
-    "jwtid": "test-key-id-1",
-    "identifier": "tester",
-    "email": "test@test.no",
-    "phone": "12345678"
-  },
   "status": "RECEIVED",
   "md5": "A814439739BD4ED36BAA643B3420002E",
   "items": 2,
