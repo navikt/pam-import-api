@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
 import io.swagger.v3.oas.annotations.Hidden
+import no.nav.arbeidsplassen.importapi.exception.KafkaStateRegistry
 import org.slf4j.LoggerFactory
 import javax.annotation.security.PermitAll
 
@@ -14,7 +15,7 @@ import javax.annotation.security.PermitAll
 @Controller("/internal")
 @Hidden
 class StatusController(private val secretSignatureConfiguration: SecretSignatureConfiguration,
-                       private val consumerRegistry: ConsumerRegistry) {
+                       private val kafkaStateRegistry: KafkaStateRegistry) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(StatusController::class.java)
@@ -29,11 +30,9 @@ class StatusController(private val secretSignatureConfiguration: SecretSignature
 
     @Get("/isAlive",produces = [MediaType.TEXT_PLAIN])
     fun isAlive(): HttpResponse<String> {
-        consumerRegistry.consumerIds.forEach {
-            if ( consumerRegistry.isPaused(it)) {
-                LOG.error("Kafka is not responding for consumer $it")
-                return HttpResponse.serverError("Kafka is not responding for consumer $it")
-            }
+        if (kafkaStateRegistry.hasError()) {
+            LOG.error("Kafka consumer has error and stopped")
+            return HttpResponse.serverError("Kafka consumer has error and stopped")
         }
         return HttpResponse.ok("Alive")
     }
