@@ -77,7 +77,7 @@ transferlog:
   delete:
     months: 6
   scheduler:
-    enabled: true
+    enabled: false
   adstate:
     kafka:
       enabled: false
@@ -85,7 +85,7 @@ adminstatussync:
   scheduler:
     enabled: false
   kafka:
-    enabled: true
+    enabled: false
 #    offsettimestamp: "2020-01-01T00:00:00Z"
   feedurl: ${PAM_AD_FEED_URL:`http://localhost:9001/api/v1/ads?source=IMPORTAPI`}
   pagesize: 200
