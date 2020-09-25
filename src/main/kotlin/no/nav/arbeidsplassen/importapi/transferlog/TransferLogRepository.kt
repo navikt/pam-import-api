@@ -2,12 +2,12 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
-import java.sql.Statement
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
@@ -49,6 +49,9 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
 
     @Transactional
     abstract fun deleteByUpdatedBefore(updated: LocalDateTime)
+
+    @Transactional
+    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<TransferLog>
 
     override fun <S : TransferLog> saveAll(entities: Iterable<S>): Iterable<S> {
         return entities.map { save(it) }.toList()

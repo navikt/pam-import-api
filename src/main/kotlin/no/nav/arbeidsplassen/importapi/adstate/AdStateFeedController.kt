@@ -13,11 +13,17 @@ import javax.annotation.security.PermitAll
 @PermitAll
 @Controller("/internal/adstates")
 @Hidden
-class AdStateFeedController(private val adStateService: AdStateService) {
+class AdStateFeedController(private val adStateService: AdStateService, private val adStateRepository: AdStateRepository) {
 
     @Get("/")
     fun getAdStates(@QueryValue updated: String, pageable: Pageable): Slice<AdStateDTO> {
         return adStateService.getAdStatesByUpdatedForInternalUse(LocalDateTime.parse(updated), pageable)
+    }
+
+    // use for migration
+    @Get("/entities")
+    fun getAdStatesEntites(@QueryValue updated: String, pageable: Pageable): Slice<AdState> {
+        return adStateRepository.findByUpdatedGreaterThanEquals(LocalDateTime.parse(updated), pageable)
     }
 
 }
