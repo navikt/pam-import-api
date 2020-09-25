@@ -8,7 +8,9 @@ import io.micronaut.http.annotation.QueryValue
 import io.swagger.v3.oas.annotations.Hidden
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import javax.annotation.security.PermitAll
 
+@PermitAll
 @Controller("/internal/transfers")
 @Hidden
 class TransferlogInternalController(private val transferLogRepository: TransferLogRepository) {
