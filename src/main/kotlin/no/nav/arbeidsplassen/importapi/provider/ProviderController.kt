@@ -16,6 +16,7 @@ import javax.annotation.security.PermitAll
 @Controller("/internal/providers")
 @Hidden
 class ProviderController(private val providerService: ProviderService,
+                         private val providerRepository: ProviderRepository,
                          private val tokenService: TokenService) {
     companion object {
         private val LOG = LoggerFactory.getLogger(ProviderController::class.java)
@@ -26,9 +27,10 @@ class ProviderController(private val providerService: ProviderService,
         return HttpResponse.ok(providerService.findById(id))
     }
 
-    @Get("/")
-    fun getProviders(pageable: Pageable): HttpResponse<Slice<ProviderDTO>> {
-        return HttpResponse.ok(providerService.list(pageable))
+    //internal use only
+    @Get("/entities")
+    fun getProviders(pageable: Pageable): Slice<Provider> {
+        return providerRepository.list(pageable)
     }
 
     @Post("/")
