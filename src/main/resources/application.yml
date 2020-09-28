@@ -63,8 +63,8 @@ datasources:
     driverClassName: ${DB_DRIVER:org.h2.Driver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
-    maximum-pool-size: 10
-    minimum-idle: 1
+    maximum-pool-size: 2
+    minimum-idle: 0
     pool-name: default
 flyway:
   datasources:

@@ -9,6 +9,7 @@ import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.Statement
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
