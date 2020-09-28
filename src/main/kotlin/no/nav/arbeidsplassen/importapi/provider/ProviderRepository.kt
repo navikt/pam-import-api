@@ -8,6 +8,7 @@ import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 
@@ -60,5 +61,8 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
 
         }
     }
+
+    @Transactional
+    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<Provider>
 }
 

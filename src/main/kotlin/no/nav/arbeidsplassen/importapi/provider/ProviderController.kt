@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.*
 import io.swagger.v3.oas.annotations.Hidden
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import java.util.*
 import javax.annotation.security.PermitAll
 
@@ -26,8 +27,8 @@ class ProviderController(private val providerService: ProviderService,
 
     //internal use only
     @Get("/entities")
-    fun getProviders(pageable: Pageable): Slice<Provider> {
-        return providerRepository.list(pageable)
+    fun getProviders(@QueryValue updated: String, pageable: Pageable): Slice<Provider> {
+        return providerRepository.findByUpdatedGreaterThanEquals(LocalDateTime.parse(updated), pageable)
     }
 
     @Post("/")
