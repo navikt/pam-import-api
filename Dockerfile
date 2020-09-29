@@ -1,5 +1,6 @@
 FROM navikt/java:11
 RUN apt-get update && apt-get install -y curl
+RUN apt-get install procps
 COPY scripts/init-env.sh /init-scripts/init-env.sh
 COPY scripts/migrate.sh ./migrate.sh
 COPY pam-import-api-migration/build/libs/pam-import-api-migration-*-all.jar ./pam-import-api-migration.jar
