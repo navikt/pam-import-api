@@ -44,7 +44,7 @@ spec:
     - name: KAFKA_BOOTSTRAP_SERVERS
       value: {{ kafka_bootstrap_servers }}
     - name: MIGRATION_URL
-      value: {{ migration_url }}
+      value: https://{{ migration_host }}/stillingsimport/internal
   gcp:
     sqlInstances:
       - name: import-api-stilling
@@ -59,3 +59,11 @@ spec:
           - name: importapi
             envVarPrefix: DB
         cascadingDelete: false
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ migration_host }}
+          ports:
+            - port: 443
+              name: https
+              protocol: HTTPS
