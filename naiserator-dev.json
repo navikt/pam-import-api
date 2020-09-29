@@ -1,6 +1,5 @@
 {
-  "ingress": "https://pam-import-api.nais.oera-q.local",
-  "ingress-tjenester": "https://tjenester-q0.nav.no/stillingsimport",
+  "ingress": ["https://pam-import-api.nais.oera-q.local", "https://tjenester-q0.nav.no/stillingsimport", "https://pam-import-api.dev-sbs.nais.io"],
   "oracle-credentials": "oracle/data/dev/creds/pamimportapi_q1-user",
   "oracle-config": "oracle/data/dev/config/pamimportapi_q1",
   "pamimportapi-env": "kv/preprod/sbs/pam-import-api/default",

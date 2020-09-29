@@ -41,5 +41,6 @@ spec:
     enabled: true
     path: /stillingsimport/internal/prometheus
   ingresses:
-    - {{ ingress }}
-    - {{ ingress-tjenester }}
+  {{#each ingress as |url|}}
+     - {{url}}
+  {{/each}}
