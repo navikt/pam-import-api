@@ -11,6 +11,7 @@
 <!--    <logger name="io.micronaut.cache.interceptor" level="DEBUG"/>-->
     <logger name="io.micronaut.security" level="DEBUG" />
     <logger name="no.nav.arbeidsplassen" level="DEBUG" />
+    <logger name="org.apache.kafka.clients.NetworkClient" level="OFF" />
     <root level="INFO">
         <appender-ref ref="stdout"/>
     </root>

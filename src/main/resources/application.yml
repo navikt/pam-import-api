@@ -4,6 +4,8 @@ micronaut:
   server:
     port: 9028
     context-path: /stillingsimport
+    cors:
+      enabled: true
   http:
     client:
       read-timeout: 30s
@@ -30,6 +32,9 @@ micronaut:
       - pattern: ${micronaut.server.context-path}/swagger-ui/**
         access:
           - isAnonymous()
+      - pattern: ${micronaut.server.context-path}/frontend/**
+        access:
+          - isAnonymous()
     token:
       jwt:
         enabled: true
@@ -45,6 +50,10 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
+      frontend:
+        enabled: true
+        mapping: /frontend/**
+        paths: classpath:frontend
 endpoints:
   metrics:
     enabled: true
