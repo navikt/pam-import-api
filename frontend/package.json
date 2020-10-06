@@ -41,10 +41,14 @@
     "nav-frontend-skjema-style": "^1.0.40",
     "nav-frontend-typografi": "^2.0.12",
     "nav-frontend-typografi-style": "^1.0.13",
+    "nav-frontend-grid": "^1.0.20",
+    "nav-frontend-grid-style": "^0.2.18",
+    "pam-frontend-core": "^1.3.4",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-day-picker": "^7.3.0",
     "react-dom": "^16.8.6",
-    "react-router-dom": "^5.0.1"
+    "react-router-dom": "^5.0.1",
+    "react-html-parser": "^2.0.2"
   }
 }

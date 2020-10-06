@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import '../styles.less';
+import './Stilling.less';
 import {getStillingByUuid} from "../api/api";
-
-
-
+import { Column, Container, Row } from 'nav-frontend-grid';
+import AdText from './adText/AdText';
+import HowToApply from "./howToApply/HowToApply";
+import EmploymentDetails from "./employmentDetails/EmploymentDetails";
+import ContactPerson from "./contactPerson/ContactPerson";
+import EmployerDetails from "./employerDetails/EmployerDetails";
+import AdDetails from "./adDetails/AdDetails";
 
 const Preview = ({ match }) => {
     const [ad, setAd] = useState(undefined);
@@ -23,11 +27,32 @@ const Preview = ({ match }) => {
     if (!ad) {
         return null;
     }
+
     return (
-        <div>
-            <div className="StillingJson">
-                {ad.adText}
-            </div>
+        <div className="Stilling">
+            <Container>
+                <Row>
+                    <Column xs='12' md='7' lg='8'>
+                        <div className="Stilling__left">
+                                <React.Fragment>
+                                    <h1 className="Stilling__h1">{ad.title}</h1>
+                                </React.Fragment>
+                                <React.Fragment>
+                                    <AdText adText={ad.adText}/>
+                                </React.Fragment>
+                        </div>
+                    </Column>
+                    <Column xs='12' md='5' lg='4'>
+                            <React.Fragment>
+                                <HowToApply properties={ad.properties} />
+                                <EmploymentDetails stilling={ad} />
+                                <ContactPerson contactList={ad.contactList} />
+                                <EmployerDetails stilling={ad} />
+                                <AdDetails ad={ad} />
+                            </React.Fragment>
+                    </Column>
+                </Row>
+            </Container>
         </div>
     );
 };
