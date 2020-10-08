@@ -10,7 +10,7 @@ const Index = () => {
     return (
         <main>
             <Switch>
-                <Route exact path="/:uuid" component={Preview} />
+                <Route exact path={"/stillingsimport/frontend/:uuid"} component={Preview} />
             </Switch>
         </main>
 

@@ -43,7 +43,8 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __API__: "'http://localhost:9028/stillingsimport/api/v1/preview'"
+            __API__: "'/stillingsimport/api/v1/preview'",
+            __CONTEXT_PATH__: "'/stillingsimport'"
         }),
         new HtmlWebPackPlugin({
             template: './src/index.html',

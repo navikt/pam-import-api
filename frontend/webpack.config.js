@@ -40,7 +40,8 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __API__: "'/'"
+            __API__: "'/stillingsimport/api/v1/preview'",
+            __CONTEXT_PATH__: "'/stillingsimport'"
         }),
         new HtmlWebPackPlugin({
             template: './src/index.html',
