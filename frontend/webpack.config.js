@@ -41,7 +41,7 @@ module.exports = {
     plugins: [
         new webpack.DefinePlugin({
             __API__: "'/stillingsimport/api/v1/preview'",
-            __CONTEXT_PATH__: "'/stillingsimport'"
+            __CONTEXT_PATH__: "'/stillingsimport/frontend'"
         }),
         new HtmlWebPackPlugin({
             template: './src/index.html',

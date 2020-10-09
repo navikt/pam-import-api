@@ -4,7 +4,6 @@ import ReactHtmlParser from 'react-html-parser';
 import { Undertittel } from 'nav-frontend-typografi';
 import fixLocationName from '../employmentDetails/fixLocationName';
 import { isValidUrl } from '../../utils';
-import getEmployer from './getEmployer';
 import './EmployerDetails.less';
 
 function getEmployerLocation(employer) {
@@ -27,7 +26,7 @@ function getEmployerLocation(employer) {
 
 export default function EmployerDetails({ stilling }) {
     const { properties } = stilling;
-    const employer = getEmployer(stilling);
+    const employer = stilling.employer
     const employerLocation = getEmployerLocation(stilling.employer);
     return (
         <div className="EmployerDetails detail-section">
@@ -36,7 +35,7 @@ export default function EmployerDetails({ stilling }) {
                 <dl className="dl-flex typo-normal">
                     {employer && [
                         <dt key="dt">Arbeidsgiver:</dt>,
-                        <dd key="dd">{employer}</dd>
+                        <dd key="dd">{employer.businessName}</dd>
                     ]}
                     {employerLocation && [
                         <dt key="dt">Adresse:</dt>,

@@ -30,9 +30,9 @@ export default function EmploymentDetails({ stilling }) {
                         <dt key="dt">Heltid/deltid:</dt>,
                         <dd key="dd">{properties.extent}</dd>
                     ]}
-                    {properties.positioncount && [
+                    {stilling.positions && [
                         <dt key="dt">Antall stillinger:</dt>,
-                        <dd key="dd">{properties.positioncount}</dd>
+                        <dd key="dd">{stilling.positions}</dd>
                     ]}
                     {properties.sector && [
                         <dt key="dt">Sektor:</dt>,
