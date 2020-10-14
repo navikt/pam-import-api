@@ -1,0 +1,51 @@
+name: deploy-labs
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENCE"
+      - "CODEOWNERS"
+    branches:
+      - labs-gcp
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11.x'
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: build and test
+        run: |
+          git clone https://github.com/navikt/pam-import-api-migration.git
+          cd pam-import-api-migration
+          git checkout main
+          ./gradlew clean build
+          cd ..
+          ./gradlew clean build -x test
+      - name: pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: build and push docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker build . --pull -t $IMAGE
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
+          docker push $IMAGE
+      - uses: nais/deploy/actions/deploy@v1
+        name: deploy to labs-gcp
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: labs-gcp
+          RESOURCE: naiserator.yml
+          VARS: naiserator-labs.json
