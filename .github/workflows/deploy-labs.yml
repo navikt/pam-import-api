@@ -1,4 +1,4 @@
-name: deploy-labs
+name: deploy-labs-gcp
 on:
   push:
     paths-ignore:
@@ -8,9 +8,8 @@ on:
       - "CODEOWNERS"
     branches:
       - labs-gcp
-
 jobs:
-  deploy-prod:
+  deploy-labs-gcp:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -47,5 +46,5 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: labs-gcp
-          RESOURCE: naiserator.yml
+          RESOURCE: naiserator-labs.yml
           VARS: naiserator-labs.json

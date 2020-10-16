@@ -1,0 +1,57 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: pam-import-api
+  namespace: teampam
+  labels:
+    team: teampam
+spec:
+  image: {{ image }}
+  port: 9028
+  liveness:
+    path: /stillingsimport/internal/isAlive
+    initialDelay: 40
+  readiness:
+    path: /stillingsimport/internal/isReady
+    initialDelay: 40
+  replicas:
+    min: 1
+    max: 1
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  vault:
+    enabled: false
+  webproxy: false
+  prometheus:
+    enabled: true
+    path: /stillingsimport/internal/prometheus
+  ingresses:
+  {{#each ingress as |url|}}
+     - {{url}}
+  {{/each}}
+  filesFrom:
+    - secret: pam-import-api-env-secret
+      mountPath: /var/run/secrets/nais.io/vault
+  env:
+    - name: DB_DRIVER
+      value: "org.postgresql.Driver"
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: {{ kafka_bootstrap_servers }}
+    - name: MIGRATION_URL
+      value: https://{{ migration_host }}/stillingsimport/internal
+  accessPolicy:
+    outbound:
+      rules:
+        - application: stillingdb-pam-postgresql
+      external:
+        - host: {{ migration_host }}
+          ports:
+            - port: 443
+              name: https
+              protocol: HTTPS
