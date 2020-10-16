@@ -6,4 +6,4 @@ if test -r "${NAV_TRUSTSTORE_PATH}";then
   export KAFKA_SASL_MECHANISM=PLAIN
   export KAFKA_SECURITY_PROTOCOL=SASL_SSL
 fi
-export DB_JDBC_URL="jdbc:postgresql://${DB_HOST}:5432/importapi"
+export DB_JDBC_URL="jdbc:postgresql://10.1.137.50:5432/importapi"
