@@ -45,6 +45,8 @@ spec:
       value: {{ kafka_bootstrap_servers }}
     - name: MIGRATION_URL
       value: https://{{ migration_host }}/stillingsimport/internal
+    - name: AD_PREVIEW_URL
+      value: {{ ad_preview_url }}
   gcp:
     sqlInstances:
       - name: import-api-stilling
