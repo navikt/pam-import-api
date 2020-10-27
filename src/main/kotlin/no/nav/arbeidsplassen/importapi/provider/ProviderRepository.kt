@@ -81,6 +81,9 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
 
         }
     }
+
+    @Transactional
+    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<Provider>
 }
 
 fun LocalDateTime.toTimeStamp(): Timestamp {
