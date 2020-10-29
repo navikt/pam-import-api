@@ -19,7 +19,7 @@ class TransferlogInternalController(private val transferLogRepository: TransferL
         private val LOG = LoggerFactory.getLogger(TransferlogInternalController::class.java)
     }
 
-    @Get("/")
+    @Get("/entities")
     fun getAllTransferlogs(@QueryValue updated: String, pageable: Pageable): Slice<TransferLog> {
         return transferLogRepository.findByUpdatedGreaterThanEquals(LocalDateTime.parse(updated),pageable)
     }
