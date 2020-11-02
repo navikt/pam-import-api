@@ -4,8 +4,6 @@ micronaut:
   server:
     port: 9028
     context-path: /stillingsimport
-    cors:
-      enabled: true
   http:
     client:
       read-timeout: 30s
