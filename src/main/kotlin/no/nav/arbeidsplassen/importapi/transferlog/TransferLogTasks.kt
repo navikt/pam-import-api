@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Sort
 import io.micronaut.transaction.annotation.TransactionalEventListener
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adstate.AdState
@@ -39,7 +40,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
 
     fun processTransferLogTask():Int {
-        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize))
+        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize, Sort.of(Sort.Order.asc("updated"))))
         transferlogs.stream().forEach {
             mapTransferLog(it)
         }
