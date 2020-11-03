@@ -49,7 +49,7 @@ class ProviderController(private val providerService: ProviderService,
 
     // NOTE set resetKey to true only if you want to disable all previous key.
     @Put("/{id}/token")
-    fun generateNewTokeForProvider(@PathVariable id: Long, @QueryValue(defaultValue = "false") resetKey: Boolean): HttpResponse<String> {
+    fun generateNewTokenForProvider(@PathVariable id: Long, @QueryValue(defaultValue = "false") resetKey: Boolean): HttpResponse<String> {
         LOG.info("Token generated for provider $id reset key $resetKey")
         val provider = if (resetKey) providerService.save(providerService.findById(id).copy(jwtid = UUID.randomUUID().toString()))
                         else providerService.findById(id)

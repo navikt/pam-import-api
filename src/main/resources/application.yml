@@ -4,8 +4,6 @@ micronaut:
   server:
     port: 9028
     context-path: /stillingsimport
-    cors:
-      enabled: true
   http:
     client:
       read-timeout: 30s
@@ -14,6 +12,12 @@ micronaut:
     sensitive: false
     binders:
       jvm:
+        enabled: true
+      web:
+        enabled: true
+      logback:
+        enabled: true
+      jdbc:
         enabled: true
     export:
       prometheus:
@@ -72,7 +76,7 @@ datasources:
     driverClassName: ${DB_DRIVER:org.h2.Driver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
-    maximum-pool-size: 2
+    maximum-pool-size: 4
     minimum-idle: 0
     pool-name: default
 flyway:
