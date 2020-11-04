@@ -9,18 +9,17 @@ on:
     branches:
       - master
 jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses:  snyk/actions/gradle@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test --severity-threshold=high
-
+#  security:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v1
+#      - uses:  snyk/actions/gradle@master
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#        with:
+#          command: test --severity-threshold=high
   build-and-deploy:
-    needs: security
+#    needs: security
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -34,7 +33,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: build and test
-        run: ./gradlew test build
+        run: |
+          git clone https://github.com/navikt/pam-import-api-migration.git
+          cd pam-import-api-migration
+          git checkout main
+          ./gradlew clean build
+          cd ..
+          ./gradlew clean build -x test
       - name: pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v1
         env:
@@ -46,11 +51,11 @@ jobs:
           docker build . --pull -t $IMAGE
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
           docker push $IMAGE
-      - name: deploy to dev-sbs
+      - name: deploy to dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-sbs
+          CLUSTER: dev-gcp
           RESOURCE: naiserator.yml
           VARS: naiserator-dev.json
       - name: post-deploy

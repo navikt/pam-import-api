@@ -16,8 +16,7 @@ following information:
 We will send you your provider identity including a secret key that gives you access to our API
 
 ## Test environment
-To test the integration, you can use https://tjenester-q0.nav.no/stillingsimport. This is behind a firewall, 
-and you need to give us your ip-range of where you are testing from. 
+To test the integration, you can use https://arbeidsplassen-api.labs.nais.io/stillingsimport.
 
 ## Authentication/Authorization
 The API is not publicly open, all requests need to be authenticated using 
@@ -36,7 +35,7 @@ Authorization: Bearer <your secret key>
 This API is designed as a lightweight REST API supporting HTTP requests with JSON.
 
 ## Open API
-Open api specification is now available [here in test](https://tjenester-q0.nav.no/stillingsimport/swagger-ui/), and in
+Open api specification is now available [here in test](https://arbeidsplassen-api.labs.nais.io/stillingsimport/swagger-ui/), and in
 [prod](https://tjenester.nav.no/stillingsimport/swagger-ui/).
 
 ## Posting an ad

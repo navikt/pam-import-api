@@ -6,22 +6,24 @@ import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.Statement
 import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ORACLE)
+@JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
 
-    val insertSQL = """INSERT INTO "TRANSFER_LOG" ("PROVIDER_ID", "ITEMS", "MD5", "PAYLOAD", "STATUS", "MESSAGE", "CREATED") VALUES (?,?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "TRANSFER_LOG" SET "PROVIDER_ID"=?, "ITEMS"=?, "MD5"=?, "PAYLOAD"=?, "STATUS"=?, "MESSAGE"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
+    val insertSQL = """insert into "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") values (?,?,?,?,?,?,?)"""
+    val updateSQL = """update "transfer_log" set "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : TransferLog> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
+            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
@@ -64,7 +66,7 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
         setString(4, entity.payload)
         setString(5, entity.status.name)
         setString(6, entity.message)
-        setObject(7, entity.created)
+        setTimestamp(7, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }

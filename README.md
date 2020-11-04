@@ -10,26 +10,12 @@
 ./gradlew run
 ```
 
-### Using Oracle database
-
-You can start pam-import-api with H2 as database, just set intellij run configuration to use test classpath. If you want
-to use real oracle database, you can use oracle docker container https://github.com/oracle/docker-images/blob/master/OracleDatabase/SingleInstance/README.md:
-
-make a local folder 'oracle' and run this command:
-
+## Run kafka, postgres with docker-compose
 ```
-docker run --name oraclexe-18 -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=system -v $(pwd)/oracle:/opt/oracle/oradata oracle/database:18.4.0-xe
-
+docker-compose up --build
 ```
 
-connect to oracle with "system" password and create a user for pam-import-api:
-
-```
-CREATE USER C##IMPORTAPI IDENTIFIED BY importapi;
-GRANT ALL PRIVILEGES TO C##IMPORTAPI;
-```
-
-
+### Kafka 
 Running with kafka in tests, you need to add these system properties:
 ```
 KAFKA_BOOTSTRAP_SERVERS=host1:port,host2:port

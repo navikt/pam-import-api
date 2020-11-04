@@ -1,7 +1,6 @@
 {
-  "ingress": ["https://pam-import-api.nais.oera-q.local", "https://tjenester-q0.nav.no/stillingsimport", "https://pam-import-api.dev-sbs.nais.io"],
-  "oracle-credentials": "oracle/data/dev/creds/pamimportapi_q1-user",
-  "oracle-config": "oracle/data/dev/config/pamimportapi_q1",
-  "pamimportapi-env": "kv/preprod/sbs/pam-import-api/default",
-  "serviceuser-credentials": "serviceuser/data/dev/srvpamimportapi"
+  "ingress": ["https://arbeidsplassen-api.dev.nav.no/stillingsimport", "https://pam-import-api.dev-gcp.nais.io/stillingsimport"],
+  "kafka_bootstrap_servers":"b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
+  "migration_host": "pam-import-api.dev-sbs.nais.io",
+  "ad_preview_url": "https://arbeidsplassen-api.dev.nav.no/stillingsimport/frontend"
 }

@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: import-api
+    name: import
   server:
     port: 9028
     context-path: /stillingsimport
@@ -12,6 +12,12 @@ micronaut:
     sensitive: false
     binders:
       jvm:
+        enabled: true
+      web:
+        enabled: true
+      logback:
+        enabled: true
+      jdbc:
         enabled: true
     export:
       prometheus:
@@ -30,6 +36,9 @@ micronaut:
       - pattern: ${micronaut.server.context-path}/swagger-ui/**
         access:
           - isAnonymous()
+      - pattern: ${micronaut.server.context-path}/frontend/**
+        access:
+          - isAnonymous()
     token:
       jwt:
         enabled: true
@@ -45,6 +54,10 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
+      frontend:
+        enabled: true
+        mapping: /frontend/**
+        paths: classpath:frontend
 endpoints:
   metrics:
     enabled: true
@@ -59,25 +72,29 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${ORACLE_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=Oracle`}
-    driverClassName: ${ORACLE_DRIVER:org.h2.Driver}
-    username: ${ORACLE_DB_USER:sa}
-    password: ${ORACLE_DB_PASSWORD:''}
+    url: ${DB_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:''}
+    maximum-pool-size: 4
+    minimum-idle: 0
+    pool-name: default
 flyway:
   datasources:
     default:
       locations: classpath:db/migration
-      #clean-on-validation-error: false
+      #clean-on-validation-error: true
 transferlog:
   batch-size: 100
   task-size: 500
   delete:
     months: 6
   scheduler:
-    enabled: true
-adminstatussync:
-  scheduler:
     enabled: false
+  adstate:
+    kafka:
+      enabled: false
+adminstatussync:
   kafka:
     enabled: true
 #    offsettimestamp: "2020-01-01T00:00:00Z"

@@ -1,0 +1,84 @@
+@import "~nav-frontend-lenker-style/src/lenker-style";
+@import "header";
+
+body {
+  padding: 2rem;
+}
+
+.StillingJson {
+  font-family: monospace;
+  white-space: pre;
+  margin: 2rem 0 0;
+  overflow-x: auto;
+}
+
+
+table {
+  border-top: 1px solid #b7b1a9;
+  border-bottom: 1px solid #b7b1a9;
+  border-collapse: collapse;
+  border-spacing: 0;
+  line-height: 1.42857143;
+  font-family: "Source Sans Pro", Arial, sans-serif;
+  font-size: 1rem;
+
+  tr {
+    border-top: 1px solid #b7b1a9;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  th, td
+  {
+    text-align: left;
+    padding: 0.5rem 1rem;
+    position: relative;
+  }
+
+  th:not(:last-child):after, td:not(:last-child):after {
+    content: "";
+    position: absolute;
+    border-right: 1px solid #b7b1a9;
+    right: 0;
+    top: 25%;
+    height: 50%;
+  }
+
+  tr:first-child td{
+    border-top-width: 2px;
+  }
+
+}
+
+.DatoWrapper{
+  display: inline-block;
+  margin-bottom: 1rem;
+
+  &:first-child {
+    margin-right: 1rem;
+  }
+
+  .DatoLabel{
+    margin-bottom: 0.5rem;
+  }
+}
+
+.statusOk{
+  color: @navGronn;
+}
+
+.statusError{
+  color: @redError;
+}
+
+.SearchPage {
+  max-width: 960px;;
+  width: 100%;
+  margin: 0 auto;
+
+  header {
+    max-width: 700px;
+  }
+}

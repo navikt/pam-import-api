@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: pam-import-api
-  namespace: default
+  namespace: teampam
   labels:
     team: teampam
 spec:
@@ -10,10 +10,10 @@ spec:
   port: 9028
   liveness:
     path: /stillingsimport/internal/isAlive
-    initialDelay: 20
+    initialDelay: 40
   readiness:
     path: /stillingsimport/internal/isReady
-    initialDelay: 20
+    initialDelay: 40
   replicas:
     min: 2
     max: 2
@@ -26,16 +26,7 @@ spec:
       cpu: 200m
       memory: 512Mi
   vault:
-    enabled: true
-    paths:
-      - kvPath: {{ serviceuser-credentials }}
-        mountPath: /secrets/pamimportapi/serviceuser/credentials
-      - kvPath: {{ oracle-credentials }}
-        mountPath: /secrets/pamimportapi/oracle/credentials
-      - kvPath: {{ oracle-config }}
-        mountPath: /secrets/pamimportapi/oracle/config
-      - kvPath: {{ pamimportapi-env }}
-        mountPath: /var/run/secrets/nais.io/vault
+    enabled: false
   webproxy: false
   prometheus:
     enabled: true
@@ -44,3 +35,37 @@ spec:
   {{#each ingress as |url|}}
      - {{url}}
   {{/each}}
+  filesFrom:
+    - secret: pam-import-api-env-secret
+      mountPath: /var/run/secrets/nais.io/vault
+  env:
+    - name: DB_DRIVER
+      value: "org.postgresql.Driver"
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: {{ kafka_bootstrap_servers }}
+    - name: MIGRATION_URL
+      value: https://{{ migration_host }}/stillingsimport/internal
+    - name: AD_PREVIEW_URL
+      value: {{ ad_preview_url }}
+  gcp:
+    sqlInstances:
+      - name: import-api-stilling
+        type: POSTGRES_11
+        tier: db-custom-2-7680
+        diskType: SSD
+        highAvailability: true
+        diskSize: 20
+        diskAutoresize: true
+        autoBackupTime: "03:00"
+        databases:
+          - name: importapi
+            envVarPrefix: DB
+        cascadingDelete: false
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ migration_host }}
+          ports:
+            - port: 443
+              name: https
+              protocol: HTTPS

@@ -15,10 +15,11 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.stream.Collector
 import java.util.stream.Collectors
+import kotlin.streams.toList
 
 
 @Requires(property = "adminstatussync.kafka.enabled", value="true")
-@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync}", threads = 1, offsetReset = OffsetReset.EARLIEST,
+@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}", threads = 1, offsetReset = OffsetReset.EARLIEST,
         batch = true, offsetStrategy = OffsetStrategy.SYNC)
 class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRepository,
                                @Value("\${adminstatussync.kafka.offsettimestamp}")
@@ -39,11 +40,12 @@ class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRep
                     LOG.info("Mapping import api ad ${it.uuid}")
                     it.toAdminStatus(adminStatusRepository)
                 }
-                .collect(Collectors.toList())
+                .toList()
 
         if (adminList.isNotEmpty()) {
-            LOG.info("{} was saved as import-api ads ", adminList.size)
-            adminStatusRepository.saveAll(adminList)
+            val distinctList = adminList.sortedByDescending(AdminStatus::updated).distinctBy(AdminStatus::uuid)
+            adminStatusRepository.saveAll(distinctList)
+            LOG.info("{} was saved as import-api ads ", distinctList.size)
         }
         LOG.info("committing latest offset {} with ad {}", offsets.last(), adList.last().uuid)
     }

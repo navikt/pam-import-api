@@ -6,6 +6,7 @@ import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
@@ -13,16 +14,16 @@ import java.time.LocalDateTime
 import java.util.*
 import javax.transaction.Transactional
 
-@JdbcRepository(dialect = Dialect.ORACLE)
+@JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
 
-    val insertSQL = """INSERT INTO "AD_STATE" ("UUID", "REFERENCE", "PROVIDER_ID", "JSON_PAYLOAD", "VERSION_ID", "CREATED") VALUES (?,?,?,?,?,?)"""
-    val updateSQL = """UPDATE "AD_STATE" SET "UUID"=?,"REFERENCE"=?, "PROVIDER_ID"=?, "JSON_PAYLOAD"=?, "VERSION_ID"=?, "CREATED"=?, "UPDATED"=CURRENT_TIMESTAMP WHERE "ID"=?"""
+    val insertSQL = """insert into "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") values (?,?,?,?,?,?)"""
+    val updateSQL = """update "ad_state" set "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : AdState> save(entity: S): S {
         if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, arrayOf("ID")).apply {
+            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
                 prepareSQL(entity)
                 execute()
                 check(generatedKeys.next())
@@ -45,7 +46,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         setLong(3, entity.providerId)
         setString(4, entity.jsonPayload)
         setLong(5, entity.versionId)
-        setObject(6, entity.created)
+        setTimestamp(6, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }

@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 import javax.transaction.Transactional
+import javax.transaction.Transactional.TxType
 
 @Requires(property = "transferlog.scheduler.enabled", value = "true")
 @Singleton
@@ -19,8 +20,7 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
     }
 
     @SchedulerLock(name = "doTransferLogTask")
-    @Scheduled(cron="*/10 * * * * *")
-    @Transactional
+    @Scheduled(cron="*/30 * * * * *")
     fun startTransferLogTask() {
         LOG.info("starting transferlogtask")
         transferLogTasks.processTransferLogTask()
@@ -28,7 +28,6 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
 
     @Scheduled(cron="05 15 00 * * *")
     @SchedulerLock(name="deleteTransferLogTask")
-    @Transactional
     fun startDeleteTransferLogTask() {
         LOG.info("starting deletTransferLogTask")
         transferLogTasks.deleteTransferLogTask()

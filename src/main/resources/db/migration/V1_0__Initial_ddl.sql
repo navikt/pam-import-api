@@ -1,13 +1,13 @@
 CREATE SEQUENCE provider_id_seq START WITH 10000;
 
 CREATE TABLE provider(
-    id NUMERIC(19,0) DEFAULT provider_id_seq.nextval NOT NULL,
+    id NUMERIC(19,0) NOT NULL DEFAULT NEXTVAL('provider_id_seq'),
     jwtid VARCHAR(36) NOT NULL,
     identifier VARCHAR(64) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(32) NOT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     UNIQUE (jwtid),
     UNIQUE (identifier)
@@ -16,11 +16,11 @@ CREATE TABLE provider(
 CREATE SEQUENCE transfer_log_id_seq;
 
 CREATE TABLE transfer_log (
-    id NUMERIC(19,0) DEFAULT transfer_log_id_seq.nextval NOT NULL,
+    id NUMERIC(19,0) NOT NULL DEFAULT NEXTVAL('transfer_log_id_seq'),
     provider_id NUMERIC(19,0) NOT NULL,
     items INTEGER NOT NULL,
     md5 VARCHAR(32) NOT NULL,
-    payload CLOB NOT NULL,
+    payload TEXT NOT NULL,
     status VARCHAR(36) NOT NULL,
     message VARCHAR(512),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -35,11 +35,11 @@ CREATE INDEX transfer_log_status_idx ON transfer_log(status);
 CREATE SEQUENCE adstate_id_seq;
 
 CREATE TABLE ad_state(
-    id NUMERIC(19,0) DEFAULT adstate_id_seq.nextval NOT NULL,
+    id NUMERIC(19,0) NOT NULL DEFAULT NEXTVAL('adstate_id_seq'),
     uuid VARCHAR(36) NOT NULL,
     provider_id NUMERIC(19,0) NOT NULL,
     reference VARCHAR(255) NOT NULL,
-    json_payload CLOB NOT NULL,
+    json_payload TEXT NOT NULL,
     version_id NUMERIC(19,0) NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -55,7 +55,7 @@ CREATE INDEX ad_state_version_id_idx ON ad_state(version_id);
 CREATE SEQUENCE admin_status_seq;
 
 CREATE TABLE admin_status(
-    id NUMERIC(19,0) DEFAULT admin_status_seq.nextval NOT NULL,
+    id NUMERIC(19,0) NOT NULL DEFAULT NEXTVAL('admin_status_seq'),
     uuid VARCHAR(36) NOT NULL,
     provider_id NUMERIC(19,0) NOT NULL,
     status VARCHAR(36) NOT NULL,
