@@ -24,7 +24,7 @@ the HTTP bearer authorization header.
 
 Example:
 ```
-POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -36,13 +36,13 @@ This API is designed as a lightweight REST API supporting HTTP requests with JSO
 
 ## Open API
 Open api specification is now available [here in test](https://arbeidsplassen-api.labs.nais.io/stillingsimport/swagger-ui/), and in
-[prod](https://tjenester.nav.no/stillingsimport/swagger-ui/).
+[prod](https://arbeidsplassen-api.nav.no/stillingsimport/swagger-ui/).
 
 ## Posting an ad
 To upload an ad, use HTTP POST as follow
 
 ```
-POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/x-json-stream
 Cache-Control: no-cache
 Content-Type: application/x-json-stream
@@ -133,7 +133,7 @@ Post ads in stream by using Content-Type: application/x-json-stream. Ads are sep
 example:
 
 ```
-POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}
+POST https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}
 Accept: application/x-json-stream
 Cache-Control: no-cache
 Content-Type: application/x-json-stream
@@ -301,7 +301,7 @@ We recommend you to upload in batches, You can group the ads in an array and sen
 may not go over 100 items.
 
 ```
-POST https://tjenester.nav.no/stillingsimport/api/v1/transfers/batch/{providerId}
+POST https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/batch/{providerId}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -504,8 +504,8 @@ Location of Employer
 
 ### Category
 Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
-from SSB. You can download all STYRK08-categories from [here](https://tjenester.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
-another simplified version of STYRK-08, can also be [used](https://tjenester.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
+from SSB. You can download all STYRK08-categories from [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
+another simplified version of STYRK-08, can also be [used](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
   
 It is possible to have more than two occupation categories for each ad.
 
@@ -521,7 +521,7 @@ let us know, we might support it later. You can also specify occupations using t
 ### Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
 Some of these properties are indexed and so will make the ad easier to search for. All supported properties names
-are also defined [here](https://tjenester.nav.no/stillingsimport/api/v1/properties/names)
+are also defined [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/names)
 Please specify as much data as possible on the property fields below.
  
 |Name | Type | Required | Description | Example |
@@ -552,7 +552,7 @@ Please specify as much data as possible on the property fields below.
 | jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
 
 Some property only allows for a set of valid values, they are listed 
-[here](https://tjenester.nav.no/stillingsimport/api/v1/properties/values)
+[here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/values)
 
 ### Work Address/Location
 
@@ -585,7 +585,7 @@ In arbeidsplassen every ad is manually checked, if it doesn't follow
 You can check your ad if is is approved or rejected using this:
 
 ```
-GET https://tjenester.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
+GET https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json
@@ -611,7 +611,7 @@ Ads will follow the expiration date, and will be automatic deactivated when it h
 You can also deactivate or stop an ad by sending a DELETE request:
 
 ```
-DELETE https://tjenester.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}
+DELETE https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}
 Accept: application/json
 Cache-Control: no-cache
 Content-Type: application/json

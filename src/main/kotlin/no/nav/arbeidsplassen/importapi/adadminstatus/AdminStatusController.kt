@@ -14,13 +14,18 @@ import no.nav.arbeidsplassen.importapi.security.Roles
 class AdminStatusController(private val adminStatusService: AdminStatusService) {
 
     @Get("/{providerId}/{reference}")
-    fun adAdminStatus(@PathVariable providerId:Long , @PathVariable reference: String): AdAdminStatusDTO {
+    fun adAdminStatus(@PathVariable providerId: Long, @PathVariable reference: String): AdAdminStatusDTO {
         return adminStatusService.findByProviderReference(providerId, reference)
     }
 
     @Get("/{providerId}/versions/{versionId}")
     fun adAdminStatusByVersion(@PathVariable versionId: Long, @PathVariable providerId: Long): List<AdAdminStatusDTO> {
         return adminStatusService.findByVersionAndProviderId(versionId, providerId)
+    }
+
+    @Get("/{providerId}/uuid/{uuid}")
+    fun adAdminStatusByUuid(@PathVariable providerId: Long, @PathVariable uuid: String): AdAdminStatusDTO {
+        return adminStatusService.findByUuid(uuid)
     }
 }
 
