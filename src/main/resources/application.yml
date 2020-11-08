@@ -90,7 +90,7 @@ transferlog:
   delete:
     months: 6
   scheduler:
-    enabled: false
+    enabled: true
   adstate:
     kafka:
       enabled: false
