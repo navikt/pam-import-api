@@ -15,7 +15,7 @@ class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
     private val hostname = InetAddress.getLocalHost().hostName
     private var leader =  "";
     private var lastCalled = LocalDateTime.MIN
-
+    private val electorUri = "http://"+electorPath;
 
     companion object {
         private val LOG = LoggerFactory.getLogger(LeaderElection::class.java)
@@ -28,7 +28,7 @@ class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
     private fun getLeader(): String {
         if (electorPath == "NOLEADERELECTION") return hostname;
         if (leader.isBlank() || lastCalled.isBefore(LocalDateTime.now().minusMinutes(2))) {
-            leader = client.exchange(electorPath,Elector::class.java).blockingFirst().body()!!.name
+            leader = client.exchange(electorUri,Elector::class.java).blockingFirst().body()!!.name
             LOG.debug("Running leader election getLeader is {} ", leader)
             lastCalled = LocalDateTime.now()
         }
