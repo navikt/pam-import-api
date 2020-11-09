@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
@@ -10,7 +11,8 @@ import javax.inject.Singleton
 
 @Singleton
 class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
-                     @Value("\${ELECTOR_PATH:NOLEADERELECTION}") val electorPath: String) {
+                     @Value("\${ELECTOR_PATH:NOLEADERELECTION}") val electorPath: String,
+                     val objectMapper: ObjectMapper) {
 
     private val hostname = InetAddress.getLocalHost().hostName
     private var leader =  "";
@@ -28,7 +30,7 @@ class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
     private fun getLeader(): String {
         if (electorPath == "NOLEADERELECTION") return hostname;
         if (leader.isBlank() || lastCalled.isBefore(LocalDateTime.now().minusMinutes(2))) {
-            leader = client.exchange(electorUri,Elector::class.java).blockingFirst().body()!!.name
+            leader = objectMapper.readValue(client.retrieve(electorUri).blockingFirst(), Elector::class.java).name
             LOG.debug("Running leader election getLeader is {} ", leader)
             lastCalled = LocalDateTime.now()
         }
