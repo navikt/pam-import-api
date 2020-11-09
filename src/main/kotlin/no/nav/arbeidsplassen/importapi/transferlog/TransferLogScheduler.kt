@@ -20,7 +20,7 @@ class TransferLogScheduler(private val transferLogTasks: TransferLogTasks, priva
     @Scheduled(cron="*/30 * * * * *")
     fun startTransferLogTask() {
         if (leaderElection.isLeader()) {
-            LOG.info("Running trasnferLogTask")
+            LOG.info("Running transferLogTask")
             transferLogTasks.processTransferLogTask()
         }
     }
