@@ -56,9 +56,6 @@ dependencies {
     implementation "jakarta.persistence:jakarta.persistence-api:2.2.2"
     implementation "io.micronaut.configuration:micronaut-flyway"
 
-    implementation "net.javacrumbs.shedlock:shedlock-micronaut:$shedlockVersion"
-    implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc:$shedlockVersion"
-
     implementation "no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion"
     implementation "no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion"
     implementation "org.postgresql:postgresql:$postgresqlVersion"

@@ -3,34 +3,33 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.context.annotation.Requires
 import io.micronaut.scheduling.annotation.Scheduled
-import net.javacrumbs.shedlock.micronaut.SchedulerLock
+import no.nav.arbeidsplassen.importapi.LeaderElection
 import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
-import javax.transaction.Transactional
-import javax.transaction.Transactional.TxType
 
 @Requires(property = "transferlog.scheduler.enabled", value = "true")
 @Singleton
 @Open
-class TransferLogScheduler(private val transferLogTasks: TransferLogTasks) {
+class TransferLogScheduler(private val transferLogTasks: TransferLogTasks, private val leaderElection: LeaderElection) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogScheduler::class.java)
     }
 
-    @SchedulerLock(name = "doTransferLogTask")
     @Scheduled(cron="*/30 * * * * *")
     fun startTransferLogTask() {
-        LOG.info("starting transferlogtask")
-        transferLogTasks.processTransferLogTask()
+        if (leaderElection.isLeader()) {
+            LOG.info("Running trasnferLogTask")
+            transferLogTasks.processTransferLogTask()
+        }
     }
 
     @Scheduled(cron="05 15 00 * * *")
-    @SchedulerLock(name="deleteTransferLogTask")
     fun startDeleteTransferLogTask() {
-        LOG.info("starting deletTransferLogTask")
-        transferLogTasks.deleteTransferLogTask()
+        if (leaderElection.isLeader()) {
+            LOG.info("starting deletTransferLogTask")
+            transferLogTasks.deleteTransferLogTask()
+        }
     }
-
 }
