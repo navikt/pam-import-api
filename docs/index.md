@@ -480,9 +480,10 @@ The main properties are required
 ### Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
 organization number to identify the employer (orgNr). This is the registered business (Virksomhet), also
-called for "underenhet" in Brønnøysundregistrene.  If you are not able to send the orgNr, 
-you must specify the employer/business name, and its postLocation. We also recommended you to use the **reference** 
-field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+called for "underenhet" in Brønnøysundregistrene. You can download all registered [underheter](https://data.brreg.no/enhetsregisteret/api/underenheter/lastned)
+
+If you are not able to send the "underenhet" orgNr, you must specify the employer/business name, and its postLocation. 
+We also recommended you to use the **reference**  field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
 
 |Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
