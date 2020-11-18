@@ -456,7 +456,10 @@ connection: keep-alive
   "updated": "2020-04-03T12:52:26.836541"
 }
 ```
-
+## Speed up batch uploads
+To speed up data transfer, it is best to not upload ads that have no changes since last upload. This is to reduce the 
+data load to the server, we recommend only uploading last modified ads.  
+ 
 # JSON Structure
 
 The data format is JSON, below is a diagram of the json structure:
