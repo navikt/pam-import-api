@@ -492,7 +492,7 @@ We also recommended you to use the **reference**  field as a unique identifier f
 |:----|:-----|:---------|:------------|:------|
 |reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
 |businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
-|orgnr | Integer | Optional | BRREG. OrgNumber | 989012088
+|orgnr | Integer | Optional | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
 |location | Object | Yes | Address of the employer | See location table|
 
 Location of Employer
