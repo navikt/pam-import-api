@@ -28,6 +28,7 @@ spec:
   vault:
     enabled: false
   webproxy: false
+  leaderElection: true
   prometheus:
     enabled: true
     path: /stillingsimport/internal/prometheus

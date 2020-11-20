@@ -456,7 +456,10 @@ connection: keep-alive
   "updated": "2020-04-03T12:52:26.836541"
 }
 ```
-
+## Speed up batch uploads
+To speed up data transfer, it is best to not upload ads that have no changes since last upload. This is to reduce the 
+data load to the server, we recommend only uploading last modified ads.  
+ 
 # JSON Structure
 
 The data format is JSON, below is a diagram of the json structure:
@@ -480,15 +483,16 @@ The main properties are required
 ### Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
 organization number to identify the employer (orgNr). This is the registered business (Virksomhet), also
-called for "underenhet" in Brønnøysundregistrene.  If you are not able to send the orgNr, 
-you must specify the employer/business name, and its postLocation. We also recommended you to use the **reference** 
-field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+called for "underenhet" in Brønnøysundregistrene. You can download all registered [underheter](https://data.brreg.no/enhetsregisteret/api/underenheter/lastned)
+
+If you are not able to send the "underenhet" orgNr, you must specify the employer/business name, and its postLocation. 
+We also recommended you to use the **reference**  field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
 
 |Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
 |reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
 |businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
-|orgnr | Integer | Optional | BRREG. OrgNumber | 989012088
+|orgnr | Integer | Optional | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
 |location | Object | Yes | Address of the employer | See location table|
 
 Location of Employer

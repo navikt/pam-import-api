@@ -34,11 +34,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: build and test
         run: |
-          git clone https://github.com/navikt/pam-import-api-migration.git
-          cd pam-import-api-migration
-          git checkout main
-          ./gradlew clean build
-          cd ..
           ./gradlew clean build -x test
       - name: pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v1
