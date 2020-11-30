@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.exception
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
@@ -68,6 +69,7 @@ private fun handleJsonProcessingException(error: JsonProcessingException): HttpR
                 .badRequest(ErrorMessage("Missing parameter: ${error.parameter.name}", MISSING_PARAMETER))
         is InvalidFormatException -> HttpResponse
                 .badRequest(ErrorMessage("Invalid value: ${error.value} at ${error.pathReference}", INVALID_VALUE))
+        is ValueInstantiationException -> HttpResponse.badRequest(ErrorMessage("Wrong value: ${error.message} at ${error.pathReference}", INVALID_VALUE))
         else -> HttpResponse.badRequest(ErrorMessage("Bad Json: ${error.localizedMessage}", UNKNOWN))
     }
 }
