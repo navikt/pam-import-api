@@ -19,8 +19,7 @@ class TransferDTOTest {
         val ads = objectMapper.transferToAdList()
         Assertions.assertEquals(2, ads.size)
         Assertions.assertEquals("Sørumsand barnehage", ads[0].employer!!.businessName)
-
-
+        Assertions.assertEquals("974220954", ads[1].employer!!.orgnr)
     }
-
 }
+
