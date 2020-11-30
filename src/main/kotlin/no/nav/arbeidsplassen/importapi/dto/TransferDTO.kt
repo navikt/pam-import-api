@@ -7,13 +7,28 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
                  val properties: Map<PropertyNames, Any> = hashMapOf(), val title: String, val adText: String,
                  val status:  AdStatus = AdStatus.RECEIVED, val privacy: PrivacyType = PrivacyType.SHOW_ALL,
-                 val positions: Int = 1, val employer: EmployerDTO?, val categoryList: List<CategoryDTO> = listOf())
+                 val positions: Int = 1, val employer: EmployerDTO?, val categoryList: List<CategoryDTO> = listOf()) {
+    init {
+        require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
+        require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
+        require(adText.isNotBlank()) {"adtext is blank"}
+    }
+}
 
 data class EmployerDTO(val reference: String, val businessName: String, val orgnr: String?, val location: LocationDTO)
 
 data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String?, val description: String?)
 
-data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?)
+data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {
+
+    init {
+        require(name.isNullOrBlank() || name.length<255) {"name size > 255"}
+        require(title.isNullOrBlank() || title.length<255) {"title size > 255"}
+        require(email.isNullOrBlank() || email.length<255) {"email size > 255"}
+        require(phone.isNullOrBlank() || phone.length<36) {"Phone size > 36"}
+        require(role.isNullOrBlank() || role.length<255)
+    }
+}
 
 data class LocationDTO(val address: String?, val postalCode: String?, val country: String?,
                        val county: String?, val municipal: String?, val city: String?,
@@ -30,3 +45,4 @@ enum class PrivacyType {
 enum class AdStatus {
     RECEIVED, STOPPED, DELETED
 }
+
