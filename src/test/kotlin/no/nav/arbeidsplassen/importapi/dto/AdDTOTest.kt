@@ -10,8 +10,9 @@ class AdDTOTest {
 
     @Test
     fun testAdDTOValidation() {
+        AdDTO(reference = "123", published = LocalDateTime.now(), title = "has a title", adText = "has adtext", locationList = listOf(LocationDTO(postalCode = "0123")), expires = LocalDateTime.now(), employer = null)
         assertThrows<IllegalArgumentException> {
-            AdDTO(reference = "123", published = LocalDateTime.now(), title = "", adText = "",expires = LocalDateTime.now(), employer = null)
+            AdDTO(reference = "123", published = LocalDateTime.now(), title = "", adText = "has adtext", locationList = listOf(LocationDTO(postalCode = "0123")), expires = LocalDateTime.now(), employer = null)
         }
     }
 
@@ -28,4 +29,5 @@ class AdDTOTest {
     fun testEmployerDTOValidation() {
         EmployerDTO(businessName = "NAV IT", reference = "123456", orgnr = "92345", location = LocationDTO(address = null, city = null, country = null, county = null, latitude = null, longitude = null, municipal = null, postalCode = "0156"))
     }
+
 }

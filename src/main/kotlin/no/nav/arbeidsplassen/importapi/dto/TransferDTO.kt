@@ -11,6 +11,7 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
     init {
         require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
         require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
+        require(locationList.isNotEmpty()) {"LocationList is empty, please specify at least one Location"}
         require(adText.isNotBlank()) {"adtext is blank"}
     }
 }
@@ -39,9 +40,9 @@ data class ContactDTO(val name: String?, val title: String?, val email: String?,
     }
 }
 
-data class LocationDTO(val address: String?, val postalCode: String?, val country: String?,
-                       val county: String?, val municipal: String?, val city: String?,
-                       val latitude: String?, val longitude: String?)
+data class LocationDTO(val address: String?=null, val postalCode: String?=null, val country: String?=null,
+                       val county: String?=null, val municipal: String?=null, val city: String?=null,
+                       val latitude: String?=null, val longitude: String?=null)
 
 enum class CategoryType {
     STYRK08, PYRK20
