@@ -18,7 +18,7 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
 
 data class EmployerDTO(val reference: String, val businessName: String, var orgnr: String?, val location: LocationDTO) {
     init {
-        require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
+        require(reference.isNotBlank() && reference.length<255) {"Employer reference is blank or size > 255"}
         require(businessName.isNotBlank() && businessName.length<255) {"businessName is blank or size > 255"}
         if (orgnr!=null && orgnr!!.contains("\\s".toRegex())) {
             // pam-ad requires this
@@ -32,15 +32,15 @@ data class CategoryDTO(val code: String, val categoryType: CategoryType = Catego
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {
 
     init {
-        require(name.isNullOrBlank() || name.length<255) {"name size > 255"}
-        require(title.isNullOrBlank() || title.length<255) {"title size > 255"}
-        require(email.isNullOrBlank() || email.length<255) {"email size > 255"}
-        require(phone.isNullOrBlank() || phone.length<36) {"Phone size > 36"}
-        require(role.isNullOrBlank() || role.length<255)
+        require(name.isNullOrBlank() || name.length<255) {"Contact name size > 255"}
+        require(title.isNullOrBlank() || title.length<255) {"Contact title size > 255"}
+        require(email.isNullOrBlank() || email.length<255) {"Contact email size > 255"}
+        require(phone.isNullOrBlank() || phone.length<36) {"Contact phone size > 36"}
+        require(role.isNullOrBlank() || role.length<255) {"Contact role is > 255 "}
     }
 }
 
-data class LocationDTO(val address: String?=null, val postalCode: String?=null, val country: String?=null,
+data class LocationDTO(val address: String?=null, val postalCode: String?=null, val country: String?="Norge",
                        val county: String?=null, val municipal: String?=null, val city: String?=null,
                        val latitude: String?=null, val longitude: String?=null)
 
