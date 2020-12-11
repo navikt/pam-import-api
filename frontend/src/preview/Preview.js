@@ -9,6 +9,7 @@ import EmploymentDetails from "./employmentDetails/EmploymentDetails";
 import ContactPerson from "./contactPerson/ContactPerson";
 import EmployerDetails from "./employerDetails/EmployerDetails";
 import AdDetails from "./adDetails/AdDetails";
+import AlertStripe from 'nav-frontend-alertstriper';
 
 const Preview = ({ match }) => {
     const [ad, setAd] = useState(undefined);
@@ -34,6 +35,11 @@ const Preview = ({ match }) => {
                 <Row>
                     <Column xs='12' md='7' lg='8'>
                         <div className="Stilling__left">
+                            {ad.status === 'DELETED' || ad.status === 'STOPPED' && (
+                                <AlertStripe type="advarsel" className="Expired alertstripe--solid">
+                                    Stillingsannonsen er inaktiv.
+                                </AlertStripe>
+                            )}
                                 <React.Fragment>
                                     <h1 className="Stilling__h1">{ad.title}</h1>
                                 </React.Fragment>
