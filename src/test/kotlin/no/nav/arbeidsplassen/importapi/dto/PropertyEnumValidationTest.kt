@@ -4,6 +4,8 @@ import io.micronaut.test.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
@@ -13,22 +15,22 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
 
     @Test
     fun validatePropertyNameValue() {
-        val correct = HashMap<String,Any>().apply {
-            put("extent", "Heltid")
-            put("engagementtype", "Fast")
-            put("jobarrangement", "Skift")
-            put("workday", "Ukedager")
-            put("workhours", "Kveld")
-            put("sector", "Privat")
+        val correct = HashMap<PropertyNames,Any>().apply {
+            put(extent, "Heltid")
+            put(engagementtype, "Fast")
+            put(jobarrangement, "Skift")
+            put(workday, "Ukedager")
+            put(workhours, "Kveld")
+            put(sector, "Privat")
         }
         propertyEnumValidation.checkOnlyValidValues(correct)
-        val errors = HashMap<String,Any>().apply {
-            put("extent", "Heltid/Deltid")
-            put("engagementtype", "Fast")
-            put("jobarrangement", "Skift")
-            put("workday", "Ukedager")
-            put("workhours", "Kveld")
-            put("sector", "Privat")
+        val errors = HashMap<PropertyNames,Any>().apply {
+            put(extent, "Heltid/Deltid")
+            put(engagementtype, "Fast")
+            put(jobarrangement, "Skift")
+            put(workday, "Ukedager")
+            put(workhours, "Kveld")
+            put(sector, "Privat")
         }
         val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)

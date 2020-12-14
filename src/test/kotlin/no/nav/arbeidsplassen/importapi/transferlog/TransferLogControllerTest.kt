@@ -114,7 +114,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
                 "starttime": "01.05.2019",
                 "applicationemail": "ola.normann@test.com",
                 "applicationurl": "https://url.to.applicationform/recruitment/hire/input.action?adId=140095810",
-                "sector": "Privat",
+                "sector": "Offentlig",
                 "applicationlabel": "Søknad Sørumsand"
               },
               "title": "Ønsker du å lede en moderne og veletablert barnehage?",
