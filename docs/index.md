@@ -511,7 +511,7 @@ Ads are classified by occupations, which use the international standard [STYRK-0
 from SSB. You can download all STYRK08-categories from [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
 another simplified version of STYRK-08, can also be [used](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
   
-It is possible to have more than two occupation categories for each ad.
+It is possible to have more than 1 and max 3 occupation categories for each ad.
 
 |Name | Type | Required | Description | Example |
 |:----|:-----|:---------|:------------|:------|
