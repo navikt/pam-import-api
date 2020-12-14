@@ -9,7 +9,7 @@ import javax.annotation.security.PermitAll
 class PropertiesEnumController(private val propertyNameValueValidation: PropertyNameValueValidation) {
 
     @Get("/values")
-    fun getPropertyValidValues(): HashMap<String, Set<String>> {
+    fun getPropertyValidValues(): HashMap<PropertyNames, Set<String>> {
         return propertyNameValueValidation.validValues
     }
 

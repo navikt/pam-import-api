@@ -16,6 +16,7 @@ import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
@@ -33,6 +34,7 @@ class TransferController(private val transferLogService: TransferLogService,
                          private val adStateService: AdStateService,
                          private val objectMapper: ObjectMapper,
                          private val styrkCodeConverter: StyrkCodeConverter,
+                         private val propertyNameValueValidation: PropertyNameValueValidation,
                          @Value("\${transferlog.batch-size:100}") val adsSize: Int) {
 
     companion object {
@@ -113,8 +115,9 @@ class TransferController(private val transferLogService: TransferLogService,
     private fun validate(ad: AdDTO) {
         ad.categoryList.stream().forEach { cat ->
             val optCat = styrkCodeConverter.lookup(cat.code)
-            if (optCat.isEmpty) LOG.warn("Category not found: $cat")
+            if (optCat.isEmpty) throw ImportApiError("category ${cat.code} does not exist", ErrorType.INVALID_VALUE)
         }
+        propertyNameValueValidation.checkOnlyValidValues(ad.properties)
     }
 
 }
