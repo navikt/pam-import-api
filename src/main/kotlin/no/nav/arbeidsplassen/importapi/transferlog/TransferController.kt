@@ -113,6 +113,9 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     private fun validate(ad: AdDTO) {
+        if (ad.categoryList.count()>3) {
+            throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE);
+        }
         ad.categoryList.stream().forEach { cat ->
             val optCat = styrkCodeConverter.lookup(cat.code)
             if (optCat.isEmpty) throw ImportApiError("category ${cat.code} does not exist", ErrorType.INVALID_VALUE)
