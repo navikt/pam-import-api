@@ -70,3 +70,6 @@ spec:
             - port: 443
               name: https
               protocol: HTTPS
+    inbound:
+      rules:
+        - application: pam-ad
