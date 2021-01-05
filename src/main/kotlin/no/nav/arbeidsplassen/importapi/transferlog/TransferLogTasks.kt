@@ -89,7 +89,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 else -> key to value
             }
         }.toMap()
-        return ad.copy(adText = text, properties = props)
+        return ad.copy(adText = text, properties = props, categoryList = ad.categoryList.distinct())
     }
 
     @TransactionalEventListener
