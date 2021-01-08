@@ -74,6 +74,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
+        LOG.info("Mapping ad {} for providerId {} transferlog {}", ad.reference, transferLog.providerId, transferLog.id)
         val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
         return inDb.map {
             it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(htmlSanitizeAd(ad))) }
