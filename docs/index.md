@@ -295,7 +295,7 @@ content-type: application/x-json-stream
 }
 ```
 
-It is important to check the status for each receipt, if it is "RECEIVED" and not "ERROR". 
+It is important to check the status for each receipt, if it is not "ERROR". 
 When using stream, the http status code will always return 200 OK. 
 
 
