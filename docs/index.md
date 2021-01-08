@@ -295,6 +295,10 @@ content-type: application/x-json-stream
 }
 ```
 
+It is important to check the status for each receipt, if it is "RECEIVED" and not "ERROR". 
+When using stream, the http status code will always return 200 OK. 
+
+
 ## Posting in batches
 You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
 We recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
