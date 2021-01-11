@@ -471,7 +471,7 @@ The data format is JSON, below is a diagram of the json structure:
 You can also download kotlin code for the DTOs 
 [here](https://github.com/navikt/pam-import-api/blob/master/src/main/kotlin/no/nav/arbeidsplassen/importapi/dto/TransferDTO.kt)
 
-### Main properties
+## Main properties
 The main properties are required
 
 |Name           | Type      | Required | Description                       | Example   |
@@ -484,7 +484,7 @@ The main properties are required
 | published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
 | expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
 
-### Employer
+## Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
 organization number to identify the employer (orgNr). This is the registered business (Virksomhet), also
 called for "underenhet" in Brønnøysundregistrene. You can download all registered [underheter](https://data.brreg.no/enhetsregisteret/api/underenheter/lastned)
@@ -510,7 +510,7 @@ Location of Employer
 |county | String | Optional | County | Oslo |
 |country | String | Optional | Country, defaults to Norge | Norge |
 
-### Category
+## Category
 Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
 from SSB. You can download all STYRK08-categories from [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
 another simplified version of STYRK-08, can also be [used](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
@@ -526,7 +526,7 @@ It is possible to have more than 1 and max 3 occupation categories for each ad.
 If you don't or can not support STYRK-occupations, and you are using another occupations category standard, please
 let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
 
-### Optional Properties
+## Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
 Some of these properties are indexed and so will make the ad easier to search for. All supported properties names
 are also defined [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/names)
@@ -559,6 +559,7 @@ Please specify as much data as possible on the property fields below.
 | jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
 
+### Properties that support only valid values 
 Some property only allows for a set of valid values, they are listed 
 [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/values)
 
