@@ -14,6 +14,9 @@ class AdDTOTest {
         assertThrows<IllegalArgumentException> {
             AdDTO(reference = "123", published = LocalDateTime.now(), title = "", adText = "has adtext", locationList = listOf(LocationDTO(postalCode = "0123")), expires = LocalDateTime.now(), employer = null)
         }
+        assertThrows<IllegalArgumentException> {
+            AdDTO(reference = "123", positions = 0, published = LocalDateTime.now(), title = "has a title", adText = "has adtext", locationList = listOf(LocationDTO(postalCode = "0123")), expires = LocalDateTime.now(), employer = null)
+        }
     }
 
     @Test
