@@ -84,7 +84,7 @@ allOpen {
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "12"
         //Will retain parameter names for Java reflection
         javaParameters = true
     }
@@ -92,7 +92,7 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "12"
         javaParameters = true
     }
 }
