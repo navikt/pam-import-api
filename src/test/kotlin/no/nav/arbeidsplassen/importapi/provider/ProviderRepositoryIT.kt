@@ -1,9 +1,8 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.context.annotation.Property
-import io.micronaut.context.annotation.PropertySource
+
 import io.micronaut.data.model.Pageable
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Test
 import java.util.*
 

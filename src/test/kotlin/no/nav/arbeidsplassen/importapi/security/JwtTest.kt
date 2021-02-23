@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.security
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.OctetSequenceKey
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Test
 import java.util.*
 import javax.crypto.KeyGenerator
