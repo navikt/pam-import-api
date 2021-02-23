@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

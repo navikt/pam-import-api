@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adminstatus
 
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status

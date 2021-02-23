@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.data.model.Pageable
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals

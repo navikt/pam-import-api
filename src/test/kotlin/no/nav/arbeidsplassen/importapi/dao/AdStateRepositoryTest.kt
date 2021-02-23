@@ -3,7 +3,7 @@ package no.nav.arbeidsplassen.importapi.dao
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
-import io.micronaut.test.annotation.MicronautTest
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
