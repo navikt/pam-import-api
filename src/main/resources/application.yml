@@ -4,6 +4,7 @@ micronaut:
   server:
     port: 9028
     context-path: /stillingsimport
+    thread-selection: auto
   http:
     client:
       read-timeout: 30s

@@ -474,15 +474,15 @@ You can also download kotlin code for the DTOs
 ## Main properties
 The main properties are required
 
-|Name           | Type      | Required | Description                       | Example   |
-|:------------- |:--------- |:-------- |:--------------------------------- |:------------    |
-| reference     | String    | Yes      | A unique identifier for the jobAd | alfanumber eg. 140095810        |
-| positions     | Integer   | Yes      | Amount of employment positions avaiable | 1         |
-| title         | String    | Yes      | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
-| adText        | HTML      | Yes      | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
-| privacy       | ENUM      | Yes      | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN |
-| published     | DATE      | Yes      | When to publish the ad | 2019-02-13T00:00:00 |
-| expires       | DATE      | Yes      | Time of expiration | 2019-02-24T00:00:00 |
+|Name           | Type      | Required | Norwegian translation | Description                       | Example   |
+|:------------- |:--------- |:-------- |:----------------------|:----------- |:------------    |
+| reference     | String    | Yes      | Referanse | A unique identifier for the jobAd | alfanumber eg. 140095810        |
+| positions     | Integer   | Yes      | Antall stilinger | Amount of employment positions avaiable | 1         |
+| title         | String    | Yes      | Overskrift | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
+| adText        | HTML      | Yes      | Annonsetekst | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
+| privacy       | ENUM      | Yes      | - | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN |
+| published     | DATE      | Yes      | Publiseringsdato | When to publish the ad | 2019-02-13T00:00:00 |
+| expires       | DATE      | Yes      | Sluttdato | Time of expiration | 2019-02-24T00:00:00 |
 
 ## Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
@@ -492,23 +492,23 @@ called for "underenhet" in Brønnøysundregistrene. You can download all registe
 If you are not able to send the "underenhet" orgNr, you must specify the employer/business name, and its postLocation. 
 We also recommended you to use the **reference**  field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|reference | String | Yes | A unique identifier for the employer | alfanumeric eg. 232151232 |
-|businessName | String | Yes | Name of the employer | Sørumsand Barnehage |
-|orgnr | Integer | Optional | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
-|location | Object | Yes | Address of the employer | See location table|
+|Name | Type | Required | Norwegian translation | Description | Example |
+|:----|:-----|:---------|:----------------------|:------------|:------|
+|reference | String | Yes | Referanse | A unique identifier for the employer | alfanumeric eg. 232151232 |
+|businessName | String | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
+|orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
+|location | Object | Yes | Arbeidssted | Address of the employer | See location table|
 
 Location of Employer
 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|address| String | Optional | Street address | Oslo gate 1|
-|postalCode| String | Yes | Postal Code | 0566 |
-|city | String | Optional | City | Oslo |
-|municipal | String | Optional | Municipal | Oslo |
-|county | String | Optional | County | Oslo |
-|country | String | Optional | Country, defaults to Norge | Norge |
+|Name | Type | Required | Norwegian translation | Description | Example |
+|:----|:-----|:---------|:----------------------|:------------|:------|
+|address| String | Optional | Adresse |Street address | Oslo gate 1|
+|postalCode| String | Yes | Postnr. | Postal Code | 0566 |
+|city | String | Optional | Sted | City | Oslo |
+|municipal | String | Optional | Kommune |Municipal | Oslo |
+|county | String | Optional | Fylke | County | Oslo |
+|country | String | Optional | Land | Country, defaults to Norge | Norge |
 
 ## Category
 Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
@@ -532,32 +532,32 @@ Some of these properties are indexed and so will make the ad easier to search fo
 are also defined [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/names)
 Please specify as much data as possible on the property fields below.
  
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| sourceurl | URL | Optional | Optional viewing the jobad on another page | eg https://url.to/123456 |
-| applicationdue | String | Optional | due date/time for job applications | 22.03.2020 |
-| applicationemail | String | Optional | applications can be send to this email | apply-here@job.com |  
-| applicationmail | String | Optional | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
-| applicationlabel | String | Optional | A tag for labelling applications | eg. referansenummer 312412 |
-| applicationurl | String | Optional | URL to an online application form | https://url.to.application/form |
-| employerdescription | HTML | Optional | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
-| employerhomepage | URL | Optional | URL to employer home page | https://url.to.homepage/ |
-| engagementtype | String | Optional | type of employee engagement contract | eg. Fast or Engasjement etc. |
-| extent | String | Optional | Full/Part time | Heltid |
-| occupation | String | Optional | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
-| salary | Integer | Optional | Salary | 800000 |
-| starttime | String | Optional | The start date or first day of work | eg. 24.05.2020 |
-| sector | String | Optional | Public of private sector | Offentlig or Privat |
-| location | String | Optional | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
-| jobtitle | String | Optional | title of position | eg. Kontorsjef |
-| keywords | String | Optional | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Java;Kotlin |
-| industry | String | Optional | what kind of industry category this job belongs to | eg. Bygg og anlegg |
-| workhours | String | Optional | what part of the day is work hours | eg. Dagtid |
-| workday | String | Optional | Day of work | eg. Ukedager |
-| facebookpage | String | Optional | facebook share URL | https://url.to.facebook/ |
-| twitteraddress | String | Optional | twitter share URL | https://url.to.twitter/ |
-| jobpercentage | String | Optional | if part time job, a percentage can be specified | eg 25% |
-| jobarrangement | String | Optional | what type of jobarrangement | eg. Skift or Vakt |
+|Name | Type | Required | Norwegian translation | Description | Example |
+|:----|:-----|:---------|:----------------------|:------------|:------|
+| sourceurl | URL | Optional | Visningsside | Optional viewing the jobad on another page | eg https://url.to/123456 |
+| applicationdue | String | Optional | Søknadsfrist | due date/time for job applications | 22.03.2020 |
+| applicationemail | String | Optional | Søknadsepost | applications can be send to this email | apply-here@job.com |  
+| applicationmail | String | Optional | Søknadsadresse | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
+| applicationlabel | String | Optional | Søknadsreferanse | A tag for labelling applications | eg. referansenummer 312412 |
+| applicationurl | String | Optional | Søknadslenke | URL to an online application form | https://url.to.application/form |
+| employerdescription | HTML | Optional | Om arbeidsgiver | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
+| employerhomepage | URL | Optional | Hjemmeside | URL to employer home page | https://url.to.homepage/ |
+| engagementtype | String | Optional | Ansettelsesform | type of employee engagement contract | eg. Fast or Engasjement etc. |
+| extent | String | Optional | Omfang | Full/Part time | Heltid |
+| occupation | String | Optional | Yrkestittel | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
+| salary | Integer | Optional | Lønn | Salary | 800000 |
+| starttime | String | Optional | Oppstartsdato | The start date or first day of work | eg. 24.05.2020 |
+| sector | String | Optional | Sektor | Public of private sector | Offentlig or Privat |
+| location | String | Optional | Arbeidssted | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
+| jobtitle | String | Optional | Stillingstittel | title of position | eg. Kontorsjef |
+| keywords | String | Optional | Nøkkelord | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Java;Kotlin |
+| industry | String | Optional | Bransje | what kind of industry category this job belongs to | eg. Bygg og anlegg |
+| workhours | String | Optional | Arbeidstid | what part of the day is work hours | eg. Dagtid |
+| workday | String | Optional | Arbeidsdager | Day of work | eg. Ukedager |
+| facebookpage | String | Optional | Facebook | facebook share URL | https://url.to.facebook/ |
+| twitteraddress | String | Optional | Twitter | twitter share URL | https://url.to.twitter/ |
+| jobpercentage | String | Optional | Stillingsprosent | if part time job, a percentage can be specified | eg 25% |
+| jobarrangement | String | Optional | Arbeidstidsordning | what type of jobarrangement | eg. Skift or Vakt |
 
 ### Properties that support only valid values 
 Some property only allows for a set of valid values, they are listed 
@@ -568,25 +568,25 @@ Some property only allows for a set of valid values, they are listed
 Work location is the address/place of work. Ad must at least specify one work location, 
 so that it shows up in a location search.
 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| address | String | Optional | Street address | Magnus Sørlis veg. 1 |
-| postalCode | String | Optional | postal/zip code | 1920 |
-| county | String | Optional| County | Viken |
-| municipal | String | Optional | Municipal | Lillestrøm |
-| city | String | Optional | City | Sørumsand |
-| country | String | Optional | defaults to Norge | Norge |
+|Name | Type | Required | Norwegian translation | Description | Example |
+|:----|:-----|:---------|:----------------------|:------------|:------|
+| address | String | Optional | Adresse | Street address | Magnus Sørlis veg. 1 |
+| postalCode | String | Optional | Postnr. | postal/zip code | 1920 |
+| county | String | Optional | Fylke | County | Viken |
+| municipal | String | Optional | Kommune | Municipal | Lillestrøm |
+| city | String | Optional | Sted | City | Sørumsand |
+| country | String | Optional | Land | defaults to Norge | Norge |
 
 
 ### Contact information
 It is possible to have many contacts, we recommended at least one contact for each jobAd.
 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-| name | String | Yes | Contact name | Tom Doe |
-| title | String | Optional | Job position title | Regionleder |
-| email | String | Optional | Contact email | tom.doe@somewhere.com |
-| phone | String | Optional | Phone number | +47 010 20 304 | 
+|Name | Type | Required | Norwegian translation | Description | Example |
+|:----|:-----|:---------|:----------------------|:------------|:------|
+| name | String | Yes | Navn | Contact name | Tom Doe |
+| title | String | Optional | Stillingstittel | Job position title | Regionleder |
+| email | String | Optional | Epost | Contact email | tom.doe@somewhere.com |
+| phone | String | Optional | Telefon | Phone number | +47 010 20 304 | 
 
 ## Ad Status 
 In arbeidsplassen every ad is manually checked, if it doesn't follow 
