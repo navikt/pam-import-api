@@ -60,7 +60,7 @@ jobs:
       - name: draft release
         uses: actions/create-release@latest
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION_TAG }}
           release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
