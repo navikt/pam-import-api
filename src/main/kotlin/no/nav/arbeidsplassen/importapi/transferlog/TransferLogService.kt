@@ -25,6 +25,12 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
                .toDTO()
     }
 
+    fun findByVersionId(versionId: Long): TransferLogDTO {
+        return transferLogRepository.findById(versionId).orElseThrow {
+            ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
+        }.toDTO()
+    }
+
     private fun TransferLogDTO.toEntity(): TransferLog {
         return TransferLog(providerId = providerId, md5 = md5, payload = payload!!, items = items)
     }
@@ -33,4 +39,12 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         return TransferLogDTO(versionId = id!!, message = message, status = status,
                 md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId)
     }
+
+    fun resend(versionId: Long):TransferLogDTO {
+        val received = transferLogRepository.findById(versionId).orElseThrow {
+            ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
+        }.copy(status = TransferLogStatus.RECEIVED)
+        return transferLogRepository.save(received).toDTO()
+    }
+
 }
