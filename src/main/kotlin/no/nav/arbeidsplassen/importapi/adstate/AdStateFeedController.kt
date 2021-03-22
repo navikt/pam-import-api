@@ -20,10 +20,4 @@ class AdStateFeedController(private val adStateService: AdStateService, private 
         return adStateService.getAdStatesByUpdatedForInternalUse(LocalDateTime.parse(updated), pageable)
     }
 
-    // use for migration
-    @Get("/entities")
-    fun getAdStatesEntites(@QueryValue updated: String, pageable: Pageable): Slice<AdState> {
-        return adStateRepository.findByUpdatedGreaterThanEquals(LocalDateTime.parse(updated), pageable)
-    }
-
 }
