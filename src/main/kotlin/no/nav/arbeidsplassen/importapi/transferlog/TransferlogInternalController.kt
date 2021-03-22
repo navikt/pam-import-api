@@ -1,15 +1,14 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
-import io.micronaut.http.annotation.*
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.Put
 import io.swagger.v3.oas.annotations.Hidden
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
-import javax.annotation.security.PermitAll
 
 @ProviderAllowed(value = [Roles.ROLE_ADMIN])
 @Controller("/internal/transfers")

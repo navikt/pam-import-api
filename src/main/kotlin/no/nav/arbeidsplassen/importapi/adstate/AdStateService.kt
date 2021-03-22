@@ -56,6 +56,13 @@ class AdStateService(private val adStateRepository: AdStateRepository,
         }
     }
 
+    fun resendAdState(uuid: String): AdStatePublicDTO {
+        val resend = adStateRepository.findByUuid(uuid).orElseThrow {
+           ImportApiError("Adstate with $uuid not found", ErrorType.NOT_FOUND)
+        }.copy(updated = LocalDateTime.now())
+        return adStateRepository.save(resend).toDTO()
+    }
+
     private fun AdState.toDTO(): AdStatePublicDTO {
         return AdStatePublicDTO(uuid = uuid, versionId = versionId, reference = reference,
                 ad = objectMapper.readValue(jsonPayload, AdDTO::class.java), updated = updated, created = created, providerId = providerId)
