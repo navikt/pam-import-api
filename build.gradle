@@ -1,12 +1,12 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.3.70"
-    id "org.jetbrains.kotlin.kapt" version "1.3.70"
-    id "org.jetbrains.kotlin.plugin.allopen" version "1.3.70"
-    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
+    id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
+    id "org.jetbrains.kotlin.plugin.allopen" version "$kotlinVersion"
+    id "com.github.johnrengelman.shadow" version "$shadowVersion"
     id "application"
 }
 
-version "0.3"
+version "0.4"
 group "no.nav.arbeidsplassen.importapi"
 
 repositories {
@@ -40,9 +40,9 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
 
-    testImplementation "io.micronaut.test:micronaut-test-junit5:1.2.0"
-    testImplementation "org.mockito:mockito-junit-jupiter:2.22.0"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.1.0"
+    testImplementation "io.micronaut.test:micronaut-test-junit5:$micronautTestVersion"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoJupiterVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
     testImplementation "com.h2database:h2:1.4.199"
     developmentOnly "com.h2database:h2:1.4.199"
 
@@ -87,7 +87,7 @@ allOpen {
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "12"
+        jvmTarget = "14"
         //Will retain parameter names for Java reflection
         javaParameters = true
     }
@@ -95,7 +95,7 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = "12"
+        jvmTarget = "14"
         javaParameters = true
     }
 }
