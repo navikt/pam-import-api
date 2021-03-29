@@ -2,5 +2,6 @@
   "ingress": ["https://arbeidsplassen-api.nav.no/stillingsimport", "https://pam-import-api.prod-gcp.nais.io/stillingsimport"],
   "kafka_bootstrap_servers": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
   "migration_host": "pam-import-api.prod-sbs.nais.io",
-  "ad_preview_url": "https://arbeidsplassen-api.nav.no/stillingsimport/frontend"
+  "ad_preview_url": "https://arbeidsplassen-api.nav.no/stillingsimport/frontend",
+  "kafka_pool": "nav-prod"
 }
