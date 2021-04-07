@@ -44,12 +44,10 @@ spec:
   env:
     - name: DB_DRIVER
       value: "org.postgresql.Driver"
-    - name: KAFKA_BOOTSTRAP_SERVERS
-      value: {{ kafka_bootstrap_servers }}
-    - name: MIGRATION_URL
-      value: https://{{ migration_host }}/stillingsimport/internal
     - name: AD_PREVIEW_URL
       value: {{ ad_preview_url }}
+    - name: ADMINSTATUS_KAFKA_TOPIC
+      value: "{{ adminstatus_kafka_topic }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling
