@@ -15,7 +15,8 @@ import javax.annotation.security.PermitAll
 @Controller("/internal")
 @Hidden
 class StatusController(private val secretSignatureConfiguration: SecretSignatureConfiguration,
-                       private val kafkaStateRegistry: KafkaStateRegistry) {
+                       private val kafkaStateRegistry: KafkaStateRegistry,
+                       private val consumerRegistry: ConsumerRegistry) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(StatusController::class.java)
@@ -31,7 +32,12 @@ class StatusController(private val secretSignatureConfiguration: SecretSignature
     @Get("/isAlive",produces = [MediaType.TEXT_PLAIN])
     fun isAlive(): HttpResponse<String> {
         if (kafkaStateRegistry.hasError()) {
-            LOG.error("Kafka consumer has error and stopped")
+            LOG.error("A Kafka consumer is set to Error, setting all consumers to pause")
+            consumerRegistry.consumerIds
+                .forEach {
+                    LOG.error("Pausing consumer $it")
+                    consumerRegistry.pause(it)
+                }
             return HttpResponse.serverError("Kafka consumer has error and stopped")
         }
         return HttpResponse.ok("Alive")

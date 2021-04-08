@@ -31,7 +31,6 @@ class KafkaExceptionHandler(private val kafkaStateRegistry: KafkaStateRegistry) 
                 LOG.error("Kafka consumer [" + consumerBean + "] produced error: " + cause.message, cause)
             }
             LOG.error("Pausing consumer, need further investigation.")
-            kafkaConsumer.pause(kafkaConsumer.assignment())
             kafkaStateRegistry.setConsumerToError(consumerBean.javaClass.simpleName)
         }
     }

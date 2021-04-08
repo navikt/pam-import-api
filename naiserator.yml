@@ -39,15 +39,15 @@ spec:
   filesFrom:
     - secret: pam-import-api-env-secret
       mountPath: /var/run/secrets/nais.io/vault
+  kafka:
+    pool: {{ kafka_pool }}
   env:
     - name: DB_DRIVER
       value: "org.postgresql.Driver"
-    - name: KAFKA_BOOTSTRAP_SERVERS
-      value: {{ kafka_bootstrap_servers }}
-    - name: MIGRATION_URL
-      value: https://{{ migration_host }}/stillingsimport/internal
     - name: AD_PREVIEW_URL
       value: {{ ad_preview_url }}
+    - name: ADMINSTATUS_KAFKA_TOPIC
+      value: "{{ adminstatus_kafka_topic }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling
@@ -63,13 +63,6 @@ spec:
             envVarPrefix: DB
         cascadingDelete: false
   accessPolicy:
-    outbound:
-      external:
-        - host: {{ migration_host }}
-          ports:
-            - port: 443
-              name: https
-              protocol: HTTPS
     inbound:
       rules:
         - application: pam-ad
