@@ -42,19 +42,9 @@ spec:
   env:
     - name: DB_DRIVER
       value: "org.postgresql.Driver"
-    - name: KAFKA_BOOTSTRAP_SERVERS
-      value: {{ kafka_bootstrap_servers }}
-    - name: MIGRATION_URL
-      value: https://{{ migration_host }}/stillingsimport/internal
     - name: AD_PREVIEW_URL
       value: {{ ad_preview_url }}
   accessPolicy:
     outbound:
       rules:
         - application: stillingdb-pam-postgresql
-      external:
-        - host: {{ migration_host }}
-          ports:
-            - port: 443
-              name: https
-              protocol: HTTPS
