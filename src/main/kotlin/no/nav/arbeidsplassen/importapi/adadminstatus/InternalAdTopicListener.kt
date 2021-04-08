@@ -12,23 +12,20 @@ import org.apache.kafka.common.TopicPartition
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
-import java.util.stream.Collector
-import java.util.stream.Collectors
 import kotlin.streams.toList
 
 
 @Requires(property = "adminstatussync.kafka.enabled", value="true")
-@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}", threads = 1, offsetReset = OffsetReset.EARLIEST,
+@KafkaListener(groupId="\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}", threads = 1, offsetReset = OffsetReset.LATEST,
         batch = true, offsetStrategy = OffsetStrategy.SYNC)
-class AdminStatusSyncWithKafka(private val adminStatusRepository: AdminStatusRepository,
-                               @Value("\${adminstatussync.kafka.offsettimestamp}")
+class InternalAdTopicListener(private val adminStatusRepository: AdminStatusRepository,
+                              @Value("\${adminstatussync.kafka.offsettimestamp}")
                                @Format("yyyy-MM-dd'T'HH:mm:ss'Z'") private val offsetTimeStamp: LocalDateTime?): ConsumerRebalanceListener, ConsumerAware<Any,Any> {
 
     private lateinit var consumer: Consumer<Any,Any>
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(AdminStatusSyncWithKafka::class.java)
+        private val LOG = LoggerFactory.getLogger(InternalAdTopicListener::class.java)
     }
 
     @Topic("\${adminstatus.kafka.topic:StillingIntern}")
