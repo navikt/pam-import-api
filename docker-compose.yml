@@ -29,18 +29,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    hostname: kafdrop
-    container_name: kafdrop
-    depends_on:
-      - broker
-    ports:
-      - 9000:9000
-    environment:
-      KAFKA_BROKERCONNECT: "broker:29092"
-      JVM_OPTS: "-Xms32M -Xmx64M"
-      SERVER_SERVLET_CONTEXTPATH: "/"
   postgres:
     hostname: postgres
     container_name: postgres
@@ -53,7 +41,7 @@ services:
     - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
     command: ["postgres", "-c", "log_statement=all"]
   import_api:
-    image: pam-import-api
+    build: .
     depends_on:
       - postgres
       - broker
