@@ -626,8 +626,24 @@ Cache-Control: no-cache
 Content-Type: application/json
 Authorization: Bearer <secret key>
 ```
+
+## Responses
+
+The API use standard HTTP status code when returning. Below are the most common ones:
+* 20x Everything was OK
+* 30x Redirect or Moved
+* 40x Client Error, or Unauthorized
+* 50x Server Error 
+
+Depending on the error, the api will also return what type of error it is. 
+##### ErrorTypes:
+PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
+
 # FAQ
-1. 
+1. *Why some ads are rejected, after it has been published?* 
+- All ads are automatic published, and then will be manually checked by an admin. If an ad does not follow NAVs guidelines,
+it will be rejected and unpublished from Arbeidsplassen. 
+
 # Suggestions/Questions
 If you have any questions/issues or suggestions please feel free to report it as github 
 [issues](https://github.com/navikt/pam-import-api/issues)
