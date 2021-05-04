@@ -565,8 +565,8 @@ Some property only allows for a set of valid values, they are listed
 
 ### Work Address/Location
 
-Work location is the address/place of work. Ad must at least specify one work location, 
-so that it shows up in a location search.
+Work location is the address/place of work. It is possible to use many work locations, however we don't recommend more 
+than three locations per jobAd, and at least one location must be specified. 
 
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
