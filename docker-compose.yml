@@ -10,7 +10,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-
   broker:
     image: confluentinc/cp-kafka:5.5.0
     hostname: broker
@@ -40,16 +39,35 @@ services:
     volumes:
     - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
     command: ["postgres", "-c", "log_statement=all"]
-  import_api:
+  pamad:
+    depends_on:
+      - postgres
+      - broker
+      - zookeeper
+    image: pam-ad_pamad:latest
+    ports:
+      - 127.0.0.1:9001:9001
+    environment:
+      - DB_PASSWORD=pamad
+      - DB_USERNAME=pamad
+      - DB_DRIVER=org.postgresql.Driver
+      - DB_HOST=postgres
+      - KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      - SCHEDULER_ENABLED=true
+      - PUSHADTOKAFKA_ENABLED=false
+      - IMPORTAPI_ENABLED=true
+      - IMPORTAPI_FEED_URL=http://importapi:9028/stillingsimport/internal/adstates
+  importapi:
     build: .
     depends_on:
       - postgres
       - broker
+      - pamad
     ports:
       - "9028:9028"
     environment:
-      DB_PASSWORD: postgres
-      DB_USERNAME: postgres
+      DB_PASSWORD: importapi
+      DB_USERNAME: importapi
       DB_DRIVER: org.postgresql.Driver
       DB_HOST: 'postgres'
       KAFKA_BOOTSTRAP_SERVERS: 'broker:29092'
