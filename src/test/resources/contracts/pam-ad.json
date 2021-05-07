@@ -14,7 +14,7 @@
     "tags":	"[\"TEST_DUGNAD\",\"STATLIG_INKLUDERINGSDUGNAD\"]"
   },
   "title": "Akvatekniker",
-  "status": "ACTIVE",
+  "status": "REJECTED",
   "privacy": "SHOW_ALL",
   "published": "2018-01-31T10:36:05.019",
   "created": "2018-01-31T10:36:05.019",
@@ -39,6 +39,6 @@
   "administration": {
     "status": "DONE",
     "reportee": "Tester",
-    "remarks": []
+    "remarks": ["DISCRIMINATING", "NOT_APPROVED_BY_LABOUR_INSPECTION"]
   }
 }
