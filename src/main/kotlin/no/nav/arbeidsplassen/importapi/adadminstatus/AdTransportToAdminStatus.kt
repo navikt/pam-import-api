@@ -9,10 +9,10 @@ val _VERSIONID = "_versionid"
 fun AdTransport.toAdminStatus(adminStatusRepository: AdminStatusRepository): AdminStatus {
     return adminStatusRepository.findByUuid(uuid)
             .map { it.copy(status = mapStatus(), versionId = properties[_VERSIONID]?.toLong()!!,
-                    message = mapMessage()) }
+                    message = mapMessage(), publishStatus = mapPublishingStatus())}
             .orElseGet{ AdminStatus(uuid = uuid, status = mapStatus(), versionId =
             properties[_VERSIONID]?.toLong()!!, providerId = properties[_PROVIDERID]?.toLong()!!,
-                    reference = reference, message = mapMessage()) }
+                    reference = reference, message = mapMessage(), publishStatus = mapPublishingStatus()) }
 }
 
 private fun AdTransport.mapMessage(): String? {
@@ -28,5 +28,16 @@ private fun AdTransport.mapStatus(): Status {
         "PENDING" -> Status.PENDING
         "RECEIVED" -> Status.RECEIVED
         else -> Status.UNKNOWN
+    }
+}
+
+private fun AdTransport.mapPublishingStatus(): PublishStatus {
+    return when (status) {
+        "INACTIVE" -> PublishStatus.INACTIVE
+        "ACTIVE" -> PublishStatus.ACTIVE
+        "REJECTED" -> PublishStatus.REJECTED
+        "STOPPED" -> PublishStatus.STOPPED
+        "DELETED" -> PublishStatus.DELETED
+        else -> PublishStatus.UNKNOWN
     }
 }
