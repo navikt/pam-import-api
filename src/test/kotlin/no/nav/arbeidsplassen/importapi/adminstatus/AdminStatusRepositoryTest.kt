@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.adminstatus
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
+import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
@@ -29,11 +30,12 @@ class AdminStatusRepositoryTest(private val adminStatusRepository: AdminStatusRe
         val read = adminStatusRepository.findById(created.id!!).get()
         assertNotNull(read)
         assertEquals("12345", read.reference)
-        val update = read.copy(message = null, status = Status.DONE)
+        val update = read.copy(message = null, status = Status.DONE, publishStatus = PublishStatus.REJECTED)
         val updated = adminStatusRepository.save(update)
         assertEquals(created.id!!, updated.id!!)
         assertNull(updated.message)
         assertEquals(Status.DONE, updated.status)
+        assertEquals(PublishStatus.REJECTED, updated.publishStatus)
         println(updated)
         adminStatusRepository.deleteById(updated.id!!)
         val deleted = adminStatusRepository.findById(created.id!!)

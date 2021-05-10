@@ -10,6 +10,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
+import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
@@ -44,7 +45,7 @@ class AdminStatusControllerTest(private val tokenService: TokenService,
         val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
         val transferInDb = transferLogRepository.save(transferLog)
         val adminStatus = AdminStatus(reference = "12345", providerId = provider.id!!, status = Status.DONE,
-                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString())
+                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString(), publishStatus = PublishStatus.ACTIVE)
         adminStatusRepository.save(adminStatus)
         val read = adminStatusRepository.findByProviderIdAndReference(providerId = provider.id!!, reference = "12345")
         Assertions.assertNotNull(read)

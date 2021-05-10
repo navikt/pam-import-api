@@ -14,8 +14,8 @@ import javax.transaction.Transactional
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
 
-    val insertSQL = """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created") values(?,?,?,?,?,?,?)"""
-    val updateSQL = """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    val insertSQL = """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created", "publish_status") values(?,?,?,?,?,?,?,?)"""
+    val updateSQL = """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "publish_status"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : AdminStatus> save(entity: S): S {
@@ -39,18 +39,20 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
 
 
     private fun PreparedStatement.prepareSQL(entity: AdminStatus) {
-        setString(1, entity.uuid)
-        setString(2, entity.status.name)
-        setString(3, entity.message)
-        setString(4, entity.reference)
-        setLong(5, entity.providerId)
-        setLong(6, entity.versionId)
-        setTimestamp(7, entity.created.toTimeStamp())
+        var parIndex=1
+        setString(parIndex++, entity.uuid)
+        setString(parIndex++, entity.status.name)
+        setString(parIndex++, entity.message)
+        setString(parIndex++, entity.reference)
+        setLong(parIndex++, entity.providerId)
+        setLong(parIndex++, entity.versionId)
+        setTimestamp(parIndex++, entity.created.toTimeStamp())
+        setString(parIndex++, entity.publishStatus.name)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(8, entity.id!!)
+            setLong(parIndex++, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
 
         }

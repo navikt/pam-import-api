@@ -17,8 +17,14 @@ data class AdminStatus(
         val providerId: Long,
         val versionId: Long,
         val created: LocalDateTime = LocalDateTime.now(),
-        val updated: LocalDateTime = LocalDateTime.now()
+        val updated: LocalDateTime = LocalDateTime.now(),
+        @Enumerated(EnumType.STRING)
+        val publishStatus: PublishStatus = PublishStatus.INACTIVE
 )
+
+enum class PublishStatus {
+        INACTIVE, ACTIVE, REJECTED, STOPPED, DELETED, UNKNOWN
+}
 
 enum class Status {
     RECEIVED, PENDING, DONE, UNKNOWN
