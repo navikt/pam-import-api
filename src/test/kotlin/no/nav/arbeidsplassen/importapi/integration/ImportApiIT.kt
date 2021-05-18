@@ -3,11 +3,14 @@ package no.nav.arbeidsplassen.importapi.integration
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.adadminstatus.Status
+import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
@@ -122,6 +125,15 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
         Assertions.assertEquals(future.get().status, TransferLogStatus.RECEIVED)
+        Thread.sleep(60000)
+        val adminstatusReq = GET<AdAdminStatusDTO>("/api/v1/adminstatus/${provider.id}/140095810")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bearerAuth(providertoken)
+        val getResp = client.exchange(adminstatusReq, AdAdminStatusDTO::class.java).blockingFirst().body()
+        LOG.info(objectMapper.writeValueAsString(getResp))
+        Assertions.assertEquals(getResp.status, Status.DONE)
+
     }
 
 }
