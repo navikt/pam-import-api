@@ -6,8 +6,8 @@ Arbeidsplassen is a public job vacancy service provided by NAV, a place where yo
 
 
 ## Registration
-Before you begin, you must register yourself as a job provider/partner. Please send your registration to this email with the 
-following information:
+Before you begin, you must register yourself as a job provider/partner. Please send us an email
+with the following information:
 
 * Provider/Company name
 * Contact email
@@ -489,17 +489,21 @@ Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregist
 organization number to identify the employer (orgNr). This is the registered business (Virksomhet), also
 called for "underenhet" in Brønnøysundregistrene. You can download all registered [underheter](https://data.brreg.no/enhetsregisteret/api/underenheter/lastned)
 
-If you are not able to send the "underenhet" orgNr, you must specify the employer/business name, and its postLocation. 
-We also recommended you to use the **reference**  field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+If you are not able to send the "underenhet" orgNr, you must specify the employer/business name, and its location. 
+For these instances we also recommend you to use the **reference**  field as a unique identifier for the employer, so that the employer can be mapped correctly next time it is used again.   
+
 
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
-|reference | String | Yes | Referanse | A unique identifier for the employer | alfanumeric eg. 232151232 |
-|businessName | String | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
 |orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
+|reference | String | Optional | Referanse | A unique identifier for the employer, you don't need to specify this if you can send virksomhetsnummer | alfanumeric eg. 232151232 |
+|businessName | String | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
 |location | Object | Yes | Arbeidssted | Address of the employer | See location table|
 
 Location of Employer
+
+This is the location address of the employer, and will be used for worklocation, if there is no location specified in the Ad itself. 
+(See below for work address/location of the job)
 
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
@@ -558,6 +562,7 @@ Please specify as much data as possible on the property fields below.
 | twitteraddress | String | Optional | Twitter | twitter share URL | https://url.to.twitter/ |
 | jobpercentage | String | Optional | Stillingsprosent | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | Arbeidstidsordning | what type of jobarrangement | eg. Skift or Vakt |
+
 
 ### Properties that support only valid values 
 Some property only allows for a set of valid values, they are listed 
@@ -642,8 +647,12 @@ PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 # FAQ
 1. *Why some ads are rejected, after it has been published?* 
 - All ads are automatic published, and then will be manually checked by an admin. If an ad does not follow NAVs guidelines,
-it will be rejected and unpublished from Arbeidsplassen. 
-
-# Suggestions/Questions
+it will be rejected and unpublished from Arbeidsplassen.
+2. *Why is only underenhet supported for orgnr?*
+- “Underenhet” is necessary for all organizations that have employees in Norway, and therefore is required in Arbeidsplassen as an employer.  
+  
+   
+# Issues/Suggestions/Questions
 If you have any questions/issues or suggestions please feel free to report it as github 
 [issues](https://github.com/navikt/pam-import-api/issues)
+
