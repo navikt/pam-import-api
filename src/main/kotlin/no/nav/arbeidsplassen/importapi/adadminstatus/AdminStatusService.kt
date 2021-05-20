@@ -38,7 +38,7 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
 
     private fun AdminStatus.toDTO(): AdAdminStatusDTO {
         return AdAdminStatusDTO(uuid = uuid, providerId = providerId, reference = reference, created = created,
-                url = "$previewUrl/$uuid",updated = updated, status = status, message = message )
+                url = "$previewUrl/$uuid",updated = updated, status = status, message = message, publishStatus = publishStatus)
     }
 
 }
