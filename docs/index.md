@@ -593,7 +593,7 @@ It is possible to have many contacts, we recommended at least one contact for ea
 | email | String | Optional | Epost | Contact email | tom.doe@somewhere.com |
 | phone | String | Optional | Telefon | Phone number | +47 010 20 304 | 
 
-## Ad Status 
+## Ad preview and status  
 In arbeidsplassen every ad is manually checked, if it doesn't follow 
 [NAVs guideline](https://www.nav.no/no/bedrift/rekruttering/relatert-informasjon/stillingsregistrering) it will be rejected.
 You can check your ad if is is approved or rejected using this:
@@ -609,15 +609,20 @@ Authorization: Bearer <secret key>
   "uuid" : "2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "status" : "DONE",
   "reference" : "12345",
-  "url" : "https://arbeidsplassen.nav.no/stillinger/intern/2afe26f3-9aef-4a12-97eb-20d6c06c513a",
+  "url" : "https://arbeidsplassen-api.nav.no/stillingimport/frontend/2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "providerId" : 10000,
   "created" : "2020-04-20T13:18:41.04",
-  "updated" : "2020-04-20T13:18:41.05"
+  "updated" : "2020-04-20T13:18:41.05",
+  "message": null,
+  "publishStatus": "INACTIVE"
 }
 ```
 
+The url points to a place where you can preview the ad.
+If the ad is rejected, the publishStatus will be set to "REJECTED" and the message will tell the reason for rejection.
+
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
-You should set a delay of 30min - 1 hour before requesting status again.
+You should set a delay of 1 hour or more before requesting status again.
 
 ## Deactivate/Stopping ad
 
