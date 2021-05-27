@@ -498,7 +498,7 @@ For these instances we also recommend you to use the **reference**  field as a u
 |orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
 |reference | String | Optional | Referanse | A unique identifier for the employer, you don't need to specify this if you can send virksomhetsnummer | alfanumeric eg. 232151232 |
 |businessName | String | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
-|location | Object | Yes | Arbeidssted | Address of the employer | See location table|
+|location | Object | Yes | Arbeidsgiver adresse  | Address of the employer | See location table|
 
 Location of Employer
 
