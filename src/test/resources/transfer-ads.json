@@ -45,9 +45,9 @@
       "published": "2019-02-13T12:59:26",
       "expires": "2019-02-24T00:00:00",
       "employer": {
-        "reference": "232151232",
+        "reference": null,
         "businessName": "Sørumsand barnehage",
-        "orgnr": "989012088",
+        "orgnr": null,
         "location": {
           "address": "Sannergata 2",
           "postalCode": "0566",
@@ -104,7 +104,6 @@
       "published": "2019-02-13T14:05:18.128",
       "expires": "2019-02-24T00:00:00",
       "employer": {
-        "reference": "123456",
         "location":
         {
           "address": "Sandslimarka 251",

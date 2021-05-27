@@ -30,7 +30,7 @@ class AdDTOTest {
 
     @Test
     fun testEmployerDTOValidation() {
-        EmployerDTO(businessName = "NAV IT", reference = "123456", orgnr = "92345", location = LocationDTO(address = null, city = null, country = null, county = null, latitude = null, longitude = null, municipal = null, postalCode = "0156"))
+        EmployerDTO(businessName = "NAV IT", reference = null, orgnr = "92345", location = LocationDTO(address = null, city = null, country = null, county = null, latitude = null, longitude = null, municipal = null, postalCode = "0156"))
     }
 
 }

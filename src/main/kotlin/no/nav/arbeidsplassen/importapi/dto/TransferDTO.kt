@@ -17,10 +17,9 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
     }
 }
 
-data class EmployerDTO(val reference: String, val businessName: String, var orgnr: String?, val location: LocationDTO) {
+data class EmployerDTO(val reference: String?, val businessName: String, var orgnr: String?, val location: LocationDTO) {
     init {
         if (orgnr.isNullOrEmpty()) {
-            require(reference.isNotBlank() && reference.length < 255) { "Employer reference is blank or size > 255" }
             require(businessName.isNotBlank() && businessName.length < 255) { "businessName is blank or size > 255" }
         }
         if (orgnr!=null && orgnr!!.contains("\\s".toRegex())) {
