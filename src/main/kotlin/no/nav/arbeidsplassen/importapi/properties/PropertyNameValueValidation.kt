@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class PropertyNameValueValidation {
 
     private val propertiesToValidate = listOf(extent, engagementtype, jobarrangement,
-            workday, workhours, sector)
+            workday, workhours, sector, remote)
 
     val validValues = HashMap<PropertyNames,Set<String>>()
 
@@ -22,7 +22,7 @@ class PropertyNameValueValidation {
         validValues[workhours] = Arbeidstid.values().flatMap { it.tekster().values }.toHashSet()
         // does not exist in AnsettelseKodeVerk
         validValues[sector] = hashSetOf("Privat", "Offentlig")
-
+        validValues[remote] = hashSetOf("Hjemmekontor", "Hybridkontor")
     }
 
     fun validateProperty(name: PropertyNames, value: String) {

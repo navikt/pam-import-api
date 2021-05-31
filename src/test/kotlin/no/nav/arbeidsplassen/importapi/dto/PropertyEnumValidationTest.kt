@@ -22,6 +22,7 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             put(workday, "Ukedager")
             put(workhours, "Kveld")
             put(sector, "Privat")
+            put(remote, "Hjemmekontor")
         }
         propertyEnumValidation.checkOnlyValidValues(correct)
         val errors = HashMap<PropertyNames,Any>().apply {
@@ -31,6 +32,7 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             put(workday, "Ukedager")
             put(workhours, "Kveld")
             put(sector, "Privat")
+            put(remote, "Et Kontor")
         }
         val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
