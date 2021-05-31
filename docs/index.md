@@ -562,6 +562,7 @@ Please specify as much data as possible on the property fields below.
 | twitteraddress | String | Optional | Twitter | twitter share URL | https://url.to.twitter/ |
 | jobpercentage | String | Optional | Stillingsprosent | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | Arbeidstidsordning | what type of jobarrangement | eg. Skift or Vakt |
+| remote | String | Optional | Hjemmekontor | Remote or hybrid workplace is possible | Hjemmekontor or Hybridkontor |
 
 
 ### Properties that support only valid values 
