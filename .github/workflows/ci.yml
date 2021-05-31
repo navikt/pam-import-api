@@ -35,8 +35,11 @@ jobs:
       - name: build
         run: gradle build
       - name: integration tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
+          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
           docker-compose stop
           docker-compose rm -f
           docker-compose up -d --build
