@@ -44,7 +44,7 @@ services:
       - postgres
       - broker
       - zookeeper
-    image: pam-ad_pamad:latest
+    image: docker.pkg.github.com/navikt/pam-ad/pam-ad:21.151.123010
     ports:
       - 127.0.0.1:9001:9001
     environment:
