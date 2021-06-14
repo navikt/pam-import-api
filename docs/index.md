@@ -638,6 +638,15 @@ Content-Type: application/json
 Authorization: Bearer <secret key>
 ```
 
+When using DELETE request, ads will be marked as "STOPPED", and no longer be searchable. If you want to fully delete
+the ad. You can use ?delete=true:
+```
+DELETE https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}/{reference}?delete=true
+```
+
+NOTE: Ads that are deleted (?delete=true) cannot be updated or created again. 
+You should therefore not use ?delete=true if you want to update the ad later.
+
 ## Responses
 
 The API use standard HTTP status code when returning. Below are the most common ones:

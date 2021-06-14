@@ -32,7 +32,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLogDTO.toEntity(): TransferLog {
-        return TransferLog(providerId = providerId, md5 = md5, payload = payload!!, items = items)
+        return TransferLog(providerId = providerId, md5 = md5, payload = payload!!, items = items, message = message)
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {

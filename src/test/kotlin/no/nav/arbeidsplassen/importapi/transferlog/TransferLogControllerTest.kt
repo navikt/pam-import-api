@@ -152,6 +152,13 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
         assertEquals(future.get().status, TransferLogStatus.RECEIVED)
+//        Thread.sleep(60000) // takes too long
+//        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
+//            .contentType(MediaType.APPLICATION_JSON)
+//            .accept(MediaType.APPLICATION_JSON_TYPE)
+//            .bearerAuth(providertoken)
+//        val deleteResp = client.exchange(delete,TransferLogDTO::class.java).blockingFirst().body()
+//        println(deleteResp)
     }
 
 
