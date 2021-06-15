@@ -664,7 +664,9 @@ PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 - All ads are automatic published, and then will be manually checked by an admin. If an ad does not follow NAVs guidelines,
 it will be rejected and unpublished from Arbeidsplassen.
 2. *Why is only underenhet supported for orgnr?*
-- “Underenhet” is necessary for all organizations that have employees in Norway, and therefore is required in Arbeidsplassen as an employer.  
+- “Underenhet” is necessary for all organizations that have employees in Norway, and therefore is required in Arbeidsplassen as an employer.
+3. *Is it possible to upload pictures and logos?*
+- Currently we don't support picture or logos, maybe in the future.
   
    
 # Issues/Suggestions/Questions
