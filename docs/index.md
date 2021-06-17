@@ -597,7 +597,7 @@ It is possible to have many contacts, we recommended at least one contact for ea
 ## Ad preview and status  
 In arbeidsplassen every ad is manually checked, if it doesn't follow 
 [NAVs guideline](https://www.nav.no/no/bedrift/rekruttering/relatert-informasjon/stillingsregistrering) it will be rejected.
-You can check your ad if is is approved or rejected using this:
+You can check your ad if it is approved or rejected using this:
 
 ```
 GET https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/adminstatus/{providerId}/{reference}
@@ -620,7 +620,14 @@ Authorization: Bearer <secret key>
 ```
 
 The url points to a place where you can preview the ad.
-If the ad is rejected, the publishStatus will be set to "REJECTED" and the message will tell the reason for rejection.
+If the ad is rejected, the publishStatus will be set to "REJECTED", and the message will tell the reason for rejection.
+
+Possible publishStatus values:
+* REJECTED
+* INACTIVE
+* ACTIVE
+* STOPPED
+* DELETED
 
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
 You should set a delay of 1 hour or more before requesting status again.
