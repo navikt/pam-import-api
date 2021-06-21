@@ -22,6 +22,10 @@ export default function EmploymentDetails({ stilling }) {
                         <dt key="dt">Sted:</dt>,
                         <dd key="dd">{location}</dd>
                     ]}
+                    {properties.remote && [
+                        <dt key="dt">Arbeidssted:</dt>,
+                        <dd key="dd">{properties.remote}</dd>
+                    ]}
                     {properties.engagementtype && [
                         <dt key="dt">Ansettelsesform:</dt>,
                         <dd key="dd">{properties.engagementtype }</dd>
@@ -82,6 +86,7 @@ EmploymentDetails.propTypes = {
             jobarrangement: PropTypes.string,
             starttime: PropTypes.string,
             jobpercentage: PropTypes.String,
+            remote: PropTypes.string,
         }),
         location: PropTypes.shape({})
     }).isRequired
