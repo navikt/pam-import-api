@@ -50,6 +50,10 @@ export default function EmploymentDetails({ stilling }) {
                         <dt key="dt">Arb.tidsordning:</dt>,
                         <dd key="dd">{properties.jobarrangement}</dd>
                     ]}
+                    {properties.jobpercentage && [
+                        <dt key="dt">Stillingsprosent:</dt>,
+                        <dd key="dd">{properties.jobpercentage}</dd>
+                    ]}
                     {properties.starttime && [
                         <dt key="dt">Oppstart:</dt>,
                         <dd key="dd">
@@ -76,7 +80,8 @@ EmploymentDetails.propTypes = {
             workday: PropTypes.string,
             workhours: PropTypes.string,
             jobarrangement: PropTypes.string,
-            starttime: PropTypes.string
+            starttime: PropTypes.string,
+            jobpercentage: PropTypes.String,
         }),
         location: PropTypes.shape({})
     }).isRequired
