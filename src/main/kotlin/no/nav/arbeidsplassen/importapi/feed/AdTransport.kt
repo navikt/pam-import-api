@@ -30,4 +30,4 @@ data class AdCompany(val id: Long, val uuid: UUID, val createdBy: String, val up
                      val publicName: String?, val deactivated: LocalDateTime?, val orgform: String?, val employees: Int)
 
 data class Administration(val status: String, val comments: String?, val reportee: String?,
-                          val remarks :List<String> = listOf(), val navIdent: String?)
+                          val remarks :List<String> = listOf(), val navIdent: String?, val message: String?)

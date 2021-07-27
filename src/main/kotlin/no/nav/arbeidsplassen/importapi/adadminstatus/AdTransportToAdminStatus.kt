@@ -17,7 +17,7 @@ fun AdTransport.toAdminStatus(adminStatusRepository: AdminStatusRepository): Adm
 
 private fun AdTransport.mapMessage(): String? {
     if ("REJECTED".equals(status)) {
-        return administration.remarks.toString()
+        return administration.message ?: administration.remarks.toString()
     }
     return null
 }
