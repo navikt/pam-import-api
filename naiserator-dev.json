@@ -3,5 +3,5 @@
   "ad_preview_url": "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport/frontend",
   "kafka_pool": "nav-dev",
   "adminstatus_kafka_topic": "teampam.stilling-intern-1",
-  "cloudsql_tier": "db-custom-2-7680"
+  "cloudsql_tier": "db-custom-1-3840"
 }
