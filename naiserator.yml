@@ -52,7 +52,7 @@ spec:
     sqlInstances:
       - name: import-api-stilling
         type: POSTGRES_11
-        tier: db-custom-2-7680
+        tier: "{{ cloudsql_tier }}"
         diskType: SSD
         highAvailability: true
         diskSize: 20
