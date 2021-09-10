@@ -552,7 +552,7 @@ Please specify as much data as possible on the property fields below.
 | salary | Integer | Optional | Lønn | Salary | 800000 |
 | starttime | String | Optional | Oppstartsdato | The start date or first day of work | eg. 24.05.2020 |
 | sector | String | Optional | Sektor | Public of private sector | Offentlig or Privat |
-| location | String | Optional | Arbeidssted | the location of work, if address can not be given. also see locationList | eg. Hjemmekontor |
+| location | String | Optional | Arbeidssted | the location of work, if address can not be given. also see locationList | eg. Offshore |
 | jobtitle | String | Optional | Stillingstittel | title of position | eg. Kontorsjef |
 | keywords | String | Optional | Nøkkelord | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Java;Kotlin |
 | industry | String | Optional | Bransje | what kind of industry category this job belongs to | eg. Bygg og anlegg |

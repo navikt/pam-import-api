@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
@@ -96,6 +97,11 @@ class TransferController(private val transferLogService: TransferLogService,
     @Get("/{providerId}/versions/{versionId}")
     fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): TransferLogDTO {
         return transferLogService.findByVersionIdAndProviderId(versionId, providerId)
+    }
+
+    @Get("/{providerId}/versions/{versionId}/payload")
+    fun getTransferPayload(@PathVariable providerId: Long, @PathVariable versionId: Long): List<AdDTO> {
+        return objectMapper.readValue(transferLogService.findByVersionIdAndProviderId(versionId, providerId).payload, object: TypeReference<List<AdDTO>>(){})
     }
 
     @Delete("/{providerId}/{reference}")
