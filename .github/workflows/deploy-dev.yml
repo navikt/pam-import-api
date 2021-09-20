@@ -12,30 +12,21 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v2
         with:
-          java-version: '14.x'
-      - uses: actions/cache@v1
+          fetch-depth: 0
+      - uses: actions/setup-java@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          distribution: 'zulu'
+          java-version: '14'
+          cache: 'gradle'
       - name: build and test
         run: |
           ./gradlew clean build -x test
       - name: pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v1
+        uses: navikt/pam-deploy/actions/pre-deploy@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: build and push docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          docker build . --pull -t $IMAGE
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin docker.pkg.github.com
-          docker push $IMAGE
       - name: deploy to dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -44,7 +35,7 @@ jobs:
           RESOURCE: naiserator.yml
           VARS: naiserator-dev.json
       - name: post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v1
+        uses: navikt/pam-deploy/actions/post-deploy@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: draft release

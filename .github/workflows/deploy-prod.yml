@@ -7,13 +7,13 @@ jobs:
   deploy-prod:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: get release tag
         env:
           VERSION_TAG: ${{ github.event.release.tag_name }}
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION:$VERSION_TAG
+          IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           echo $IMAGE
       - uses: nais/deploy/actions/deploy@v1
@@ -24,6 +24,6 @@ jobs:
           RESOURCE: naiserator.yml
           VARS: naiserator-prod.json
       - name: post-production
-        uses: navikt/pam-deploy/actions/post-production@v1
+        uses: navikt/pam-deploy/actions/post-production@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
