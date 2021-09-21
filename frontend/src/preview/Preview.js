@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './Stilling.less';
 import {getStillingByUuid} from "../api/api";
+import {getStillingByProviderIdReference} from "../api/api";
 import { Column, Container, Row } from 'nav-frontend-grid';
 import AdText from './adText/AdText';
 import HowToApply from "./howToApply/HowToApply";
@@ -14,7 +15,7 @@ import AlertStripe from 'nav-frontend-alertstriper';
 const Preview = ({ match }) => {
     const [ad, setAd] = useState(undefined);
     useEffect(() => {
-        const { uuid } = match.params;
+        let uuid = match.params.uuid;
         if (uuid) {
             const fetchData = async () => {
                 const result = await getStillingByUuid(uuid);
@@ -23,7 +24,16 @@ const Preview = ({ match }) => {
 
             fetchData();
         }
-    }, [match.params.uuid]);
+        let providerId = match.params.providerId
+        let reference = match.params.reference
+        if (providerId && reference) {
+            const fetchData = async () => {
+                const result = await getStillingByProviderIdReference(providerId, reference);
+                setAd(result);
+            };
+            fetchData()
+        }
+    }, []);
 
     if (!ad) {
         return null;
@@ -67,7 +77,9 @@ const Preview = ({ match }) => {
 Preview.propTypes = {
     match: PropTypes.shape({
         params: PropTypes.shape({
-            uuid: PropTypes.string
+            uuid: PropTypes.string,
+            providerId: PropTypes.string,
+            reference: PropTypes.string
         })
     }).isRequired
 };
