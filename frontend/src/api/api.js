@@ -20,5 +20,3 @@ const get = async (url) => new Promise((resolve, reject) => {
 
 
 export const getStillingByUuid = (uuid) => get(`${__API__}/${uuid}`);
-
-export const getStillingByProviderIdReference = (providerId,reference) => get(`${__API__}/${providerId}/${reference}`);

@@ -11,7 +11,6 @@ const Index = () => {
         <main>
             <Switch>
                 <Route exact path={`${__CONTEXT_PATH__}/:uuid`} component={Preview} />
-                <Route exact path={`${__CONTEXT_PATH__}/:providerId/:reference`} component={Preview} />
             </Switch>
         </main>
 
