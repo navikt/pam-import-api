@@ -31,15 +31,9 @@ class AdPreviewController(private val adStateService: AdStateService, private va
         return adStateService.getAdStatesByProviderReference(providerId, reference).ad
     }
 
-    @Get("/frontend/{uuid}")
-    fun forwardIndexHtml(@PathVariable uuid: String) : Optional<StreamedFile> {
-        LOG.debug("Previewing uuid {} ", uuid)
-        return environment.getResource("classpath:frontend/index.html").map { StreamedFile(it) }
-    }
-
-    @Get("/frontend/{providerId}/{reference}")
-    fun forwardIndexHtml(@PathVariable providerId: Long, @PathVariable reference: String) : Optional<StreamedFile> {
-        LOG.debug("Previewing provider {} reference {}", providerId, reference)
+    @Get("/frontend{/path:.*}")
+    fun forwardIndexHtml(path:String?) : Optional<StreamedFile> {
+        LOG.info("Got frontend request for path {}",path)
         return environment.getResource("classpath:frontend/index.html").map { StreamedFile(it) }
     }
 
