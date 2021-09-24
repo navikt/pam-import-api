@@ -13,13 +13,14 @@ import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
 import javax.inject.Singleton
 import javax.transaction.Transactional
-import javax.transaction.Transactional.TxType
 import kotlin.streams.toList
 
 @Singleton
@@ -30,6 +31,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val meterRegistry: MeterRegistry,
                        private val kafkaSender: AdstateKafkaSender,
                        private val eventPublisher: ApplicationEventPublisher,
+                       private val styrkCodeConverter: StyrkCodeConverter,
                        @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
@@ -77,20 +79,29 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         LOG.info("Mapping ad {} for providerId {} transferlog {}", ad.reference, transferLog.providerId, transferLog.id)
         val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
         return inDb.map {
-            it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(htmlSanitizeAd(ad))) }
-                .orElseGet{ AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(htmlSanitizeAd(ad)),
+            it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad))) }
+                .orElseGet{ AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)),
                         providerId = transferLog.providerId, reference = ad.reference)}
     }
 
-    private fun htmlSanitizeAd(ad: AdDTO): AdDTO {
+    private fun sanitizeAd(ad: AdDTO): AdDTO {
         val text = sanitize(ad.adText)
+
         val props = ad.properties.map { (key, value) ->
             when (key.type) {
                 PropertyType.HTML -> key to sanitize(value.toString())
                 else -> key to value
             }
-        }.toMap()
-        return ad.copy(adText = text, properties = props, categoryList = ad.categoryList.distinct())
+        }.toMutableList()
+
+        val categoryList = ad.categoryList.distinct()
+        val arbOccupations =  categoryList.map {
+            val occupation = styrkCodeConverter.lookup(it.code).get()
+            "${occupation.categoryLevel1}/${occupation.categoryLevel2}"
+        }.distinct().joinToString(separator =";")
+        props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations)
+
+        return ad.copy(adText = text, properties = props.toMap(), categoryList = categoryList)
     }
 
     @TransactionalEventListener

@@ -32,7 +32,7 @@ class AdStateDTOTest(private val objectMapper: ObjectMapper,
             reference = ad.reference, versionId = transferInDb.id!!)
         val save = adstateRepository.save(adState)
         Assertions.assertNotNull(save.id)
-        //println(objectMapper.writeValueAsString(adStateService.getAdStateByUuid(save.uuid)))
+        println(objectMapper.writeValueAsString(adStateService.getAdStateByUuid(save.uuid)))
     }
 
 

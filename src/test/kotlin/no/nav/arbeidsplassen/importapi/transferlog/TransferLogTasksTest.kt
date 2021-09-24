@@ -25,6 +25,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
         transferLogRepository.save(TransferLog(providerId = provider.id!!, md5 = payload.toMD5Hex(), payload = payload, items =  2))
         transferLogTasks.processTransferLogTask()
         val adstates = adStateRepository.findAll()
+        adstates.forEach { println(it.jsonPayload) }
         assertEquals(2, adstates.count())
         val transferLog = transferLogRepository.findByStatus(TransferLogStatus.DONE, Pageable.from(0))
         assertEquals(1, transferLog.count())
