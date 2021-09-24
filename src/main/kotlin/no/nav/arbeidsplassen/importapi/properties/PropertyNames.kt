@@ -28,7 +28,8 @@ enum class PropertyNames(val type: PropertyType) {
     twitteraddress(PropertyType.URL),
     jobpercentage(PropertyType.TEXT),
     jobarrangement(PropertyType.TEXT),
-    remote(PropertyType.TEXT)
+    remote(PropertyType.TEXT),
+    arboccupation(PropertyType.TEXT)
 
 }
 
