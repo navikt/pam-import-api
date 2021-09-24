@@ -11,7 +11,7 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
     init {
         require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
         require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
-        require(locationList.isNotEmpty()) {"LocationList is empty, please specify at least one Location"}
+        require(locationList.isNotEmpty() || employer?.orgnr != null) {" LocationList is empty, please specify at least one Location"}
         require(adText.isNotBlank()) {"adtext is blank"}
         require(positions > 0 ) {"positions should be 1 or more"}
     }
