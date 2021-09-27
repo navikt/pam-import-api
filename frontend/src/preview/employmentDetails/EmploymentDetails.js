@@ -20,8 +20,8 @@ export default function EmploymentDetails({ stilling }) {
                     }
                     {properties.arbeidsplassenoccupation && [
                         <dt key="dt">Yrkeskategori:</dt>,
-                        <dd key="dd">{properties.arbeidsplassenoccupation}</dd>]
-                    }
+                        <dd key="dd">{properties.arbeidsplassenoccupation.replace(";","<br/>")}</dd>
+                    ]}
                     {location && [
                         <dt key="dt">Sted:</dt>,
                         <dd key="dd">{location}</dd>
