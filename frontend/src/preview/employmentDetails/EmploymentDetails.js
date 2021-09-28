@@ -26,6 +26,10 @@ export default function EmploymentDetails({ stilling }) {
                         <dt key="dt">Arbeidssted:</dt>,
                         <dd key="dd">{properties.remote}</dd>
                     ]}
+                    {properties.arbeidsplassenoccupation && [
+                        <dt key="dt">Yrkeskategori:</dt>,
+                        <dd key="dd">{properties.arbeidsplassenoccupation.replace(";","<br/>")}</dd>
+                    ]}
                     {properties.engagementtype && [
                         <dt key="dt">Ansettelsesform:</dt>,
                         <dd key="dd">{properties.engagementtype }</dd>
