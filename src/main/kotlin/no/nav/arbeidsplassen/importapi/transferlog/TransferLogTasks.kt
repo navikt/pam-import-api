@@ -19,7 +19,7 @@ import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 import javax.transaction.Transactional
 import kotlin.streams.toList
 
@@ -30,7 +30,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val objectMapper: ObjectMapper,
                        private val meterRegistry: MeterRegistry,
                        private val kafkaSender: AdstateKafkaSender,
-                       private val eventPublisher: ApplicationEventPublisher,
+                       private val eventPublisher: ApplicationEventPublisher<AdStateEvent>,
                        private val styrkCodeConverter: StyrkCodeConverter,
                        @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,

@@ -3,17 +3,15 @@ package no.nav.arbeidsplassen.importapi.adminstatus
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.rxjava2.http.client.RxHttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
-import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
@@ -24,7 +22,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 
 @MicronautTest

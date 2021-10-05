@@ -5,9 +5,9 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.RxHttpClient
-import io.micronaut.http.client.RxStreamingHttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.rxjava2.http.client.RxHttpClient
+import io.micronaut.rxjava2.http.client.RxStreamingHttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
@@ -17,7 +17,7 @@ import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CompletableFuture
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 @MicronautTest
 @Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")

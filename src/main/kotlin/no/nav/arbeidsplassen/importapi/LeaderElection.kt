@@ -2,12 +2,12 @@ package no.nav.arbeidsplassen.importapi
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Value
-import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.rxjava2.http.client.RxHttpClient
 import org.slf4j.LoggerFactory
 import java.net.InetAddress
 import java.time.LocalDateTime
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,

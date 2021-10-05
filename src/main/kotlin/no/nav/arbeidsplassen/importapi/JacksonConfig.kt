@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.micronaut.context.event.BeanCreatedEvent
 import io.micronaut.context.event.BeanCreatedEventListener
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class JacksonConfig(): BeanCreatedEventListener<ObjectMapper> {

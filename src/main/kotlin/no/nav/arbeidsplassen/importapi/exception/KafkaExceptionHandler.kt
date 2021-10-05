@@ -9,7 +9,7 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.SerializationException
 import org.slf4j.LoggerFactory
 import java.util.regex.Pattern
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 @Replaces(bean = DefaultKafkaListenerExceptionHandler::class)

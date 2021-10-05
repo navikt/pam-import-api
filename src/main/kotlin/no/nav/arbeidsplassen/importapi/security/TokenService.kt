@@ -8,7 +8,7 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import java.util.*
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class TokenService(private val secretSignatureConfiguration: SecretSignatureConfiguration) {

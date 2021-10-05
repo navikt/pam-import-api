@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.exception
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class KafkaStateRegistry {

@@ -6,7 +6,7 @@ import io.micronaut.cache.annotation.Cacheable
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.Open
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 @Open

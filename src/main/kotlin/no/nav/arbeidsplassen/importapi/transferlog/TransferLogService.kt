@@ -3,10 +3,8 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.provider.ProviderService
-import no.nav.arbeidsplassen.importapi.provider.info
 
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class TransferLogService(private val transferLogRepository: TransferLogRepository) {

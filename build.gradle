@@ -36,12 +36,12 @@ dependencies {
     kapt("io.micronaut.openapi:micronaut-openapi:$micronautOpenApiVersion")
     kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
     kapt "io.micronaut.security:micronaut-security-annotations"
+    implementation ("io.projectreactor:reactor-core")
 
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
 
-    testImplementation "io.micronaut.test:micronaut-test-junit5:$micronautTestVersion"
-    testImplementation "org.mockito:mockito-junit-jupiter:$mockitoJupiterVersion"
+    testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
     testImplementation "com.h2database:h2:1.4.199"
     developmentOnly "com.h2database:h2:1.4.199"
@@ -64,9 +64,11 @@ dependencies {
     implementation "io.micronaut.security:micronaut-security-jwt"
     implementation "io.swagger.core.v3:swagger-annotations"
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20190610.1"
-    implementation "org.apache.commons:commons-text:1.8"
-    implementation "io.micronaut.cache:micronaut-cache-caffeine"
+    implementation("org.apache.commons:commons-text:1.8")
+    implementation("io.micronaut.cache:micronaut-cache-caffeine")
     runtimeOnly project(':frontend')
+    implementation("io.micronaut.rxjava2:micronaut-rxjava2")
+    implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
  }
 
 test.classpath += configurations.developmentOnly

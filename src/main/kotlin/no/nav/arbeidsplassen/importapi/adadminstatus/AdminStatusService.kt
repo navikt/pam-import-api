@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.Value
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class AdminStatusService(private val adminStatusRepository: AdminStatusRepository,
