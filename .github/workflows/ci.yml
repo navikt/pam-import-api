@@ -34,7 +34,7 @@ jobs:
           PAT_READ_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
         run: |
           set -e
-          echo "$PAT_READ_TOKEN" | docker login --password-stdin ghcr.io
+          echo "$PAT_READ_TOKEN" | docker login -u USERNAME --password-stdin ghcr.io
           docker-compose stop
           docker-compose rm -f
           docker-compose up -d --build
