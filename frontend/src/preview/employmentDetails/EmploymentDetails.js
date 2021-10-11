@@ -28,7 +28,7 @@ export default function EmploymentDetails({ stilling }) {
                     ]}
                     {properties.arbeidsplassenoccupation && [
                         <dt key="dt">Yrkeskategori:</dt>,
-                        <dd key="dd">{properties.arbeidsplassenoccupation.replace(";"," ")}</dd>
+                        <dd key="dd">{properties.arbeidsplassenoccupation.replace(";","\n")}</dd>
                     ]}
                     {properties.engagementtype && [
                         <dt key="dt">Ansettelsesform:</dt>,
