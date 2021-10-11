@@ -6,7 +6,7 @@ import io.micronaut.scheduling.annotation.Scheduled
 import no.nav.arbeidsplassen.importapi.LeaderElection
 import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Requires(property = "transferlog.scheduler.enabled", value = "true")
 @Singleton

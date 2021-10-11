@@ -11,7 +11,7 @@ import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.provider.info
 import java.time.LocalDateTime
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class AdStateService(private val adStateRepository: AdStateRepository,

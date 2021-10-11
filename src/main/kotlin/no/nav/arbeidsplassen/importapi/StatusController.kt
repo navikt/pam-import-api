@@ -40,7 +40,7 @@ class StatusController(private val secretSignatureConfiguration: SecretSignature
                 }
             return HttpResponse.serverError("Kafka consumer has error and stopped")
         }
-        return HttpResponse.ok("Alive")
+        return HttpResponse.ok("OK")
     }
 
 

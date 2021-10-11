@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi
 
 import io.micronaut.context.annotation.Factory
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Factory
 class MicronautConfig {

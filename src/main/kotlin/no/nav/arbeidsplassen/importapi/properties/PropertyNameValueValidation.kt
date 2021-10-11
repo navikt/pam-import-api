@@ -4,7 +4,7 @@ import no.nav.arbeid.pam.kodeverk.ansettelse.*
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames.*
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Singleton
 class PropertyNameValueValidation {

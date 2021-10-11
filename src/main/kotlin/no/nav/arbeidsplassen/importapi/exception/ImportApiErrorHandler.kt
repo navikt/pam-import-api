@@ -15,7 +15,7 @@ import io.micronaut.http.server.exceptions.JsonExceptionHandler
 import no.nav.arbeidsplassen.importapi.exception.ErrorType.*
 import org.slf4j.LoggerFactory
 import java.util.*
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Produces
 @Singleton

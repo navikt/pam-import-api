@@ -5,9 +5,10 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.RxHttpClient
-import io.micronaut.http.client.RxStreamingHttpClient
+
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.rxjava2.http.client.RxHttpClient
+import io.micronaut.rxjava2.http.client.RxStreamingHttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 // End 2 End Test, using docker-compose. This test will run in github action CI
 @MicronautTest(startApplication = false)

@@ -9,15 +9,15 @@ on:
     branches:
       - '*'
 jobs:
-#  security:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v1
-#      - uses:  snyk/actions/gradle@master
-#        env:
-#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-#        with:
-#          command: test --severity-threshold=high
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses:  snyk/actions/gradle@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test --severity-threshold=high
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -31,10 +31,10 @@ jobs:
         run: gradle build
       - name: integration tests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_READ_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
         run: |
           set -e
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin ghcr.io
+          echo "$PAT_READ_TOKEN" | docker login -u USERNAME --password-stdin ghcr.io
           docker-compose stop
           docker-compose rm -f
           docker-compose up -d --build
