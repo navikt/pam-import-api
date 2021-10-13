@@ -31,7 +31,7 @@ jobs:
         run: gradle build
       - name: integration tests
         env:
-          PAT_READ_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
+          PAT_READ_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
           set -e
           echo "$PAT_READ_TOKEN" | docker login -u USERNAME --password-stdin ghcr.io
