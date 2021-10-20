@@ -34,3 +34,6 @@ ation/json" -d '{"identifier":"jobnorge-test","email":"test@jobnorge.no", "phone
 pam-import-api.nais.oera-q.local/stillingsimport/internal/providers
 
 ````
+
+[API documentation](https://navikt.github.io/pam-import-api/)
+
