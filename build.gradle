@@ -36,7 +36,6 @@ dependencies {
     kapt("io.micronaut.openapi:micronaut-openapi:$micronautOpenApiVersion")
     kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
     kapt "io.micronaut.security:micronaut-security-annotations"
-    implementation ("io.projectreactor:reactor-core")
 
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
