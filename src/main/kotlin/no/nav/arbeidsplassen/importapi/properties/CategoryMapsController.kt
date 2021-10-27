@@ -13,14 +13,16 @@ import javax.annotation.security.PermitAll
 class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter) {
 
     @Get("/pyrk/occupations")
-    fun getPyrkCategoryMap(@QueryValue(defaultValue = "code") sort: String):Map<String, Occupation> {
-        return if ("alfa"==sort) styrkCodeConverter.pyrkMap.toList().sortedBy { (k,v) -> v.categoryLevel2 }.toMap()
-        else return styrkCodeConverter.pyrkMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
+    fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
+        return styrkCodeConverter.occupationMap.toList().sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues {it.value.simplyfy()}
     }
 
     @Get("/styrk/occupations")
-    fun getStyrkCategoryMap(@QueryValue(defaultValue = "code") sort: String): Map<String, PyrkOccupation> {
-        return styrkCodeConverter.occupationMap.toList().sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues {it.value.simplyfy()}
+    fun getStyrkCategoryMap(@QueryValue(defaultValue = "code") sort: String): Map<String, Occupation> {
+        return if ("alfa"==sort) {
+            styrkCodeConverter.occupationMap.toList().sortedBy { (k, v) -> v.styrkDescription }.toMap()
+        }
+        else styrkCodeConverter.occupationMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
     }
 
 }
