@@ -14,7 +14,7 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter)
 
     @Get("/pyrk/occupations")
     fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
-        return styrkCodeConverter.occupationMap.toList().sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues {it.value.simplyfy()}
+        return styrkCodeConverter.occupationMap.toList().distinctBy { (k,v) -> v.categoryLevel2 }.sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues{it.value.simplyfy()}
     }
 
     @Get("/styrk/occupations")
