@@ -9,8 +9,6 @@ import io.micronaut.security.token.RolesFinder
 import io.micronaut.web.router.MethodBasedRouteMatch
 import io.micronaut.web.router.RouteMatch
 import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import org.slf4j.LoggerFactory
 import java.util.*

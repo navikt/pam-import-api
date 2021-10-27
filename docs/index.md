@@ -515,9 +515,8 @@ This is the location address of the employer, and will be used for worklocation,
 |country | String | Optional | Land | Country, defaults to Norge | Norge |
 
 ## Category
-Ads are classified by occupations, which use the international standard [STYRK-08](https://www.ssb.no/klass/klassifikasjoner/7) 
-from SSB. You can download all STYRK08-categories from [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations),
-another simplified version of STYRK-08, can also be [used](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
+Ads are classified by occupations, and these are divided in two levels. 
+You can download all occupations [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
   
 It is possible to have more than 1 and max 3 occupation categories for each ad.
 
@@ -525,7 +524,7 @@ It is possible to have more than 1 and max 3 occupation categories for each ad.
 |:----|:-----|:---------|:------------|:------|
 |code | String | yes | the code of occupation | 2342 |
 | categoryType | ENUM | yes | type of occupation standard | STYRK08 |
-| name | String | optional | name of category | Barnehagelærer |
+| name | String | optional | name of category | Barnehage |
 
 If you don't or can not support STYRK-occupations, and you are using another occupations category standard, please
 let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
