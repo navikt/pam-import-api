@@ -565,8 +565,8 @@ Please specify as much data as possible on the property fields below.
 
 
 ### Properties that support only valid values 
-Some property only allows for a set of valid values, they are listed 
-[here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/values)
+"sector","remote","extent", "workday", "engagementtype", "jobarrangement", "workhours" 
+only allows for a set of valid values, they are listed [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/values)
 
 ### Work Address/Location
 
