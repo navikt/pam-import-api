@@ -94,7 +94,10 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             }
         }.toMutableList()
 
-        val categoryList = ad.categoryList.distinct()
+        val categoryList = ad.categoryList.distinct().map {
+            val occupation = styrkCodeConverter.lookup(it.code).get()
+            it.copy(code=occupation.styrkCode)
+        }
         val arbOccupations =  categoryList.map {
             val occupation = styrkCodeConverter.lookup(it.code).get()
             "${occupation.categoryLevel1}/${occupation.categoryLevel2}"
