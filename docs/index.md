@@ -628,6 +628,14 @@ Possible publishStatus values:
 * STOPPED
 * DELETED
 
+When publishStatus is "REJECTED", the following reasons will be in the message field:
+* NOT_APPROVED_BY_LABOUR_INSPECTION
+* NO_EMPLOYMENT
+* DUPLICATE
+* DISCRIMINATING
+* FOREIGN_JOB
+* UNKNOWN
+
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
 You should set a delay of 1 hour or more before requesting status again.
 
