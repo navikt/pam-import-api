@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.pulsevent
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
@@ -12,11 +11,11 @@ import java.sql.Statement
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class PulsEventRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
+abstract class PulsEventRepository(private val connection: Connection):
     CrudRepository<PulsEvent, Long> {
 
-    val insertSQL = """insert into "puls_event" ("provider_id", "uuid", "type", "total", "created", "updated" ) values (?,?,?,?,?, current_timestamp)"""
-    val updateSQL = """update "puls_event" set "provider_id"=?, "uuid"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    val insertSQL = """insert into "puls_event" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
+    val updateSQL = """update "puls_event" set "provider_id"=?, "uuid"=?,"reference"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : PulsEvent> save(entity: S): S {
@@ -43,6 +42,7 @@ abstract class PulsEventRepository(private val connection: Connection, private v
         var index=1
         setLong(index, entity.providerId)
         setString(++index, entity.uuid)
+        setString(++index, entity.reference)
         setString(++index, entity.type)
         setLong(++index, entity.total)
         setTimestamp(++index, entity.created.toTimeStamp())
@@ -54,5 +54,8 @@ abstract class PulsEventRepository(private val connection: Connection, private v
             DataSettings.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }
+
+    @Transactional
+    abstract fun findByUuidAndType(uuid:String, type: String): PulsEvent?
 
 }

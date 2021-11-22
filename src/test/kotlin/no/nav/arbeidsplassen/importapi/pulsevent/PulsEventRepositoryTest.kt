@@ -14,7 +14,7 @@ class PulsEventRepositoryTest(private val repository: PulsEventRepository, priva
     @Test
     fun readAndSave() {
         val provider = providerRepository.newTestProvider()
-        val first = repository.save(PulsEvent(providerId=provider.id!!, uuid = UUID.randomUUID().toString(),
+        val first = repository.save(PulsEvent(providerId=provider.id!!, uuid = UUID.randomUUID().toString(), reference = UUID.randomUUID().toString(),
             type = "Stilling visning", total = 5))
         assertNotNull(first.id)
         val inDb = repository.findById(first.id).get()
@@ -22,6 +22,8 @@ class PulsEventRepositoryTest(private val repository: PulsEventRepository, priva
         assertEquals(5,inDb.total)
         val updated = repository.save(inDb.copy(total=10))
         assertEquals(first.id, updated.id)
-        assertEquals(10, updated.total)
+        assertEquals(first.uuid, updated.uuid)
+        val uuidandype = repository.findByUuidAndType(updated.uuid, updated.type)
+        assertEquals(10, uuidandype?.total)
     }
 }
