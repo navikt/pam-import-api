@@ -18,11 +18,11 @@ class PulsEventService(private val repository: PulsEventRepository) {
     }
 
     private fun PulsEvent.toDTO(): PulsEventDTO {
-        return PulsEventDTO(id = id, uuid = uuid , total = total, type=type, created=created, updated=updated)
+        return PulsEventDTO(id=id, providerId=providerId, reference=reference, uuid = uuid , total = total, type=type, created=created, updated=updated)
     }
 
     private fun PulsEventDTO.toEntity(): PulsEvent {
-        return PulsEvent(id=id, uuid=uuid, total=total, type=type, created=created, updated=updated)
+        return PulsEvent(id=id, providerId=providerId, reference=reference, uuid=uuid, total=total, type=type, created=created, updated=updated)
     }
 
 }
