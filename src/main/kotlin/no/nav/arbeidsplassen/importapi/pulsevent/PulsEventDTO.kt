@@ -1,8 +1,6 @@
 package no.nav.arbeidsplassen.importapi.pulsevent
 
 import io.micronaut.core.annotation.Introspected
-import io.micronaut.data.annotation.GeneratedValue
-import io.micronaut.data.annotation.Id
 import java.time.LocalDateTime
 
 @Introspected
