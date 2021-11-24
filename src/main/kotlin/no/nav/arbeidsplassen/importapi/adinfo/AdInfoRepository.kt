@@ -1,5 +1,6 @@
-package no.nav.arbeidsplassen.importapi.pulsevent
+package no.nav.arbeidsplassen.importapi.adinfo
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
@@ -11,14 +12,14 @@ import java.sql.Statement
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class PulsEventRepository(private val connection: Connection):
-    CrudRepository<PulsEvent, Long> {
+abstract class AdInfoRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
+    CrudRepository<AdInfo, Long> {
 
-    val insertSQL = """insert into "puls_event" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
-    val updateSQL = """update "puls_event" set "provider_id"=?, "uuid"=?,"reference"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "data", "created", "updated" ) values (?,?,?,?::jsonb,?,?, current_timestamp)"""
+    val updateSQL = """update "ad_info" set "provider_id"=?, "uuid"=?,"reference"=?, "data"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
-    override fun <S : PulsEvent> save(entity: S): S {
+    override fun <S : AdInfo> save(entity: S): S {
 
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
@@ -38,13 +39,12 @@ abstract class PulsEventRepository(private val connection: Connection):
         }
     }
 
-    private fun PreparedStatement.prepareSQL(entity: PulsEvent) {
+    private fun PreparedStatement.prepareSQL(entity: AdInfo) {
         var index=1
         setLong(index, entity.providerId)
         setString(++index, entity.uuid)
         setString(++index, entity.reference)
-        setString(++index, entity.type)
-        setLong(++index, entity.total)
+        setString(++index, objectMapper.writeValueAsString(entity.data))
         setTimestamp(++index, entity.created.toTimeStamp())
         if (entity.isNew()) {
             DataSettings.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
@@ -56,6 +56,6 @@ abstract class PulsEventRepository(private val connection: Connection):
     }
 
     @Transactional
-    abstract fun findByUuidAndType(uuid:String, type: String): PulsEvent?
+    abstract fun findByUuid(uuid:String): AdInfo?
 
 }

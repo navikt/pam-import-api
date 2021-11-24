@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.pulsevent
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.adinfo.AdInfoRepository
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -9,7 +10,7 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 @MicronautTest
-class PulsEventRepositoryTest(private val repository: PulsEventRepository, private val providerRepository: ProviderRepository) {
+class PulsEventRepositoryTest(private val repository: AdInfoRepository, private val providerRepository: ProviderRepository) {
 
     @Test
     fun readAndSave() {
