@@ -15,8 +15,8 @@ import javax.transaction.Transactional
 abstract class AdInfoRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
     CrudRepository<AdInfo, Long> {
 
-    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "data", "created", "updated" ) values (?,?,?,?::jsonb,?,?, current_timestamp)"""
-    val updateSQL = """update "ad_info" set "provider_id"=?, "uuid"=?,"reference"=?, "data"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "activity", "created", "updated" ) values (?,?,?,?::jsonb,?,?, current_timestamp)"""
+    val updateSQL = """update "ad_info" set "provider_id"=?, "uuid"=?,"reference"=?, "activity"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
     override fun <S : AdInfo> save(entity: S): S {
@@ -44,7 +44,7 @@ abstract class AdInfoRepository(private val connection: Connection, private val 
         setLong(index, entity.providerId)
         setString(++index, entity.uuid)
         setString(++index, entity.reference)
-        setString(++index, objectMapper.writeValueAsString(entity.data))
+        setString(++index, objectMapper.writeValueAsString(entity.activity))
         setTimestamp(++index, entity.created.toTimeStamp())
         if (entity.isNew()) {
             DataSettings.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")

@@ -9,7 +9,7 @@ data class AdInfoDTO(
     val providerId: Long,
     val uuid: String,
     val reference: String,
-    val data: Map<String, Any> = emptyMap(),
+    val activity: MutableMap<String, Any> = mutableMapOf(),
     val created: LocalDateTime = LocalDateTime.now(),
     val updated: LocalDateTime = LocalDateTime.now()
 )
