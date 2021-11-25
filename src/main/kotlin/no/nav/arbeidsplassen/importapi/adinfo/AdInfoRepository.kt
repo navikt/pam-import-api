@@ -15,7 +15,7 @@ import javax.transaction.Transactional
 abstract class AdInfoRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
     CrudRepository<AdInfo, Long> {
 
-    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "activity", "created", "updated" ) values (?,?,?,?::jsonb,?,?, current_timestamp)"""
+    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "activity", "created", "updated" ) values (?,?,?,?::jsonb,?, current_timestamp)"""
     val updateSQL = """update "ad_info" set "provider_id"=?, "uuid"=?,"reference"=?, "activity"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional

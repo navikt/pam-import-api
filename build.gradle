@@ -42,9 +42,6 @@ dependencies {
 
     testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
-    testImplementation "com.h2database:h2:1.4.199"
-    developmentOnly "com.h2database:h2:1.4.199"
-
 
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     implementation "io.micronaut.micrometer:micronaut-micrometer-core:$micronautVersion"
@@ -68,6 +65,8 @@ dependencies {
     runtimeOnly project(':frontend')
     implementation("io.micronaut.rxjava2:micronaut-rxjava2")
     implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
+
+    testImplementation("org.testcontainers:postgresql:${tcVersion}")
  }
 
 test.classpath += configurations.developmentOnly
