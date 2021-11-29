@@ -4,12 +4,13 @@ import io.micronaut.core.annotation.Introspected
 import java.time.LocalDateTime
 
 @Introspected
-data class AdInfoDTO(
+data class AdPulsDTO(
     var id: Long? = null,
     val providerId: Long,
     val uuid: String,
     val reference: String,
-    val activity: MutableMap<String, Any> = mutableMapOf(),
+    val type: PulsEventType,
+    val total: Long,
     val created: LocalDateTime = LocalDateTime.now(),
     val updated: LocalDateTime = LocalDateTime.now()
 )

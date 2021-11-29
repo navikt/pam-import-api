@@ -5,6 +5,7 @@ import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import jakarta.inject.Singleton
+import java.lang.Exception
 
 @Singleton
 class AdminStatusService(private val adminStatusRepository: AdminStatusRepository,
@@ -31,9 +32,8 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
     }
 
     fun findByUuid(uuid: String): AdAdminStatusDTO {
-        return adminStatusRepository.findByUuid(uuid).orElseThrow {
-            ImportApiError(message = "AdAdminStatus $uuid not found", type = ErrorType.NOT_FOUND)
-        }.toDTO()
+        return adminStatusRepository.findByUuid(uuid)?.toDTO()
+            ?: throw ImportApiError(message = "AdAdminStatus for $uuid not found", type = ErrorType.NOT_FOUND)
     }
 
     private fun AdminStatus.toDTO(): AdAdminStatusDTO {

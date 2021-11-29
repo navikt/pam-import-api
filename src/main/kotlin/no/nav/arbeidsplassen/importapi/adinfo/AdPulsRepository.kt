@@ -12,14 +12,14 @@ import java.sql.Statement
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class AdInfoRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
-    CrudRepository<AdInfo, Long> {
+abstract class AdPulsRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
+    CrudRepository<AdPuls, Long> {
 
-    val insertSQL = """insert into "ad_info" ("provider_id", "uuid", "reference", "activity", "created", "updated" ) values (?,?,?,?::jsonb,?, current_timestamp)"""
-    val updateSQL = """update "ad_info" set "provider_id"=?, "uuid"=?,"reference"=?, "activity"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    val insertSQL = """insert into "ad_puls" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
+    val updateSQL = """update "ad_puls" set "provider_id"=?, "uuid"=?,"reference"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
 
     @Transactional
-    override fun <S : AdInfo> save(entity: S): S {
+    override fun <S : AdPuls> save(entity: S): S {
 
         if (entity.isNew()) {
             connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
@@ -39,12 +39,13 @@ abstract class AdInfoRepository(private val connection: Connection, private val 
         }
     }
 
-    private fun PreparedStatement.prepareSQL(entity: AdInfo) {
+    private fun PreparedStatement.prepareSQL(entity: AdPuls) {
         var index=1
         setLong(index, entity.providerId)
         setString(++index, entity.uuid)
         setString(++index, entity.reference)
-        setString(++index, objectMapper.writeValueAsString(entity.activity))
+        setString(++index, entity.type.name)
+        setLong(++index, entity.total)
         setTimestamp(++index, entity.created.toTimeStamp())
         if (entity.isNew()) {
             DataSettings.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
@@ -56,6 +57,6 @@ abstract class AdInfoRepository(private val connection: Connection, private val 
     }
 
     @Transactional
-    abstract fun findByUuid(uuid:String): AdInfo?
+    abstract fun findByUuidAndType(uuid:String, type: PulsEventType): AdPuls?
 
 }
