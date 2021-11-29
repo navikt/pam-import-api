@@ -17,7 +17,7 @@ class PulsEventTopicListener(private val adInfoService: AdPulsService, private v
         private val LOG = LoggerFactory.getLogger(PulsEventTopicListener::class.java)
     }
 
-    @Topic("\${pulsevent.kafka.topic:teampam.puls-intern}")
+    @Topic("\${pulsevent.kafka.topic:teampam.puls-intern-2}")
     fun syncPulsEvents(events: List<PulsEventDTO>, offsets: List<Long>) {
         LOG.info("Received ${events.size} events from puls")
         events
@@ -28,8 +28,14 @@ class PulsEventTopicListener(private val adInfoService: AdPulsService, private v
 
     fun PulsEventDTO.toAdInfoDTO(): AdPulsDTO? {
        return adminStatusRepository.findByUuid(this.oid)?.let {
-            AdPulsDTO(uuid = it.uuid, type = PulsEventType.fromValue(this.type), total=this.total, providerId = it.providerId, reference = it.reference)
-        }
+           AdPulsDTO(
+               uuid = it.uuid,
+               type = PulsEventType.fromValue(this.type),
+               total = this.total,
+               providerId = it.providerId,
+               reference = it.reference
+           )
+       }
     }
 }
 

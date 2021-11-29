@@ -24,10 +24,10 @@ class AdStateService(private val adStateRepository: AdStateRepository,
         }
     }
 
-    fun getAdStateByUuid(uuid: String):
-            AdStatePublicDTO = adStateRepository.findByUuid(uuid)
-            .orElseThrow{ ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND) }
-            .toDTO()
+    @Throws(ImportApiError::class)
+    fun getAdStateByUuid(uuid: String): AdStatePublicDTO {
+        return adStateRepository.findByUuid(uuid)?.toDTO()
+            ?: throw ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND) }
 
     fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long):
             AdStatePublicDTO = adStateRepository.findByUuidAndProviderId(uuid, providerId)
@@ -57,9 +57,8 @@ class AdStateService(private val adStateRepository: AdStateRepository,
     }
 
     fun resendAdState(uuid: String): AdStatePublicDTO {
-        val resend = adStateRepository.findByUuid(uuid).orElseThrow {
+        val resend = adStateRepository.findByUuid(uuid)?.copy(updated = LocalDateTime.now()) ?: throw
            ImportApiError("Adstate with $uuid not found", ErrorType.NOT_FOUND)
-        }.copy(updated = LocalDateTime.now())
         return adStateRepository.save(resend).toDTO()
     }
 

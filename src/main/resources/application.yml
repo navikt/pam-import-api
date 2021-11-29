@@ -95,6 +95,10 @@ transferlog:
   adstate:
     kafka:
       enabled: false
+pulsevent:
+  kafka:
+    enabled: true
+    topic: teampam.puls-intern-2
 adminstatussync:
   kafka:
     enabled: true
