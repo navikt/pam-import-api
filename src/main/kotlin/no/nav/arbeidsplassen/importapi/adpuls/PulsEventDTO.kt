@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.adinfo
+package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.micronaut.core.annotation.Introspected
 import java.time.Instant

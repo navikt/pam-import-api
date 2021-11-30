@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.adinfo
+package no.nav.arbeidsplassen.importapi.adpuls
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.jdbc.annotation.JdbcRepository

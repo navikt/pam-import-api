@@ -8,14 +8,14 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.*
-import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.Produces
 import io.micronaut.http.server.exceptions.ConversionErrorHandler
-import io.micronaut.http.server.exceptions.ExceptionHandler;
+import io.micronaut.http.server.exceptions.ExceptionHandler
 import io.micronaut.http.server.exceptions.JsonExceptionHandler
 import no.nav.arbeidsplassen.importapi.exception.ErrorType.*
 import org.slf4j.LoggerFactory
 import java.util.*
-import jakarta.inject.Singleton;
+import jakarta.inject.Singleton
 
 @Produces
 @Singleton

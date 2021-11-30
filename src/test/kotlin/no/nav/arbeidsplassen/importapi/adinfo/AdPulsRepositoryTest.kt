@@ -1,6 +1,9 @@
 package no.nav.arbeidsplassen.importapi.adinfo
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.adpuls.AdPuls
+import no.nav.arbeidsplassen.importapi.adpuls.AdPulsRepository
+import no.nav.arbeidsplassen.importapi.adpuls.PulsEventType
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.assertEquals

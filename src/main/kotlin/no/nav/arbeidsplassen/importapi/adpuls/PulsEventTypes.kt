@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.adinfo
+package no.nav.arbeidsplassen.importapi.adpuls
 
 enum class PulsEventType(private val value: String) {
     pageviews("Stilling visning"),

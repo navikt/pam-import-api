@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.adinfo
+package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
