@@ -16,4 +16,4 @@ CREATE TABLE ad_puls
 );
 
 CREATE INDEX ad_puls_updated_idx ON ad_puls(updated);
-CREATE INDEX ad_puls_provider_reference_idx ON ad_puls(provider_id, reference);
+CREATE INDEX ad_puls_provider_idx ON ad_puls(provider_id);

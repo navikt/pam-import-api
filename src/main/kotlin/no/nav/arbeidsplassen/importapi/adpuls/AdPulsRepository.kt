@@ -9,6 +9,7 @@ import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
@@ -65,4 +66,6 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     @Transactional
     abstract fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls>
 
+    @Transactional
+    abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, after: LocalDateTime): List<AdPuls>
 }
