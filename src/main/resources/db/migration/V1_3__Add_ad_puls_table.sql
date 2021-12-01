@@ -15,4 +15,5 @@ CREATE TABLE ad_puls
     CONSTRAINT fk_provider_ad_puls_event FOREIGN KEY (provider_id) REFERENCES provider (id)
 );
 
-CREATE INDEX ad_info_updated_idx ON ad_puls(updated);
+CREATE INDEX ad_puls_updated_idx ON ad_puls(updated);
+CREATE INDEX ad_puls_provider_reference_idx ON ad_puls(provider_id, reference);

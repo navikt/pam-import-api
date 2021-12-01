@@ -59,4 +59,10 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     @Transactional
     abstract fun findByUuidAndType(uuid:String, type: PulsEventType): AdPuls?
 
+    @Transactional
+    abstract fun findByUuid(uuid: String): List<AdPuls>
+
+    @Transactional
+    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls>
+
 }

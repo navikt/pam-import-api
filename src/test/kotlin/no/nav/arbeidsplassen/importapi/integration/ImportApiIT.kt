@@ -1,7 +1,12 @@
 package no.nav.arbeidsplassen.importapi.integration
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micronaut.configuration.kafka.annotation.KafkaClient
+import io.micronaut.configuration.kafka.annotation.KafkaKey
+import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.context.annotation.Property
+import io.micronaut.context.annotation.PropertySource
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.MediaType
@@ -22,10 +27,14 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
 import jakarta.inject.Inject
+import no.nav.arbeidsplassen.importapi.adpuls.PulsEventDTO
+import org.junit.jupiter.api.Assertions.assertEquals
+
 
 // End 2 End Test, using docker-compose. This test will run in github action CI
 @MicronautTest(startApplication = false)
-@Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
+@PropertySource(value = [Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest"),
+    Property(name="kafka.bootstrap.servers", value="localhost:9092"), Property(name="pulsevent.kafka.enabled", value = "false")])
 class ImportApiIT(private val tokenService: TokenService, private val objectMapper: ObjectMapper) {
 
     @Inject
@@ -35,6 +44,9 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
     @Inject
     @field:Client("\${micronaut.server.context-path}")
     lateinit var client: RxHttpClient
+
+    @Inject
+    lateinit var pulsKafkaSender: PulsKafkaSender
 
     companion object {
         private val LOG = LoggerFactory.getLogger(ImportApiIT::class.java)
@@ -95,7 +107,7 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
               "adText": "<p>Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer. Barnehagens satsningsområder er Mat med Smak og Null mobbing i barnehagen.</p>\n<p><strong>Hovedansvarsområder:</strong></p>\n<ul><li>Drifte og utvikle egen barnehage i tråd med gjeldende forskrifter, bestemmelser og Norlandias overordnete strategi</li><li>Personalansvar</li><li>Overordnet faglig ansvar i egen barnehage</li><li>Bidra og medvirke i regionens endrings -og strategiprosesser</li><li>Kvalitet i barnehagen i henhold til konsernets kvalitets- og miljøpolicy</li></ul>\n<p><strong>Ønskede kvalifikasjoner:</strong></p>\n<ul><li>Barnehagelærerutdanning</li><li>Gode lederegenskaper</li><li>Engasjement for mat og miljø</li><li>Økonomiforståelse</li><li>Beslutningsdyktig, proaktiv og løsningsorientert</li><li>Effektiv og evnen til å håndtere flere oppgaver samtidig</li><li>Være motivator og støttespiller for medarbeiderne</li><li>Ha gode strategiske evner</li></ul>\n<p><strong>Vi tilbyr:</strong></p>\n<ul><li>Jobb i et sterkt fagmiljø i stadig utvikling, med et stort handlingsrom innenfor fastsatte rammer</li><li>Korte beslutningsveier og muligheter for personlig og faglig utvikling</li><li>Gode personalfasiliteter</li><li>Konkurransedyktig lønn og gode pensjonsbetingelser</li><li>Gyldig politiattest (ikke eldre enn 3 måneder ved tiltredelse) må fremvises før ansettelse</li></ul>\n<p><em><strong>Dette er en unik mulighet til å få lede en moderne veletablert barnehage.</strong></em></p>\n",
               "privacy": "SHOW_ALL",
               "published": "2019-02-13T12:59:26",
-              "expires": "2019-02-24T00:00:00",
+              "expires": "2100-02-24T00:00:00",
               "employer": {
                 "id": 255533,
                 "reference": "232151232",
@@ -125,16 +137,32 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
         val response = strClient.jsonStream(post, TransferLogDTO::class.java)
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
-        Assertions.assertEquals(future.get().status, TransferLogStatus.RECEIVED)
-        Thread.sleep(60000)
+        assertEquals(future.get().status, TransferLogStatus.RECEIVED)
+        Thread.sleep(30000)
         val adminstatusReq = GET<AdAdminStatusDTO>("/api/v1/adminstatus/${provider.id}/140095810")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bearerAuth(providertoken)
-        val getResp = client.exchange(adminstatusReq, AdAdminStatusDTO::class.java).blockingFirst().body()
-        LOG.info(objectMapper.writeValueAsString(getResp))
-        Assertions.assertEquals(getResp.status, Status.DONE)
-
+        val received = client.exchange(adminstatusReq, AdAdminStatusDTO::class.java).blockingFirst().body()
+        LOG.info(objectMapper.writeValueAsString(received))
+        assertEquals(received.status, Status.DONE)
+        // expect puls event
+        pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 10, type = "Stilling visning"))
+        Thread.sleep(10000)
+        val pulsRequest = GET<Any>("/api/v1/stats/${provider.id}/${received.reference}")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .bearerAuth(providertoken)
+        val puls = client.exchange(pulsRequest, JsonNode::class.java).blockingFirst().body()
+        assertEquals(10, puls[0]["total"].intValue())
+        LOG.info(objectMapper.writeValueAsString(puls))
     }
 
+}
+
+@KafkaClient
+interface PulsKafkaSender {
+    @KafkaClient(batch = true)
+    @Topic("teampam.puls-intern-2")
+    fun sendPulsEvent(@KafkaKey key: String, pulsevent: PulsEventDTO)
 }

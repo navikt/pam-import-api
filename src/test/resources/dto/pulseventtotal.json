@@ -1,0 +1,11 @@
+{
+  "id" : 1,
+  "oid" : "175c3b13-6b56-4cc6-82d3-fb02089e6726",
+  "total" : 10,
+  "type" : "Stilling visning",
+  "properties" : {
+    "title" : "This is a title"
+  },
+  "created" : "+1000000000-12-31T23:59:59.999999999Z",
+  "updated" : "+1000000000-12-31T23:59:59.999999999Z"
+}

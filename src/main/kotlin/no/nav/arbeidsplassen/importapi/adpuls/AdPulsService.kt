@@ -6,6 +6,14 @@ import jakarta.inject.Singleton
 class AdPulsService(private val repository: AdPulsRepository) {
 
 
+    fun findByUuid(uuid: String): List<AdPulsDTO> {
+        return repository.findByUuid(uuid).map{it.toDTO()}
+    }
+
+    fun findByProviderReference(providerId: Long, reference: String): List<AdPulsDTO> {
+        return repository.findByProviderIdAndReference(providerId, reference).map { it.toDTO() }
+    }
+
     fun save(adPulsDTO: AdPulsDTO) {
         repository.save(repository.findByUuidAndType(adPulsDTO.uuid, adPulsDTO.type)?.copy(total = adPulsDTO.total) ?: adPulsDTO.toEntity())
     }
