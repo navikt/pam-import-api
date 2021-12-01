@@ -19,7 +19,7 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         return adPulsService.findByProviderReference(providerId, reference)
     }
 
-    @Get("/providerId")
+    @Get("/{providerId}")
     fun getAllTodayStatsForProvider(@PathVariable providerId: Long):List<AdPulsDTO> {
         val today = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS)
         return adPulsService.findByProviderIdAndUpdatedAfter(providerId, today)

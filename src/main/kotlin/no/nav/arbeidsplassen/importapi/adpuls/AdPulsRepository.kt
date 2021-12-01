@@ -67,5 +67,5 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     abstract fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls>
 
     @Transactional
-    abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, after: LocalDateTime): List<AdPuls>
+    abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, updated: LocalDateTime): List<AdPuls>
 }
