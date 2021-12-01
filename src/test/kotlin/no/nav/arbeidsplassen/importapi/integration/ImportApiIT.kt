@@ -138,7 +138,7 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
         assertEquals(future.get().status, TransferLogStatus.RECEIVED)
-        Thread.sleep(30000)
+        Thread.sleep(60000)
         val adminstatusReq = GET<AdAdminStatusDTO>("/api/v1/adminstatus/${provider.id}/140095810")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
