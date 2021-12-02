@@ -6,9 +6,7 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.Provider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 
-class TestUtils {
-
-}
+class TestUtils
 
 fun ProviderRepository.newTestProvider(): Provider {
     return save(Provider(identifier = "tester", email = "tester@tester.test", phone = "12345678"))

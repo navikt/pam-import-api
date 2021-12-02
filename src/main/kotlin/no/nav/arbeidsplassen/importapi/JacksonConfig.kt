@@ -10,7 +10,7 @@ import io.micronaut.context.event.BeanCreatedEventListener
 import jakarta.inject.Singleton
 
 @Singleton
-class JacksonConfig(): BeanCreatedEventListener<ObjectMapper> {
+class JacksonConfig : BeanCreatedEventListener<ObjectMapper> {
 
     override fun onCreated(event: BeanCreatedEvent<ObjectMapper>): ObjectMapper {
         val objectMapper = event.bean

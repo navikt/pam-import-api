@@ -48,6 +48,8 @@ spec:
       value: {{ ad_preview_url }}
     - name: ADMINSTATUS_KAFKA_TOPIC
       value: "{{ adminstatus_kafka_topic }}"
+    - name: PULSEVENT_KAFKA_TOPIC
+      value: "{{ pulsevent_kafka_topic }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling

@@ -31,9 +31,8 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
     }
 
     fun findByUuid(uuid: String): AdAdminStatusDTO {
-        return adminStatusRepository.findByUuid(uuid).orElseThrow {
-            ImportApiError(message = "AdAdminStatus $uuid not found", type = ErrorType.NOT_FOUND)
-        }.toDTO()
+        return adminStatusRepository.findByUuid(uuid)?.toDTO()
+            ?: throw ImportApiError(message = "AdAdminStatus for $uuid not found", type = ErrorType.NOT_FOUND)
     }
 
     private fun AdminStatus.toDTO(): AdAdminStatusDTO {

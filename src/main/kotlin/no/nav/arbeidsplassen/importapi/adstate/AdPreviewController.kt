@@ -7,7 +7,6 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.server.types.files.StreamedFile
 import io.swagger.v3.oas.annotations.Hidden
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
 import javax.annotation.security.PermitAll

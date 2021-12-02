@@ -15,20 +15,20 @@ class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
                      val objectMapper: ObjectMapper) {
 
     private val hostname = InetAddress.getLocalHost().hostName
-    private var leader =  "";
+    private var leader =  ""
     private var lastCalled = LocalDateTime.MIN
-    private val electorUri = "http://"+electorPath;
+    private val electorUri = "http://"+electorPath
 
     companion object {
         private val LOG = LoggerFactory.getLogger(LeaderElection::class.java)
     }
 
     fun isLeader(): Boolean {
-        return hostname == getLeader();
+        return hostname == getLeader()
     }
 
     private fun getLeader(): String {
-        if (electorPath == "NOLEADERELECTION") return hostname;
+        if (electorPath == "NOLEADERELECTION") return hostname
         if (leader.isBlank() || lastCalled.isBefore(LocalDateTime.now().minusMinutes(2))) {
             leader = objectMapper.readValue(client.retrieve(electorUri).blockingFirst(), Elector::class.java).name
             LOG.debug("Running leader election getLeader is {} ", leader)

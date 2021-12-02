@@ -4,7 +4,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.0
     hostname: zookeeper
-    container_name: zookeeper
+    container_name: zookeeper_importapi
     ports:
       - "2181:2181"
     environment:
@@ -13,7 +13,7 @@ services:
   broker:
     image: confluentinc/cp-kafka:5.5.0
     hostname: broker
-    container_name: broker
+    container_name: broker_importapi
     depends_on:
       - zookeeper
     ports:
@@ -30,7 +30,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
   postgres:
     hostname: postgres
-    container_name: postgres
+    container_name: postgres_importapi
     image: postgres:11
     ports:
       - "5432:5432"
@@ -38,13 +38,14 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
     - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
-    command: ["postgres", "-c", "log_statement=all"]
+    command: ["postgres", "-c", "log_statement=none"]
   pamad:
     depends_on:
       - postgres
       - broker
       - zookeeper
-    image: ghcr.io/navikt/pam-ad:21.267.153931
+    image: ghcr.io/navikt/pam-ad:21.321.084608
+    container_name: pamad_importapi
     ports:
       - 127.0.0.1:9001:9001
     environment:
@@ -54,9 +55,11 @@ services:
       - DB_HOST=postgres
       - KAFKA_BOOTSTRAP_SERVERS=broker:29092
       - SCHEDULER_ENABLED=true
-      - PUSHADTOKAFKA_ENABLED=false
+      - PUSHADTOKAFKA_ENABLED=true
       - IMPORTAPI_ENABLED=true
       - IMPORTAPI_FEED_URL=http://importapi:9028/stillingsimport/internal/adstates
+      - AD_INTERN_TOPIC=teampam.stilling-intern-1
+      - EVENTOUTBOX_WRITE_ENABLED=true
   importapi:
     build: .
     depends_on:
@@ -71,3 +74,4 @@ services:
       DB_DRIVER: org.postgresql.Driver
       DB_HOST: 'postgres'
       KAFKA_BOOTSTRAP_SERVERS: 'broker:29092'
+      ADMINSTATUS_KAFKA_TOPIC: teampam.stilling-intern-1

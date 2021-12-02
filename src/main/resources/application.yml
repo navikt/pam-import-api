@@ -73,8 +73,8 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${DB_JDBC_URL:`jdbc:h2:mem:devDb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`}
-    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    url: ${DB_JDBC_URL:`jdbc:tc:postgresql:11:///puls?TC_INITSCRIPT=postgres/postgres-init.sql`}
+    driverClassName: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
     maximum-pool-size: 4
@@ -95,6 +95,10 @@ transferlog:
   adstate:
     kafka:
       enabled: false
+pulsevent:
+  kafka:
+    enabled: true
+    topic: teampam.puls-intern-2
 adminstatussync:
   kafka:
     enabled: true
