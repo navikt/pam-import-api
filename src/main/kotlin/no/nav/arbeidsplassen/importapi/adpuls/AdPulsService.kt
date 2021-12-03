@@ -1,11 +1,19 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
+import io.micronaut.cache.annotation.CacheConfig
+import io.micronaut.cache.annotation.Cacheable
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.Open
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
+@Open
 @Singleton
 class AdPulsService(private val repository: AdPulsRepository) {
 
+    companion object {
+        private val LOG = LoggerFactory.getLogger(AdPulsService::class.java)
+    }
 
     fun findByUuid(uuid: String): List<AdPulsDTO> {
         return repository.findByUuid(uuid).map{it.toDTO()}
@@ -34,7 +42,9 @@ class AdPulsService(private val repository: AdPulsRepository) {
         return AdPuls(id=id, providerId=providerId, reference=reference, uuid=uuid, type = type, total = total, created=created, updated=updated)
     }
 
+    @Cacheable("provider_ad_stats")
     fun findByProviderIdAndUpdatedAfter(providerId: Long, updatedAfter: LocalDateTime): List<AdPulsDTO> {
+        LOG.info("Getting puls events for provider $providerId and updated after $updatedAfter")
         return repository.findByProviderIdAndUpdatedAfter(providerId, updatedAfter).map { it.toDTO() }
     }
 
