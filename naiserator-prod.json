@@ -4,5 +4,5 @@
   "kafka_pool": "nav-prod",
   "adminstatus_kafka_topic": "teampam.stilling-intern-1",
   "cloudsql_tier": "db-custom-2-7680",
-  "pulsevent_kafka_topic": "tteampam.pam-puls-intern-2"
+  "pulsevent_kafka_topic": "teampam.pam-puls-intern-2"
 }
