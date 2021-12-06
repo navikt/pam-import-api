@@ -50,6 +50,8 @@ spec:
       value: "{{ adminstatus_kafka_topic }}"
     - name: PULSEVENT_KAFKA_TOPIC
       value: "{{ pulsevent_kafka_topic }}"
+    - name: PULSEVENT_KAFKA_ENABLED
+      value: "{{ pulsevent_kafka_enabled }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling

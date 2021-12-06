@@ -31,6 +31,7 @@ class PulsEventTopicListener(private val adInfoService: AdPulsService, private v
     fun PulsEventDTO.toAdInfoDTO(): AdPulsDTO? {
        return adminStatusRepository.findByUuid(this.oid)?.let {
            AdPulsDTO(
+               id = it.id,
                uuid = it.uuid,
                type = PulsEventType.fromValue(this.type),
                total = this.total,
