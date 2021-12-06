@@ -40,6 +40,11 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
         }
     }
 
+    @Transactional
+    override fun <S : AdPuls> saveAll(entities: Iterable<S>): Iterable<S> {
+        return entities.map { save(it) }
+    }
+
     private fun PreparedStatement.prepareSQL(entity: AdPuls) {
         var index=1
         setLong(index, entity.providerId)

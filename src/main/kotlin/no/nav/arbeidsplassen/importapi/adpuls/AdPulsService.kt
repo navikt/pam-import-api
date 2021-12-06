@@ -6,6 +6,7 @@ import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import javax.transaction.Transactional
 
 @Open
 @Singleton
@@ -19,6 +20,10 @@ class AdPulsService(private val repository: AdPulsRepository) {
         return repository.findByUuid(uuid).map{it.toDTO()}
     }
 
+    fun findByUuidAndType(uuid: String, type: PulsEventType): AdPulsDTO? {
+        return repository.findByUuidAndType(uuid, type)?.toDTO()
+    }
+
     fun findByProviderReference(providerId: Long, reference: String): List<AdPulsDTO> {
         return repository.findByProviderIdAndReference(providerId, reference).map { it.toDTO() }
     }
@@ -28,10 +33,11 @@ class AdPulsService(private val repository: AdPulsRepository) {
             ?: adPulsDTO.toEntity()).toDTO()
     }
 
+
     fun saveAll(adPulsDTOs: List<AdPulsDTO>): List<AdPulsDTO> {
-        return repository.saveAll(
-            adPulsDTOs.map { repository.findByUuidAndType(it.uuid, it.type)?.copy(total = it.total) ?: it.toEntity()}
-        ).map { it.toDTO() }
+        return repository.saveAll(adPulsDTOs.map {
+            repository.findByUuidAndType(it.uuid, it.type)?.copy(total = it.total) ?: it.toEntity()
+        }).map { it.toDTO() }
     }
 
     private fun AdPuls.toDTO(): AdPulsDTO {

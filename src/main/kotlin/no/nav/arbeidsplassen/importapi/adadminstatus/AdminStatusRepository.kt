@@ -75,4 +75,5 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     @Transactional
     abstract fun findByUuid(uuid:String): AdminStatus?
 
+
 }

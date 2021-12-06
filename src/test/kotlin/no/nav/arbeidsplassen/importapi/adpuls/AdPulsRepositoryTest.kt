@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.adinfo
+package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adpuls.AdPuls
@@ -22,5 +22,11 @@ class AdPulsRepositoryTest(private val repository: AdPulsRepository, private val
         val inDb = repository.findById(first.id).get()
         assertNotNull(inDb)
         assertEquals(10, inDb.total)
+        val new = inDb.copy(total = 20)
+        repository.save(new)
+        val typeUuid = repository.findByUuidAndType(first.uuid, first.type)
+        assertNotNull(typeUuid)
+        assertEquals(first.id, typeUuid!!.id)
+        assertEquals(20, typeUuid!!.total)
     }
 }

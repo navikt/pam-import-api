@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.integration
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.configuration.kafka.annotation.KafkaClient
 import io.micronaut.configuration.kafka.annotation.KafkaKey
@@ -10,25 +10,24 @@ import io.micronaut.context.annotation.PropertySource
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.MediaType
-
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.rxjava2.http.client.RxHttpClient
 import io.micronaut.rxjava2.http.client.RxStreamingHttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
+import no.nav.arbeidsplassen.importapi.adpuls.AdPulsDTO
+import no.nav.arbeidsplassen.importapi.adpuls.PulsEventDTO
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogStatus
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CompletableFuture
-import jakarta.inject.Inject
-import no.nav.arbeidsplassen.importapi.adpuls.PulsEventDTO
-import org.junit.jupiter.api.Assertions.assertEquals
 
 
 // End 2 End Test, using docker-compose. This test will run in github action CI
@@ -148,14 +147,20 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
         assertEquals(received.status, Status.DONE)
         // expect puls event
         pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 10, type = "Stilling visning"))
+        pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 20, type = "Stilling visning"))
+        pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 5, type = "Stilling sok-via-url"))
         Thread.sleep(10000)
-        val pulsRequest = GET<Any>("/api/v1/stats/${provider.id}/${received.reference}")
+        val typeRef: TypeReference<List<AdPulsDTO>> = object: TypeReference<List<AdPulsDTO>>(){
+        }
+
+        val pulsRequest2 = GET<Any>("/api/v1/stats/${provider.id}/${received.reference}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bearerAuth(providertoken)
-        val puls = client.exchange(pulsRequest, JsonNode::class.java).blockingFirst().body()
-        assertEquals(10, puls[0]["total"].intValue())
-        LOG.info(objectMapper.writeValueAsString(puls))
+        val body = client.exchange(pulsRequest2, String::class.java).blockingFirst().body()
+        LOG.info(body)
+        val dtos =  objectMapper.readValue(body, typeRef)
+        assertEquals(2, dtos.size)
     }
 
 }
