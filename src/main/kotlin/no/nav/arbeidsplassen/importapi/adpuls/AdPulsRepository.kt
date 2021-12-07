@@ -2,6 +2,8 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings
@@ -46,8 +48,8 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     }
 
     private fun PreparedStatement.prepareSQL(entity: AdPuls) {
-        var index=1
-        setLong(index, entity.providerId)
+        var index=0
+        setLong(++index, entity.providerId)
         setString(++index, entity.uuid)
         setString(++index, entity.reference)
         setString(++index, entity.type.name)
@@ -72,5 +74,5 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     abstract fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls>
 
     @Transactional
-    abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, updated: LocalDateTime): List<AdPuls>
+    abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, updated: LocalDateTime, pageable: Pageable): Slice<AdPuls>
 }

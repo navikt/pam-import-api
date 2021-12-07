@@ -1,14 +1,11 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.cache.annotation.CacheConfig
-import io.micronaut.cache.annotation.Cacheable
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Slice
 import jakarta.inject.Singleton
-import no.nav.arbeidsplassen.importapi.Open
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import javax.transaction.Transactional
 
-@Open
 @Singleton
 class AdPulsService(private val repository: AdPulsRepository) {
 
@@ -48,10 +45,8 @@ class AdPulsService(private val repository: AdPulsRepository) {
         return AdPuls(id=id, providerId=providerId, reference=reference, uuid=uuid, type = type, total = total, created=created, updated=updated)
     }
 
-    @Cacheable("provider_ad_stats")
-    fun findByProviderIdAndUpdatedAfter(providerId: Long, updatedAfter: LocalDateTime): List<AdPulsDTO> {
-        LOG.info("Getting puls events for provider $providerId and updated after $updatedAfter")
-        return repository.findByProviderIdAndUpdatedAfter(providerId, updatedAfter).map { it.toDTO() }
+    fun findByProviderIdAndUpdatedAfter(providerId: Long, updatedAfter: LocalDateTime, pageable: Pageable): Slice<AdPulsDTO> {
+        return repository.findByProviderIdAndUpdatedAfter(providerId, updatedAfter, pageable).map { it.toDTO() }
     }
 
 }

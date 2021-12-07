@@ -7,6 +7,7 @@ import io.micronaut.configuration.kafka.annotation.KafkaKey
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.context.annotation.Property
 import io.micronaut.context.annotation.PropertySource
+import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.MediaType
@@ -27,6 +28,8 @@ import no.nav.arbeidsplassen.importapi.transferlog.TransferLogStatus
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 
 
@@ -144,25 +147,22 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
             .bearerAuth(providertoken)
         val received = client.exchange(adminstatusReq, AdAdminStatusDTO::class.java).blockingFirst().body()
         LOG.info(objectMapper.writeValueAsString(received))
-        assertEquals(received.status, Status.DONE)
+        assertEquals(received!!.status, Status.DONE)
         // expect puls event
         pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 10, type = "Stilling visning"))
         pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 20, type = "Stilling visning"))
         pulsKafkaSender.sendPulsEvent("${received.uuid}#Stilling visning", PulsEventDTO(oid=received.uuid, total = 5, type = "Stilling sok-via-url"))
         Thread.sleep(10000)
-        val typeRef: TypeReference<List<AdPulsDTO>> = object: TypeReference<List<AdPulsDTO>>(){
-        }
-
-        val pulsRequest2 = GET<Any>("/api/v1/stats/${provider.id}/${received.reference}")
+        val now = LocalDateTime.now().minusHours(1).truncatedTo(ChronoUnit.HOURS)
+        val pulsRequest2 = GET<Any>("/api/v1/stats/${provider.id}?from=${now}")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .bearerAuth(providertoken)
         val body = client.exchange(pulsRequest2, String::class.java).blockingFirst().body()
         LOG.info(body)
-        val dtos =  objectMapper.readValue(body, typeRef)
-        assertEquals(2, dtos.size)
+        val dtos =  objectMapper.readValue(body, object: TypeReference<Slice<AdPulsDTO>>(){})
+        assertEquals(2, dtos.numberOfElements)
     }
-
 }
 
 @KafkaClient

@@ -39,20 +39,20 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
 
 
     private fun PreparedStatement.prepareSQL(entity: AdminStatus) {
-        var parIndex=1
-        setString(parIndex++, entity.uuid)
-        setString(parIndex++, entity.status.name)
-        setString(parIndex++, entity.message)
-        setString(parIndex++, entity.reference)
-        setLong(parIndex++, entity.providerId)
-        setLong(parIndex++, entity.versionId)
-        setTimestamp(parIndex++, entity.created.toTimeStamp())
-        setString(parIndex++, entity.publishStatus.name)
+        var parIndex=0
+        setString(++parIndex, entity.uuid)
+        setString(++parIndex, entity.status.name)
+        setString(++parIndex, entity.message)
+        setString(++parIndex, entity.reference)
+        setLong(++parIndex, entity.providerId)
+        setLong(++parIndex, entity.versionId)
+        setTimestamp(++parIndex, entity.created.toTimeStamp())
+        setString(++parIndex, entity.publishStatus.name)
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         }
         else {
-            setLong(parIndex++, entity.id!!)
+            setLong(++parIndex, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
 
         }
