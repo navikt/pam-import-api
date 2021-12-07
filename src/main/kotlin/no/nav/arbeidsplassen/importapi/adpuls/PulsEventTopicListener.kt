@@ -23,15 +23,18 @@ class PulsEventTopicListener(
     }
 
     @Topic("\${pulsevent.kafka.topic:teampam.puls-intern-2}")
-    fun syncPulsEvents(events: List<PulsEventDTO>, offsets: List<Long>) {
+    fun syncPulsEvents(events: List<PulsEventDTO>, offsets: List<Long>): List<AdPulsDTO> {
         LOG.info("Received ${events.size} events from puls")
         val dtos = adPulsService.saveAll(
             events
                 .filter { PulsEventType.fromValue(it.type) != PulsEventType.unknown }
+                .map { "${it.oid}${it.type}" to it }
+                .toMap().values
                 .map { it.toAdInfoDTO() }
                 .filterNotNull()
         )
         LOG.info("${dtos.size} events was saved")
+        return dtos
     }
 
     fun PulsEventDTO.toAdInfoDTO(): AdPulsDTO? {

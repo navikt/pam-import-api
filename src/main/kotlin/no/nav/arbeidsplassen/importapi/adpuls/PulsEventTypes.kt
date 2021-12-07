@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-enum class PulsEventType(private val value: String) {
+enum class PulsEventType(val value: String) {
     pageviews("Stilling visning"),
     applicationurlclicks("Stilling sok-via-url"),
     unknown("unknown");
