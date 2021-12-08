@@ -673,6 +673,79 @@ Depending on the error, the api will also return what type of error it is.
 ##### ErrorTypes:
 PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 
+
+## Stats 
+
+It is possible to get stats about your ads, you can see how many views and applications you have got for a certain ad.
+
+For example:
+
+```
+GET https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/stats/{providerId}?from=yyyy-MM-ddTHH:mm&sort=updated,asc&page=0
+Accept: application/json
+Cache-Control: no-cache
+Content-Type: application/json
+Authorization: Bearer <secret key>
+"content": [
+    {
+      "id": 1193,
+      "providerId": 10041,
+      "uuid": "a8778ad6-315f-4be4-a6f0-65c3d55822c9",
+      "reference": "234543",
+      "type": "pageviews",
+      "total": 44,
+      "created": "2021-12-07T08:07:41.094211",
+      "updated": "2021-12-08T08:09:30.159884"
+    },
+    {
+      "id": 4587,
+      "providerId": 10041,
+      "uuid": "ff3109f6-2bcb-422b-b7a1-f8ebe657baa8",
+      "reference": "244838",
+      "type": "applicationurlclicks",
+      "total": 1,
+      "created": "2021-12-08T03:08:59.178562",
+      "updated": "2021-12-08T03:08:59.217267"
+    },
+],
+  "pageable": {
+    "number": 0,
+    "sort": {
+      "orderBy": [
+        {
+          "property": "updated",
+          "direction": "ASC",
+          "ignoreCase": false,
+          "ascending": true
+        }
+      ],
+      "sorted": true
+    },
+    "size": 1000,
+    "offset": 0,
+    "unpaged": false,
+    "sorted": true
+  },
+  "empty": false,
+  "size": 1000,
+  "offset": 0,
+  "pageNumber": 0,
+  "numberOfElements": 2
+```
+
+### Supported types:
+
+| type      | norwegian description |
+|-----------|-----------------------|
+| pageviews | Antall visning        |
+| applicationurlclicks | Antall klikk på søknad |
+
+### Limitations
+There are some limitations. You can not set the "from" parameter date older than 24h, and each call gives you max=1000
+items. You will have to scroll through the pages by using the "page" query parameter if "numberofElements" is 1000 or more.
+
+It is also not recommended requesting for stats more than 1 time per hour.
+
 # FAQ
 1. *Why some ads are rejected, after it has been published?* 
 - All ads are automatic published, and then will be manually checked by an admin. If an ad does not follow NAVs guidelines,
