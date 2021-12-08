@@ -741,9 +741,9 @@ Authorization: Bearer <secret key>
 | applicationurlclicks | Antall klikk på søknad |
 
 ### Limitations
-There are some limitations. You can not set the "from" parameter date older than 24h, and each call gives you max=1000
-items. You will have to scroll through the pages by using the "page" query parameter if "numberofElements" is 1000 or more.
-
+You can not set the "from" parameter date older than 24h. Each request only gives max of 1000 items, 
+you will have to scroll through the pages by using the "page" query parameter if "numberofElements" is 1000 or more.
+Because the aggregations of the events take a lot of time, there is a delay of 2 hours before data is updated.
 It is also not recommended requesting for stats more than 1 time per hour.
 
 # FAQ
