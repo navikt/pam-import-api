@@ -674,8 +674,9 @@ Depending on the error, the api will also return what type of error it is.
 PARSE_ERROR, MISSING_PARAMETER, INVALID_VALUE, CONFLICT, NOT_FOUND, UNKNOWN
 
 
-## Stats 
+# Stats 
 
+## Requesting for ad stats
 It is possible to get stats about your ads, you can see how many views and applications you have got for a certain ad.
 
 For example:
