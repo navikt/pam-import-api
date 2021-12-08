@@ -30,6 +30,7 @@ class PulsEventTopicListener(
                 .filter { PulsEventType.fromValue(it.type) != PulsEventType.unknown }
                 .map { "${it.oid}${it.type}" to it }
                 .toMap().values
+                .sortedBy { it.updated }
                 .map { it.toAdInfoDTO() }
                 .filterNotNull()
         )
@@ -46,7 +47,7 @@ class PulsEventTopicListener(
                     providerId = it.providerId,
                     reference = it.reference
                 )
-            }
+        }
     }
 }
 

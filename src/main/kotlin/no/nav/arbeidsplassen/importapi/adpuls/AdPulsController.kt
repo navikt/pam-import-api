@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
+import io.micronaut.data.model.Sort.Order.Direction
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable

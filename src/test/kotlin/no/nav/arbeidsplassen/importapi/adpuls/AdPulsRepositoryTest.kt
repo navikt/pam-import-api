@@ -27,6 +27,6 @@ class AdPulsRepositoryTest(private val repository: AdPulsRepository, private val
         val typeUuid = repository.findByUuidAndType(first.uuid, first.type)
         assertNotNull(typeUuid)
         assertEquals(first.id, typeUuid!!.id)
-        assertEquals(20, typeUuid!!.total)
+        assertEquals(20, typeUuid.total)
     }
 }

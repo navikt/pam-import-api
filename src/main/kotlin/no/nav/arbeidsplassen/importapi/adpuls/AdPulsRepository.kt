@@ -75,4 +75,7 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
 
     @Transactional
     abstract fun findByProviderIdAndUpdatedAfter(providerId: Long, updated: LocalDateTime, pageable: Pageable): Slice<AdPuls>
+
+    @Transactional
+    abstract fun deleteByUpdatedBefore(before: LocalDateTime): Long
 }
