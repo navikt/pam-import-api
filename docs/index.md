@@ -476,9 +476,9 @@ The main properties are required
 
 |Name           | Type      | Required | Norwegian translation | Description                       | Example   |
 |:------------- |:--------- |:-------- |:----------------------|:----------- |:------------    |
-| reference     | String    | Yes      | Referanse | A unique identifier for the jobAd | alfanumber eg. 140095810        |
+| reference     | String (255)   | Yes      | Referanse | A unique identifier for the jobAd | alfanumber eg. 140095810        |
 | positions     | Integer   | Yes      | Antall stilinger | Amount of employment positions avaiable | 1         |
-| title         | String    | Yes      | Overskrift | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
+| title         | String (512) | Yes      | Overskrift | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
 | adText        | HTML      | Yes      | Annonsetekst | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
 | privacy       | ENUM      | Yes      | - | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN |
 | published     | DATE      | Yes      | Publiseringsdato | When to publish the ad | 2019-02-13T00:00:00 |
@@ -496,8 +496,8 @@ For these instances we also recommend you to use the **reference**  field as a u
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
 |orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
-|reference | String | Optional | Referanse | A unique identifier for the employer, you don't need to specify this if you can send virksomhetsnummer | alfanumeric eg. 232151232 |
-|businessName | String | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
+|reference | String (255) | Optional | Referanse | A unique identifier for the employer, you don't need to specify this if you can send virksomhetsnummer | alfanumeric eg. 232151232 |
+|businessName | String (255) | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
 |location | Object | Yes | Arbeidsgiver adresse  | Address of the employer | See location table|
 
 Location of Employer
