@@ -11,10 +11,15 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
     init {
         require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
         require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
-        require(locationList.isNotEmpty()) { "LocationList is empty"}
+        require(locationIsSetAndHasPostalCodeOrCountyMunicipal())
+                    {"LocationList is empty, no postalcode or county/municipal is set"}
         require(adText.isNotBlank()) {"adtext is blank"}
         require(positions > 0 ) {"positions should be 1 or more"}
     }
+
+    private fun locationIsSetAndHasPostalCodeOrCountyMunicipal() = (locationList.isNotEmpty()
+            && (locationList[0].postalCode.isNullOrEmpty().not() ||
+            (locationList[0].county.isNullOrEmpty().not() && locationList[0].municipal.isNullOrEmpty().not())))
 }
 
 data class EmployerDTO(val reference: String?, val businessName: String, var orgnr: String?, val location: LocationDTO) {
@@ -44,12 +49,7 @@ data class ContactDTO(val name: String?, val title: String?, val email: String?,
 
 data class LocationDTO(val address: String?=null, val postalCode: String?=null, val country: String?="Norge",
                        val county: String?=null, val municipal: String?=null, val city: String?=null,
-                       val latitude: String?=null, val longitude: String?=null) {
-    init {
-        require(!postalCode.isNullOrBlank() || (!county.isNullOrBlank() && !municipal.isNullOrBlank())) {
-            "Missing postal code or county and munipal not set"}
-    }
-}
+                       val latitude: String?=null, val longitude: String?=null)
 
 enum class CategoryType {
     STYRK08, PYRK20
