@@ -2,8 +2,8 @@
 version: v1.14.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
- SNYK-JAVA-COMH2DATABASE-1769238:
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-2421244:
     - '*':
-        reason: Test dependency, and not fixable
+        reason: Open API is using bad version
         expires: 2025-07-08T06:14:39.494Z
 patch: {}

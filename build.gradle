@@ -37,13 +37,13 @@ dependencies {
     kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
     kapt "io.micronaut.security:micronaut-security-annotations"
 
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
 
     testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
 
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     implementation "io.micronaut.micrometer:micronaut-micrometer-core:$micronautVersion"
     implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus:$micronautVersion"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
@@ -65,9 +65,9 @@ dependencies {
     runtimeOnly project(':frontend')
     implementation("io.micronaut.rxjava2:micronaut-rxjava2")
     implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
-
     testImplementation("org.testcontainers:postgresql:${tcVersion}")
  }
+
 
 test.classpath += configurations.developmentOnly
 
