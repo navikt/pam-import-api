@@ -11,12 +11,15 @@ data class AdDTO(val reference: String, val published: LocalDateTime?, val expir
     init {
         require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
         require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
-        require(locationList.isNotEmpty()
-                && ( locationList[0].postalCode.isNullOrEmpty().not() || locationList[0].county.isNullOrEmpty().not()))
-                    {"LocationList is empty, or no postalcode or county/municipal set"}
+        require(locationIsSetAndHasPostalCodeOrCountyMunicipal())
+                    {"LocationList is empty, no postalcode or county/municipal is set"}
         require(adText.isNotBlank()) {"adtext is blank"}
         require(positions > 0 ) {"positions should be 1 or more"}
     }
+
+    private fun locationIsSetAndHasPostalCodeOrCountyMunicipal() = (locationList.isNotEmpty()
+            && (locationList[0].postalCode.isNullOrEmpty().not() ||
+            (locationList[0].county.isNullOrEmpty().not() && locationList[0].municipal.isNullOrEmpty().not())))
 }
 
 data class EmployerDTO(val reference: String?, val businessName: String, var orgnr: String?, val location: LocationDTO) {
