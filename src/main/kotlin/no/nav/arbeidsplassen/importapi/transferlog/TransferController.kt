@@ -85,6 +85,10 @@ class TransferController(private val transferLogService: TransferLogService,
         }
     }
 
+    private fun locationMustHavePostalCodeOrCountyMunicipal(ad:AdDTO) = (ad.locationList.isNotEmpty()
+            && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
+            (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
+
     private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
        return when (error) {
             is JsonParseException -> TransferLogDTO(message="Parse error: at ${error.location}", status = TransferLogStatus.ERROR, providerId = provider.id!!)
@@ -121,6 +125,9 @@ class TransferController(private val transferLogService: TransferLogService,
     private fun validate(ad: AdDTO) {
         if (ad.categoryList.count()>3) {
             throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE)
+        }
+        if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
+            throw ImportApiError("Location does not have postal code, or does not have county/municipality", ErrorType.INVALID_VALUE)
         }
         ad.categoryList.stream().forEach { cat ->
             val optCat = styrkCodeConverter.lookup(cat.code)

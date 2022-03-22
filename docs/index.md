@@ -502,13 +502,12 @@ For these instances we also recommend you to use the **reference**  field as a u
 
 Location of Employer
 
-This is the location address of the employer, and will be used for worklocation, if there is no location specified in the Ad itself. 
-(See below for work address/location of the job)
+This is the location address of the employer, see also below for work address/location of the job.
 
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
 |address| String | Optional | Adresse |Street address | Oslo gate 1|
-|postalCode| String | Yes | Postnr. | Postal Code | 0566 |
+|postalCode| String | Optional | Postnr. | Postal Code | 0566 |
 |city | String | Optional | Sted | City | Oslo |
 |municipal | String | Optional | Kommune |Municipal | Oslo |
 |county | String | Optional | Fylke | County | Oslo |
@@ -576,7 +575,7 @@ than three locations per jobAd, and at least one location must be specified.
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
 | address | String | Optional | Adresse | Street address | Magnus Sørlis veg. 1 |
-| postalCode | String | Optional | Postnr. | postal/zip code | 1920 |
+| postalCode | String | yes      | Postnr. | postal/zip code | 1920 |
 | county | String | Optional | Fylke | County | Viken |
 | municipal | String | Optional | Kommune | Municipal | Lillestrøm |
 | city | String | Optional | Sted | City | Sørumsand |
