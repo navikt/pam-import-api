@@ -96,12 +96,11 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
               ],
               "locationList": [
                 {
-                  "address": "Magnus Sørlis veg",
-                  "postalCode": "1920",
-                  "country": "NORGE",
-                  "county": "VIKEN",
-                  "municipal": "LILLESTRØM",
-                  "city": "SØRUMSAND"
+                    "address": "Veien 2",
+                    "postalCode": "0001",
+                    "county": "Oslo",
+                    "municipal": "Oslo",
+                    "country": "Norge"
                 }
               ],
               "properties": {
@@ -151,7 +150,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
         val response = strClient.jsonStream(post, TransferLogDTO::class.java)
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
-        assertEquals(future.get().status, TransferLogStatus.RECEIVED)
+        assertEquals(TransferLogStatus.RECEIVED, future.get().status)
 //        Thread.sleep(60000) // takes too long
 //        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
 //            .contentType(MediaType.APPLICATION_JSON)
