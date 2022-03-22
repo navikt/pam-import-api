@@ -28,7 +28,7 @@ class ImportApiErrorHandler : ExceptionHandler<ImportApiError, HttpResponse<Erro
             CONFLICT -> HttpResponseFactory.INSTANCE.status<ErrorMessage>(HttpStatus.CONFLICT).body(createMessage(error))
             UNKNOWN -> HttpResponse.serverError(createMessage(error))
         }
-        LOG.error(response.body().toString())
+        if (error.type != NOT_FOUND) { LOG.error(response.body().toString()) }
         return response
     }
     private fun createMessage(error: ImportApiError) = ErrorMessage(message = error.message!!, errorType = error.type)
