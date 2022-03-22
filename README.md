@@ -35,5 +35,9 @@ pam-import-api.nais.oera-q.local/stillingsimport/internal/providers
 
 ````
 
+### Deploy to prod
+
+Before deploying to production and if the API changes, remember to send information about it to all providers. 
+
 [API documentation](https://navikt.github.io/pam-import-api/)
 
