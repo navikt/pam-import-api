@@ -77,7 +77,7 @@ datasources:
     driverClassName: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
-    maximum-pool-size: 4
+    maximum-pool-size: 8
     minimum-idle: 0
     pool-name: default
 flyway:
