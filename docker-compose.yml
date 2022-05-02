@@ -44,7 +44,7 @@ services:
       - postgres
       - broker
       - zookeeper
-    image: ghcr.io/navikt/pam-ad:21.321.084608
+    image: ghcr.io/navikt/pam-ad:22.091.083048
     container_name: pamad_importapi
     ports:
       - 127.0.0.1:9001:9001
