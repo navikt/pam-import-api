@@ -17,7 +17,7 @@ The app mainly uses the following technologies:
 * Postgres
 * Kafka
 
-## Integrations
+## Environment
 
 The image below shows a simplified sketch of pam-import-api and its internal integrations.
 
@@ -60,7 +60,7 @@ information to the Kafka topic `puls` that pam-import-api listens to.
 ./gradlew run
 ```
 
-## Run kafka, postgres with docker-compose
+## Run Kafka and Postgres with docker-compose
 
 ```
 docker-compose up --build
