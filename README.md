@@ -83,9 +83,9 @@ KAFKA_SECURITY_PROTOKOL=SASL_SSL
 curl -k -XPOST -H "Accept: application/json" -H "Cache-Control: no-cache" -H "Content-Type: application/json" -d '{"identifier":"jobnorge-test","email":"test@jobnorge.no", "phone":"12345678"}' https://pam-import-api.nais.oera-q.local/stillingsimport/internal/providers
 ```
 
-# Registering new providers
+# Register new providers
 
-Providers must authenticate themselves with a `providerId` and `token` when using the API. These are generated manually with scripts in this app ([registerProvider.sh]() and [provider-token.sh]()).
+Providers must authenticate requests to the API with a `providerId` and `token`. These credentials are generated manually with scripts in this app ([register-new-provider.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/register-new-provider.sh) and [generate-provider-tokens.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/generate-provider-tokens.sh)).
 
 ## Prerequisites
 
@@ -94,9 +94,7 @@ Providers must register themselves as a job provider/partner and be approved by 
 * Contact email (technical support or personell)
 * Contact phone number
 
-## Using the registration scripts
-
-Step-by-step guide:
+## Step-by-step guide to using the scripts
 
 1. Set environment variables
     1. The scripts require environment variables `PATH_PROD_KEY` and `PATH_DEV_KEY`
@@ -108,39 +106,41 @@ export PATH_PROD_KEY=<path_prod_key>
 export PATH_DEV_KEY=<path_dev_key>
 ```
 
-2. Run `registerProvider.sh`
+2. Run `register-new-provider.sh`
     1. Provide `identifier`, `email` and `phone` when prompted for these
     2. Verify that provided info is correct (`Y`/`y` to approve)
     3. Note `id` from the output (this is `providerId` needed by the provider for authentication)
 
 ```bash
-bash registerProvider.sh
+bash register-new-provider.sh
 
-Register new IMPORT-API provider, please type in correct information
-identifier (brukt som medium):<identifier>
-email:<email>
-phone:<phone>
-this will create a new provider on both test and production using the json file:
-{ "identifier": "<identifier>", "email": "<email>", "phone": "<phone>" } 
+Registering new import-api provider, please type in provider information
+ identifier (brukt som medium): <identifier>
+ email: <email>
+ phone: <phone>
 
-Are you sure? <Y>
+This will create a new provider in test and production using the json file:
+ { "identifier": "<identifier>", "email": "<email>", "phone": "<phone>" } 
+
+Are you sure (Y/y to approve)? <Y>
 
 # note id in response
 ```
 
-3. Run `provider-token.sh`
+3. Run `generate-provider-tokens.sh`
     1. Provide `providerId` when prompted for this (`id` from the previous step)
     2. Verify that provided info is correct (`Y`/`y` to approve)
     3. Note `token` for dev and prod from the output (these are the `tokens` needed by the provider for authentication)
 
 ```bash
-bash provider-token.sh
+bash generate-provider-tokens.sh
 
-Create tokens for provider
-provider-id:<providerId>
-this will generate tokens for provider <providerId>
+Generating tokens for provider
+ providerId: <providerId>
 
-Are you sure? <Y>
+This will generate tokens for provider: <providerId> 
+
+Are you sure (Y/y to approve)? Y
 
 # note token for dev and prod
 ```
