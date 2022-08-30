@@ -1,10 +1,8 @@
 ![build-deploy-dev](https://github.com/navikt/pam-import-api/workflows/build-deploy-dev/badge.svg)
 ![deploy-prod](https://github.com/navikt/pam-import-api/workflows/deploy-prod/badge.svg)
 
-pam-import-api
-===
-
-Application that lets job providers upload and publish job ads to [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
+## Beskrivelse
+pam-import-api er en applikasjon som lar stillingsleverandærer laste opp og publisere stillingsannonser på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
 
 # Technical documentation
 
