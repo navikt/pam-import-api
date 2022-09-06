@@ -5,9 +5,15 @@ import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 
 @Singleton
-class TransferLogService(private val transferLogRepository: TransferLogRepository) {
+class TransferLogService(private val transferLogRepository: TransferLogRepository,
+                         private val styrkCodeConverter: StyrkCodeConverter,
+                         private val propertyNameValueValidation: PropertyNameValueValidation) {
 
 
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
@@ -44,5 +50,33 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         }.copy(status = TransferLogStatus.RECEIVED)
         return transferLogRepository.save(received).toDTO()
     }
+
+    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO) : AdDTO {
+        if ("SNAREST" == ad.properties[PropertyNames.starttime]?.uppercase()
+            && ad.expires == null) {
+            val newExpiryDate = ad.published?.plusDays(10)
+            return ad.copy(expires = newExpiryDate)
+        } else {
+            return ad
+        }
+    }
+
+    fun validate(ad: AdDTO) {
+        if (ad.categoryList.count()>3) {
+            throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE)
+        }
+        if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
+            throw ImportApiError("Location does not have postal code, or does not have county/municipality", ErrorType.INVALID_VALUE)
+        }
+        ad.categoryList.stream().forEach { cat ->
+            val optCat = styrkCodeConverter.lookup(cat.code)
+            if (optCat.isEmpty) throw ImportApiError("category ${cat.code} does not exist", ErrorType.INVALID_VALUE)
+        }
+        propertyNameValueValidation.checkOnlyValidValues(ad.properties)
+    }
+
+    private fun locationMustHavePostalCodeOrCountyMunicipal(ad:AdDTO) = (ad.locationList.isNotEmpty()
+            && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
+            (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
 
 }
