@@ -52,7 +52,7 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO) : AdDTO {
-        if ("SNAREST" == ad.properties[PropertyNames.starttime]?.uppercase()
+        if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
             && ad.expires == null) {
             val newExpiryDate = ad.published?.plusDays(10)
             return ad.copy(expires = newExpiryDate)
