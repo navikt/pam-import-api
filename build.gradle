@@ -47,7 +47,10 @@ dependencies {
     implementation "io.micronaut.micrometer:micronaut-micrometer-core:$micronautVersion"
     implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus:$micronautVersion"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
-    implementation "io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}"
+    implementation ("io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}") {
+        exclude group: 'org.apache.kafka:kafka-clients'
+    }
+    implementation "org.apache.kafka:kafka-clients:2.8.2"
 
     implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
     implementation "io.micronaut.sql:micronaut-jdbc-hikari:$micronautSQLVersion"
