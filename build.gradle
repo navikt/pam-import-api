@@ -21,15 +21,21 @@ configurations {
 }
 
 dependencies {
-    implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+    implementation platform("io.micronaut:micronaut-bom:$micronautVersion"){
+        exclude group: "org.apache.kafka", module: "kafka-clients"
+    }
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     implementation "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
     implementation "io.micronaut:micronaut-runtime"
     implementation "io.micronaut:micronaut-http-server-netty"
     implementation "io.micronaut:micronaut-http-client"
 
-    kapt platform("io.micronaut:micronaut-bom:$micronautVersion")
-    kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion")
+    kapt platform("io.micronaut:micronaut-bom:$micronautVersion"){
+        exclude group: "org.apache.kafka", module: "kafka-clients"
+    }
+    kaptTest platform("io.micronaut:micronaut-bom:$micronautVersion"){
+        exclude group: "org.apache.kafka", module: "kafka-clients"
+    }
 
     kapt "io.micronaut:micronaut-inject-java"
     kapt "io.micronaut:micronaut-validation"
@@ -48,7 +54,7 @@ dependencies {
     implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus:$micronautVersion"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
     implementation ("io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}") {
-        exclude group: 'org.apache.kafka:kafka-clients'
+        exclude group: "org.apache.kafka", module: "kafka-clients"
     }
     implementation "org.apache.kafka:kafka-clients:2.8.2"
 
