@@ -474,15 +474,15 @@ You can also download kotlin code for the DTOs
 ## Main properties
 The main properties are required
 
-|Name           | Type      | Required | Norwegian translation | Description                       | Example   |
-|:------------- |:--------- |:-------- |:----------------------|:----------- |:------------    |
-| reference     | String (255)   | Yes      | Referanse | A unique identifier for the jobAd | alfanumber eg. 140095810        |
-| positions     | Integer   | Yes      | Antall stilinger | Amount of employment positions avaiable | 1         |
-| title         | String (512) | Yes      | Overskrift | The main ad title | Ønsker du å lede en moderne og veletablert barnehage? |
-| adText        | HTML      | Yes      | Annonsetekst | A describing text, html must be welformed. We only support basic html tags | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
-| privacy       | ENUM      | Yes      | - | Controls what to be shown. | SHOW_ALL, INTERNAL_NOT_SHOWN |
-| published     | DATE      | Yes      | Publiseringsdato | When to publish the ad | 2019-02-13T00:00:00 |
-| expires       | DATE      | Yes      | Sluttdato | Time of expiration | 2019-02-24T00:00:00 |
+|Name           | Type      | Required | Norwegian translation | Description                                                                      | Example   |
+|:------------- |:--------- |:-------- |:----------------------|:---------------------------------------------------------------------------------|:------------    |
+| reference     | String (255)   | Yes      | Referanse | A unique identifier for the jobAd                                                | alfanumber eg. 140095810        |
+| positions     | Integer   | Yes      | Antall stilinger | Amount of employment positions avaiable                                          | 1         |
+| title         | String (512) | Yes      | Overskrift | The main ad title                                                                | Ønsker du å lede en moderne og veletablert barnehage? |
+| adText        | HTML      | Yes      | Annonsetekst | A describing text, html must be welformed. We only support basic html tags       | Nå har du en unik mulighet til å lede en godt faglig og veletablert barnehage. Norlandia Sørumsand barnehage ble etablert i 2006 og har moderne og fleksible oppholdsarealer...|
+| privacy       | ENUM      | Yes      | - | Controls what to be shown. Consumers outside of NAV should always use `SHOW_ALL` | SHOW_ALL, INTERNAL_NOT_SHOWN |
+| published     | DATE      | Yes      | Publiseringsdato | When to publish the ad                                                           | 2019-02-13T00:00:00 |
+| expires       | DATE      | Yes      | Sluttdato | Time of expiration                                                               | 2019-02-24T00:00:00 |
 
 ## Employer
 Arbeidsplassen uses [Brønnøysundregistrene](https://data.brreg.no/enhetsregisteret/oppslag/underenheter)
