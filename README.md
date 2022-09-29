@@ -143,6 +143,10 @@ Are you sure (Y/y to approve)? Y
 # note token for dev and prod
 ```
 
+## Provider og token til testing av api'et 
+Det er laget et eget token for testing av api'et i dev for utviklere. ProviderId og token kan hentes her:  
+https://vault.adeo.no/ui/vault/secrets/secret/show/teampam/import-api/import-api-dev-key 
+
 # Deploy to prod
 
 Before deploying to production and if the API changes, remember to send information about it to all providers.
