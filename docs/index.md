@@ -514,9 +514,11 @@ This is the location address of the employer, see also below for work address/lo
 |country | String | Optional | Land | Country, defaults to Norge | Norge |
 
 ## Category
-Ads are classified by occupations, and these are divided in two levels. 
-You can download all occupations [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).
-  
+Ads are classified by occupations, and these are divided in two levels. We support two types of classifications, `STYRK08` and `PYRK20`.  
+`STYRK08` is [an official Norwegian standard for classification of occupations](https://www.ssb.no/en/klass/klassifikasjoner/7). A complete list of supported styrk-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations).  
+`PYRK20` is a broader classification that just includes the categories of occupations, which are the same categories we use for filtering ads at https://arbeidsplassen.nav.no/stillinger. A complete list of "pyrk"-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).  
+We reccomend using `STYRK08` codes if you are able to, as they are more specific and includes all the information from the corresponding `PYRK20` as well.
+
 It is possible to have more than 1 and max 3 occupation categories for each ad.
 
 |Name | Type | Required | Description | Example |
@@ -634,6 +636,8 @@ When publishStatus is "REJECTED", the following reasons will be in the message f
 * DISCRIMINATING
 * FOREIGN_JOB
 * UNKNOWN
+
+> If the reason is `NOT_APPROVED_BY_LABOUR_INSPECTION`, it means that the employer does not have authorization by the Norwegian Labor Inspection Authority. For more info, see https://www.arbeidstilsynet.no/godkjenninger/
 
 The administration of an ad might take up to one day, it is not recommended to frequently send request for status.
 You should set a delay of 1 hour or more before requesting status again.
