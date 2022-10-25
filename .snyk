@@ -2,17 +2,6 @@
 version: v1.25.0
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JAVA-COMFASTERXMLJACKSONCORE-2421244:
-    - '*':
-        reason: Open API is using bad version
-        expires: 2025-07-08T06:14:39.494Z
-  SNYK-JAVA-ORGYAML-2806360:
-    - '*':
-        reason: >-
-          Currently no version of micronaut without vulnerability, DoS not
-          critical for this app
-        expires: 2022-11-01T00:00:00.000Z
-        created: 2022-08-31T12:44:45.037Z
   SNYK-JAVA-ORGJSOUP-1567345:
     - '*':
         reason: >-
