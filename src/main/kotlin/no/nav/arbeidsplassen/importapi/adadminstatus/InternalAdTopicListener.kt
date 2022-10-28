@@ -28,7 +28,7 @@ class InternalAdTopicListener(private val adminStatusRepository: AdminStatusRepo
         private val LOG = LoggerFactory.getLogger(InternalAdTopicListener::class.java)
     }
 
-    @Topic("\${adminstatus.kafka.topic:StillingIntern}")
+    @Topic("\${adminstatus.kafka.topic:teampam.stilling-intern-1}")
     fun kakfkaAdminStatusSyncWithAd(adList: List<AdTransport>, offsets: List<Long>) {
         LOG.info("received from kafka with batch size of {} ads", adList.size)
         val adminList = adList.stream()
