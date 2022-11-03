@@ -21,7 +21,6 @@ import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
 import javax.transaction.Transactional
-import kotlin.streams.toList
 
 @Singleton
 @Open
@@ -84,9 +83,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                         providerId = transferLog.providerId, reference = ad.reference)}
     }
 
-    private fun sanitizeAd(ad: AdDTO): AdDTO {
-        val text = sanitize(ad.adText)
-
+    fun sanitizeAd(ad: AdDTO): AdDTO {
         val props = ad.properties.map { (key, value) ->
             when (key.type) {
                 PropertyType.HTML -> key to sanitize(value.toString())
@@ -104,7 +101,20 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         }.distinct().joinToString(separator =";")
         props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations)
 
-        return ad.copy(adText = text, properties = props.toMap(), categoryList = categoryList)
+
+        return ad.copy(
+            adText = sanitize(ad.adText),
+            title = ad.title.replaceAmpersand(),
+            employer = ad.employer?.copy(
+                businessName = ad.employer.businessName.replaceAmpersand()
+            ),
+            properties = props.toMap(),
+            categoryList = categoryList
+        )
+    }
+
+    private fun String.replaceAmpersand(): String {
+        return this.replace("&amp;", "&")
     }
 
     @TransactionalEventListener
