@@ -21,6 +21,7 @@ import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
 import javax.transaction.Transactional
+import kotlin.streams.toList
 
 @Singleton
 @Open
