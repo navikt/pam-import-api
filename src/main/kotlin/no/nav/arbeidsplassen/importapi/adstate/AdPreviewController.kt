@@ -22,13 +22,13 @@ class AdPreviewController(private val adStateService: AdStateService, private va
 
     @Get("/api/v1/preview/{uuid}")
     fun previewAd(@PathVariable uuid: String): AdDTO {
+        LOG.info("Previewing ad as json. Uuid:  {}", uuid)
         return adStateService.getAdStateByUuid(uuid).ad
     }
 
     @Get("/frontend/{uuid}")
     fun forwardIndexHtml(uuid: String) : Optional<StreamedFile> {
-        LOG.debug("Previewing uuid {} ", uuid)
+        LOG.info("Previewing ad. Uuid: {}", uuid)
         return environment.getResource("classpath:frontend/index.html").map { StreamedFile(it) }
     }
-
 }
