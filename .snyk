@@ -7,6 +7,6 @@ ignore:
         reason: >-
           Currently no version of micronaut without vulnerability, DoS not
           critical for this app
-        expires: 2022-11-01T00:00:00.000Z
+        expires: 2022-12-01T00:00:00.000Z
         created: 2022-08-31T12:45:55.924Z
 patch: {}
