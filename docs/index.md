@@ -563,6 +563,7 @@ Please specify as much data as possible on the property fields below.
 | jobpercentage | String | Optional | Stillingsprosent | if part time job, a percentage can be specified | eg 25% |
 | jobarrangement | String | Optional | Arbeidstidsordning | what type of jobarrangement | eg. Skift or Vakt |
 | remote | String | Optional | Hjemmekontor | Remote or hybrid workplace is possible | Hjemmekontor or Hybridkontor |
+| euresflagg | String | Optional | EURES-flagg | Marks a particular interest in recruiting workers from other European countries and provides additional visibility in the EURES job portal | true or false |
 
 
 ### Properties that support only valid values 
