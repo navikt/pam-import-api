@@ -10,7 +10,7 @@ import jakarta.inject.Singleton
 class PropertyNameValueValidation {
 
     private val propertiesToValidate = listOf(extent, engagementtype, jobarrangement,
-            workday, workhours, sector, remote)
+            workday, workhours, sector, remote, euresflagg)
 
     val validValues = HashMap<PropertyNames,Set<String>>()
 
@@ -23,6 +23,7 @@ class PropertyNameValueValidation {
         // does not exist in AnsettelseKodeVerk
         validValues[sector] = hashSetOf("Privat", "Offentlig")
         validValues[remote] = hashSetOf("Hjemmekontor", "Hybridkontor")
+        validValues[euresflagg] = hashSetOf("true", "false")
     }
 
     fun validateProperty(name: PropertyNames, value: String) {
