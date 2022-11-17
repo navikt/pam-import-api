@@ -8,6 +8,5 @@ jobs:
     uses: navikt/pam-deploy/.github/workflows/deploy-prod.yml@v2
     with:
       NAIS_RESOURCE: naiserator.yml
-      JAVA_VERSION: '17'
     secrets:
       NAIS_DEPLOY_APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
