@@ -8,6 +8,7 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+      - support-multiple-values-for-some-fields
 jobs:
   call-workflow:
     uses: navikt/pam-deploy/.github/workflows/deploy-dev.yml@v2

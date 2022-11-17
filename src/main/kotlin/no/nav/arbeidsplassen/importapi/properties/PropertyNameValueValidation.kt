@@ -9,14 +9,16 @@ import jakarta.inject.Singleton
 @Singleton
 class PropertyNameValueValidation {
 
-    private val propertiesToValidate = listOf(extent, engagementtype, jobarrangement,
-            workday, workhours, sector, remote, euresflagg)
+    private val propertiesToValidate =
+        listOf(extent, engagementtype, jobarrangement, workday, workhours, sector, remote, euresflagg)
 
-    val validValues = HashMap<PropertyNames,Set<String>>()
+    private val supportsMultipleValues = listOf(workday, workhours)
+
+    val validValues = HashMap<PropertyNames, Set<String>>()
 
     init {
-        validValues[extent] = Omfang.values().flatMap{ it.tekster().values }.toHashSet()
-        validValues[engagementtype] = Ansettelsesform.values().flatMap{ it.tekster().values }.toHashSet()
+        validValues[extent] = Omfang.values().flatMap { it.tekster().values }.toHashSet()
+        validValues[engagementtype] = Ansettelsesform.values().flatMap { it.tekster().values }.toHashSet()
         validValues[jobarrangement] = Arbeidstidsordning.values().flatMap { it.tekster().values }.toHashSet()
         validValues[workday] = Arbeidsdager.values().flatMap { it.tekster().values }.toHashSet()
         validValues[workhours] = Arbeidstid.values().flatMap { it.tekster().values }.toHashSet()
@@ -31,12 +33,20 @@ class PropertyNameValueValidation {
             throw ImportApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
     }
 
-    fun checkOnlyValidValues(properties: Map<PropertyNames, Any>) {
-        propertiesToValidate.forEach {
-            if (properties.containsKey(it))
-                validateProperty(it, properties[it] as String)
+    fun checkOnlyValidValues(properties: Map<PropertyNames, Any>) =
+        propertiesToValidate.forEach { propertyToValidate ->
+            properties[propertyToValidate]?.let { property ->
+                property as String
+                if (propertyToValidate in supportsMultipleValues)
+                    unwrapStringifiedList(property).forEach { validateProperty(propertyToValidate, it) }
+                else
+                    validateProperty(propertyToValidate, property)
+            }
         }
-    }
 
 
+    private fun unwrapStringifiedList(stringifiedList: String) = stringifiedList
+        .removeSurrounding("[", "]")
+        .split(",")
+        .map { it.trim().removeSurrounding("\"") }
 }

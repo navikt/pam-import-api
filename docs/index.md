@@ -495,7 +495,7 @@ For these instances we also recommend you to use the **reference**  field as a u
 
 |Name | Type | Required | Norwegian translation | Description | Example |
 |:----|:-----|:---------|:----------------------|:------------|:------|
-|orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace)
+|orgnr | Integer | Optional | Virksomhetsnummer | BRREG. OrgNumber (only underenhet is supported) | 989012088 (and no whitespace) |
 |reference | String (255) | Optional | Referanse | A unique identifier for the employer, you don't need to specify this if you can send virksomhetsnummer | alfanumeric eg. 232151232 |
 |businessName | String (255) | Yes | Arbeidsgiver navn | Name of the employer | Sørumsand Barnehage |
 |location | Object | Yes | Arbeidsgiver adresse  | Address of the employer | See location table|
@@ -536,34 +536,34 @@ Some of these properties are indexed and so will make the ad easier to search fo
 are also defined [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/properties/names)
 Please specify as much data as possible on the property fields below.
  
-|Name | Type | Required | Norwegian translation | Description | Example |
-|:----|:-----|:---------|:----------------------|:------------|:------|
-| sourceurl | URL | Optional | Visningsside | Optional viewing the jobad on another page | eg https://url.to/123456 |
-| applicationdue | String | Optional | Søknadsfrist | due date/time for job applications | 22.03.2020 |
-| applicationemail | String | Optional | Søknadsepost | applications can be send to this email | apply-here@job.com |  
-| applicationmail | String | Optional | Søknadsadresse | Postal address for applications | Oslo gate 1, 0431 Oslo, Norge |
-| applicationlabel | String | Optional | Søknadsreferanse | A tag for labelling applications | eg. referansenummer 312412 |
-| applicationurl | String | Optional | Søknadslenke | URL to an online application form | https://url.to.application/form |
-| employerdescription | HTML | Optional | Om arbeidsgiver | A presentation about the employer, can be in html | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...|
-| employerhomepage | URL | Optional | Hjemmeside | URL to employer home page | https://url.to.homepage/ |
-| engagementtype | String | Optional | Ansettelsesform | type of employee engagement contract | eg. Fast or Engasjement etc. |
-| extent | String | Optional | Omfang | Full/Part time | Heltid |
-| occupation | String | Optional | Yrkestittel | occupation types, separated by semicolon | eg. IT Utvikling; Java Utvikler |
-| salary | Integer | Optional | Lønn | Salary | 800000 |
-| starttime | String | Optional | Oppstartsdato | The start date or first day of work | eg. 24.05.2020 |
-| sector | String | Optional | Sektor | Public of private sector | Offentlig or Privat |
-| location | String | Optional | Arbeidssted | the location of work, if address can not be given. also see locationList | eg. Offshore |
-| jobtitle | String | Optional | Stillingstittel | title of position | eg. Kontorsjef |
-| keywords | String | Optional | Nøkkelord | searchable tag keywords for the job ad, separated by semicolon | eg. 42312341;Java;Kotlin |
-| industry | String | Optional | Bransje | what kind of industry category this job belongs to | eg. Bygg og anlegg |
-| workhours | String | Optional | Arbeidstid | what part of the day is work hours | eg. Dagtid |
-| workday | String | Optional | Arbeidsdager | Day of work | eg. Ukedager |
-| facebookpage | String | Optional | Facebook | facebook share URL | https://url.to.facebook/ |
-| twitteraddress | String | Optional | Twitter | twitter share URL | https://url.to.twitter/ |
-| jobpercentage | String | Optional | Stillingsprosent | if part time job, a percentage can be specified | eg 25% |
-| jobarrangement | String | Optional | Arbeidstidsordning | what type of jobarrangement | eg. Skift or Vakt |
-| remote | String | Optional | Hjemmekontor | Remote or hybrid workplace is possible | Hjemmekontor or Hybridkontor |
-| euresflagg | String | Optional | EURES-flagg | Marks a particular interest in recruiting workers from other European countries and provides additional visibility in the EURES job portal | true or false |
+| Name                | Type    | Required | Norwegian translation | Description                                                                                                                                | Example                                                                                                      |
+|:--------------------|:--------|:---------|:----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------|
+| sourceurl           | URL     | Optional | Visningsside          | Optional viewing the jobad on another page                                                                                                 | eg https://url.to/123456                                                                                     |
+| applicationdue      | String  | Optional | Søknadsfrist          | due date/time for job applications                                                                                                         | 22.03.2020                                                                                                   |
+| applicationemail    | String  | Optional | Søknadsepost          | applications can be send to this email                                                                                                     | apply-here@job.com                                                                                           |  
+| applicationmail     | String  | Optional | Søknadsadresse        | Postal address for applications                                                                                                            | Oslo gate 1, 0431 Oslo, Norge                                                                                |
+| applicationlabel    | String  | Optional | Søknadsreferanse      | A tag for labelling applications                                                                                                           | eg. referansenummer 312412                                                                                   |
+| applicationurl      | String  | Optional | Søknadslenke          | URL to an online application form                                                                                                          | https://url.to.application/form                                                                              |
+| employerdescription | HTML    | Optional | Om arbeidsgiver       | A presentation about the employer, can be in html                                                                                          | I Norlandia barnehagene vil vi være med å skape livslang lyst til lek og læring...                           |
+| employerhomepage    | URL     | Optional | Hjemmeside            | URL to employer home page                                                                                                                  | https://url.to.homepage/                                                                                     |
+| engagementtype      | String  | Optional | Ansettelsesform       | type of employee engagement contract                                                                                                       | eg. Fast or Engasjement etc.                                                                                 |
+| extent              | String  | Optional | Omfang                | Full/Part time                                                                                                                             | Heltid                                                                                                       |
+| occupation          | String  | Optional | Yrkestittel           | occupation types, separated by semicolon                                                                                                   | eg. IT Utvikling; Java Utvikler                                                                              |
+| salary              | Integer | Optional | Lønn                  | Salary                                                                                                                                     | 800000                                                                                                       |
+| starttime           | String  | Optional | Oppstartsdato         | The start date or first day of work                                                                                                        | eg. 24.05.2020                                                                                               |
+| sector              | String  | Optional | Sektor                | Public of private sector                                                                                                                   | Offentlig or Privat                                                                                          |
+| location            | String  | Optional | Arbeidssted           | the location of work, if address can not be given. also see locationList                                                                   | eg. Offshore                                                                                                 |
+| jobtitle            | String  | Optional | Stillingstittel       | title of position                                                                                                                          | eg. Kontorsjef                                                                                               |
+| keywords            | String  | Optional | Nøkkelord             | searchable tag keywords for the job ad, separated by semicolon                                                                             | eg. 42312341;Java;Kotlin                                                                                     |
+| industry            | String  | Optional | Bransje               | what kind of industry category this job belongs to                                                                                         | eg. Bygg og anlegg                                                                                           |
+| workhours           | String  | Optional | Arbeidstid            | what part of the day is work hours                                                                                                         | eg. Dagtid. Multiple values can be given by passing a stringified list, eg. `"[\"Dagtid\", \"Kveld\"]"`      |
+| workday             | String  | Optional | Arbeidsdager          | Day of work                                                                                                                                | eg. Ukedager. Multiple values can be given by passing a stringified list, eg. `"[\"Ukedager\", \"Lørdag\"]"` |
+| facebookpage        | String  | Optional | Facebook              | facebook share URL                                                                                                                         | https://url.to.facebook/                                                                                     |
+| twitteraddress      | String  | Optional | Twitter               | twitter share URL                                                                                                                          | https://url.to.twitter/                                                                                      |
+| jobpercentage       | String  | Optional | Stillingsprosent      | if part time job, a percentage can be specified                                                                                            | eg 25%                                                                                                       |
+| jobarrangement      | String  | Optional | Arbeidstidsordning    | what type of jobarrangement                                                                                                                | eg. Skift or Vakt                                                                                            |
+| remote              | String  | Optional | Hjemmekontor          | Remote or hybrid workplace is possible                                                                                                     | Hjemmekontor or Hybridkontor                                                                                 |
+| euresflagg          | String  | Optional | EURES-flagg           | Marks a particular interest in recruiting workers from other European countries and provides additional visibility in the EURES job portal | true or false                                                                                                |
 
 
 ### Properties that support only valid values 
