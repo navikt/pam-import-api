@@ -37,4 +37,41 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
         val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(errors) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
+
+    @Test
+    fun validatePropertiesWithMultipleValues() {
+        val stringifyedLists = hashMapOf(
+            workday to "[\"Ukedager\", \"Lørdag\", \"Søndag\"]",
+            workhours to "[\"Dagtid\",\"Kveld\" ,\"Natt\"]"
+        )
+        propertyEnumValidation.checkOnlyValidValues(stringifyedLists)
+
+        val stringifiedListsWithSingleValue = hashMapOf(
+            workday to "[\"Ukedager\"]",
+            workhours to "[\"Dagtid\"]",
+        )
+        propertyEnumValidation.checkOnlyValidValues(stringifiedListsWithSingleValue)
+
+        val singleValue = hashMapOf(
+            workday to "Ukedager",
+            workhours to "Dagtid"
+        )
+
+        propertyEnumValidation.checkOnlyValidValues(singleValue)
+
+        val stringifyedListsWithBadValues = hashMapOf(
+            workday to "[\"Ukebager\", \"Blørdag\"]",
+            workhours to "[\"Kveldd\"]"
+        )
+
+        var error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
+        assertEquals(ErrorType.INVALID_VALUE, error.type)
+
+        val valuesThatDoesntSupportMultipleValues = hashMapOf(
+            sector to "[\"Offentlig\", \"Privat\"]",
+        )
+
+        error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(valuesThatDoesntSupportMultipleValues) }
+        assertEquals(ErrorType.INVALID_VALUE, error.type)
+    }
 }
