@@ -15,6 +15,7 @@ jobs:
       NAIS_RESOURCE: naiserator.yml
       java-version: '17'
       distribution: 'temurin'
+      cache: 'gradle'
     secrets:
       NAIS_DEPLOY_APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
