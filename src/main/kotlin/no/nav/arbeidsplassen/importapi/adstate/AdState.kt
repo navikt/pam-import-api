@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.adstate
 
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class AdState(

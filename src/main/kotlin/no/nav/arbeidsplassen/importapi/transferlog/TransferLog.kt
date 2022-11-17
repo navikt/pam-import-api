@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import java.time.LocalDateTime
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 data class TransferLog (

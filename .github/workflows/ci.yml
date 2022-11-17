@@ -15,8 +15,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '14'
+          distribution: 'temurin'
+          java-version: '17'
           cache: 'gradle'
       - name: build
         run: gradle build
