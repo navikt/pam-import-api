@@ -13,9 +13,7 @@ jobs:
     uses: navikt/pam-deploy/.github/workflows/deploy-dev.yml@v2
     with:
       NAIS_RESOURCE: naiserator.yml
-      java-version: '17'
-      distribution: 'temurin'
-      cache: 'gradle'
+      JAVA_VERSION: '17'
     secrets:
       NAIS_DEPLOY_APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
