@@ -12,7 +12,6 @@ import org.junit.jupiter.api.assertThrows
 
 @MicronautTest
 class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNameValueValidation) {
-
     @Test
     fun validatePropertyNameValue() {
         val correct = HashMap<PropertyNames,Any>().apply {
@@ -39,39 +38,38 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
     }
 
     @Test
-    fun validatePropertiesWithMultipleValues() {
+    fun `Properties that support multiple values are validated correctly`() {
         val stringifyedLists = hashMapOf(
-            workday to "[\"Ukedager\", \"Lørdag\", \"Søndag\"]",
-            workhours to "[\"Dagtid\",\"Kveld\" ,\"Natt\"]"
+            workday to """["Ukedager", "Lørdag", "Søndag"]""",
+            workhours to """["Dagtid","Kveld" ,"Natt"]"""
         )
         propertyEnumValidation.checkOnlyValidValues(stringifyedLists)
 
         val stringifiedListsWithSingleValue = hashMapOf(
-            workday to "[\"Ukedager\"]",
-            workhours to "[\"Dagtid\"]",
+            workday to """["Ukedager"]""",
+            workhours to """["Dagtid"]""",
         )
         propertyEnumValidation.checkOnlyValidValues(stringifiedListsWithSingleValue)
 
-        val singleValue = hashMapOf(
-            workday to "Ukedager",
-            workhours to "Dagtid"
-        )
-
-        propertyEnumValidation.checkOnlyValidValues(singleValue)
-
         val stringifyedListsWithBadValues = hashMapOf(
-            workday to "[\"Ukebager\", \"Blørdag\"]",
-            workhours to "[\"Kveldd\"]"
-        )
+            workday to """["Ukebager", "Blørdag"]""",
+            workhours to """["Kveldd"]""")
 
-        var error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
+        val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
+    }
 
-        val valuesThatDoesntSupportMultipleValues = hashMapOf(
-            sector to "[\"Offentlig\", \"Privat\"]",
-        )
+    @Test
+    fun `Properties that support multiple values still support single value`() {
+        val singleValue = hashMapOf(workday to "Ukedager", workhours to "Dagtid")
+        propertyEnumValidation.checkOnlyValidValues(singleValue)
+    }
 
-        error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(valuesThatDoesntSupportMultipleValues) }
+    @Test
+    fun `Properties that dont support multiple values throw exception`() {
+        val valuesThatDoesntSupportMultipleValues = hashMapOf(sector to """["Offentlig", "Privat"]""")
+
+        val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(valuesThatDoesntSupportMultipleValues) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
 }
