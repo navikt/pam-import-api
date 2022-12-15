@@ -13,7 +13,6 @@ group "no.nav.arbeidsplassen.importapi"
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url "https://jcenter.bintray.com" }
     maven { url "https://github-package-registry-mirror.gc.nav.no/cached/maven-release"}
 }
 
