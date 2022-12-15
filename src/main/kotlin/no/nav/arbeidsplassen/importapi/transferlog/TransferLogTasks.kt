@@ -58,7 +58,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     fun mapTransferLog(it: TransferLog) {
         try {
             val adList = mapTransferLogs(it)
-            LOG.info("mapping transfer ${it.id} for provider ${it.providerId} found ${adList.size} ads ")
+            LOG.info("mapping transfer ${it.id} for provider ${it.providerId} found ${adList.size} ads")
             val savedList = adStateRepository.saveAll(adList)
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
             meterRegistry.counter("ads_received", "provider", it.providerId.toString()).increment(adList.size.toDouble())
