@@ -9,4 +9,11 @@ ignore:
           critical for this app
         expires: 2022-12-01T00:00:00.000Z
         created: 2022-08-31T12:45:55.924Z
+  SNYK-JAVA-IONETTY-3167773:
+    - '*':
+        reason: >-
+          Currently no version of micronaut without vulnerability, DoS not
+          critical for this app
+        expires: 2023-03-01T00:00:00.000Z
+        created: 2022-12-15T14:49:55.924Z
 patch: {}
