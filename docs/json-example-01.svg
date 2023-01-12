@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?>
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" class="vtree" width="960" height="450"><style>
+<svg role="img" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" class="vtree" width="960" height="450"><style>
     .vtree-node text { font: 14px sans-serif; }
     .vtree-link { fill: none; stroke: #888; stroke-width: 2px; }
     .vtree-table { stroke-width: 2px; stroke: steelblue; }
