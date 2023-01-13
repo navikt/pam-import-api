@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-#if [[ -z $PATH_PROD_KEY ]]
-#  then
-#    echo "PATH_PROD_KEY not defined!"
-#    exit 1
-#fi
+if [[ -z $PATH_PROD_KEY ]]
+  then
+    echo "PATH_PROD_KEY not defined!"
+    exit 1
+fi
 if [[ -z $PATH_DEV_KEY ]]
   then
     echo "PATH_DEV_KEY not defined!"
@@ -20,8 +20,8 @@ then
   echo -e "dev:"
   curl -XPUT -H "Authorization: Bearer `cat $PATH_DEV_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.dev-gcp.nais.io/stillingsimport/internal/providers/$id/token"
   echo -e "\nprod:"
-  #curl -XPUT -H "Authorization: Bearer `cat $PATH_PROD_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.prod-gcp.nais.io/stillingsimport/internal/providers/$id/token"
-  #echo -e "\n"
+  curl -XPUT -H "Authorization: Bearer `cat $PATH_PROD_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.prod-gcp.nais.io/stillingsimport/internal/providers/$id/token"
+  echo -e "\n"
 else
   echo "Aborting, will not generate tokens for provider: $id"
 fi
