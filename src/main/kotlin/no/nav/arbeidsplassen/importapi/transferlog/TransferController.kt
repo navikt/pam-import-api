@@ -40,6 +40,7 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Post("/batch/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
+        LOG.debug("Streaming for provider $providerId")
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
@@ -50,7 +51,10 @@ class TransferController(private val transferLogService: TransferLogService,
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
              return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!))
         }
-        updatedAds.stream().forEach { transferLogService.validate(it) }
+        updatedAds.stream().forEach {
+            LOG.info("Got ad ${it.reference} for $providerId")
+            transferLogService.validate(it)
+        }
 
         val transferLogDTO = TransferLogDTO(payload = content, md5 = md5, items = ads.size, providerId = provider.id!!)
         return HttpResponse.created(transferLogService.save(transferLogDTO).apply {
