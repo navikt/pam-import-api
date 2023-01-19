@@ -40,7 +40,7 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Post("/batch/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
-        LOG.debug("Streaming for provider $providerId")
+        LOG.debug("Streaming ${ads.size} for provider $providerId")
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
