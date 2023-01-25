@@ -1,5 +1,5 @@
 {
-  "ingress": ["https://arbeidsplassen-api.dev.nav.no/stillingsimport", "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport","https://pam-import-api.dev-gcp.nais.io/stillingsimport"],
+  "ingress": ["https://arbeidsplassen-api.dev.nav.no/stillingsimport", "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport","https://pam-import-api.dev.intern.nav.no/stillingsimport"],
   "ad_preview_url": "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport/frontend",
   "kafka_pool": "nav-dev",
   "adminstatus_kafka_topic": "teampam.stilling-intern-1",
