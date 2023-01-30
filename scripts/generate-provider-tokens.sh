@@ -18,9 +18,9 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   echo -e "dev:"
-  curl -XPUT -H "Authorization: Bearer `cat $PATH_DEV_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.dev-gcp.nais.io/stillingsimport/internal/providers/$id/token"
+  curl -XPUT -H "Authorization: Bearer `cat $PATH_DEV_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.dev.intern.nav.no/stillingsimport/internal/providers/$id/token"
   echo -e "\nprod:"
-  curl -XPUT -H "Authorization: Bearer `cat $PATH_PROD_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.prod-gcp.nais.io/stillingsimport/internal/providers/$id/token"
+  curl -XPUT -H "Authorization: Bearer `cat $PATH_PROD_KEY`" -H "Content-Type: application/json"  "https://pam-import-api.intern.nav.no/stillingsimport/internal/providers/$id/token"
   echo -e "\n"
 else
   echo "Aborting, will not generate tokens for provider: $id"
