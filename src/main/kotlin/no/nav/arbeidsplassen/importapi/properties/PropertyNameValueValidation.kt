@@ -29,7 +29,7 @@ class PropertyNameValueValidation {
     }
 
     fun validateProperty(name: PropertyNames, value: String) {
-        if (!validValues[name]!!.contains(value))
+        if (!value.isNullOrEmpty() && !validValues[name]!!.contains(value))
             throw ImportApiError("property $name contains invalid value $value", ErrorType.INVALID_VALUE)
     }
 
