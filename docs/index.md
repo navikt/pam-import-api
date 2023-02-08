@@ -25,9 +25,9 @@ the HTTP bearer authorization header.
 Example:
 ```
 POST https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/transfers/{providerId}
-Accept: application/json
+Accept: application/x-json-stream
 Cache-Control: no-cache
-Content-Type: application/json
+Content-Type: application/x-json-stream
 Authorization: Bearer <your secret key>
 ```
 
@@ -300,8 +300,8 @@ When using stream, the http status code will always return 200 OK.
 
 
 ## Posting in batches
-You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday.
-We recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
+You can choose to upload the ads in stream or in batches. If you have a lot of ads, more than thousands everyday, 
+we recommend you to upload in batches, You can group the ads in an array and send then in batches. The size of the array
 may not go over 100 items.
 
 ```
