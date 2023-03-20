@@ -15,6 +15,15 @@ with the following information:
 
 We will send you your provider identity including a secret key that gives you access to our API
 
+## Supported languages
+Ads must be in one of the following languages:
+* Norwegian
+* Swedish
+* Danish
+* English
+
+If you wish to post an ad for the same position in multiple languages, they must be included in the same ad, meaning that one ad contains text for both languages.
+
 ## Test environment
 To test the integration, you can use https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport.
 
