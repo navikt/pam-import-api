@@ -19,7 +19,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
       - name: build
-        run: gradle build
+        run: ./build.sh
       - name: integration tests
         env:
           PAT_READ_TOKEN: ${{ secrets.READER_TOKEN }}
