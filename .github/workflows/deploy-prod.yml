@@ -5,7 +5,7 @@ on:
 
 jobs:
   call-workflow:
-    uses: navikt/pam-deploy/.github/workflows/deploy-prod.yml@v2
+    uses: navikt/pam-deploy/.github/workflows/deploy-prod.yml@v4
     with:
       NAIS_RESOURCE: naiserator.yml
     secrets:
