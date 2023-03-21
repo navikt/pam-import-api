@@ -29,4 +29,4 @@ jobs:
           docker-compose stop
           docker-compose rm -f
           docker-compose up -d --build
-          ./wait-for-integration.sh gradle integration
+          ./wait-for-integration.sh ./gradlew integration

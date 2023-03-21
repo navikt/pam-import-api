@@ -31,7 +31,7 @@ services:
   postgres:
     hostname: postgres
     container_name: postgres_importapi
-    image: postgres:11
+    image: postgres:14
     ports:
       - "5432:5432"
     environment:
