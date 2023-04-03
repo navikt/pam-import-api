@@ -36,6 +36,7 @@ dependencies {
     kapt("io.micronaut.data:micronaut-data-processor:$micronautDataVersion")
     kapt "io.micronaut.security:micronaut-security-annotations"
 
+    implementation("io.swagger.core.v3:swagger-annotations")
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
