@@ -20,7 +20,7 @@ read -p "Are you sure (Y/y to approve)? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  curl -POST -H "Authorization: Bearer `cat $PATH_DEV_KEY`" -H "Content-Type: application/json" -d "$json"  "https://pam-import-api.dev.intern.nav.no/stillingsimport/internal/providers"
+  curl -POST -H "Authorization: Bearer `cat $PATH_DEV_KEY`" -H "Content-Type: application/json" -d "$json"  "https://pam-import-api.intern.dev.nav.no/stillingsimport/internal/providers"
   curl -POST -H "Authorization: Bearer `cat $PATH_PROD_KEY`" -H "Content-Type: application/json" -d "$json"  "https://pam-import-api.intern.nav.no/stillingsimport/internal/providers"
 else
   echo "Aborting, will not create new provider"
