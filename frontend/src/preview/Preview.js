@@ -10,11 +10,14 @@ import ContactPerson from "./contactPerson/ContactPerson";
 import EmployerDetails from "./employerDetails/EmployerDetails";
 import AdDetails from "./adDetails/AdDetails";
 import AlertStripe from 'nav-frontend-alertstriper';
+import {useParams} from "react-router-dom";
 
-const Preview = ({ match }) => {
+const Preview = () => {
     const [ad, setAd] = useState(undefined);
+    const params = useParams()
+
     useEffect(() => {
-        const { uuid } = match.params;
+        const { uuid } = params;
         if (uuid) {
             const fetchData = async () => {
                 const result = await getStillingByUuid(uuid);
@@ -23,7 +26,7 @@ const Preview = ({ match }) => {
 
             fetchData();
         }
-    }, [match.params.uuid]);
+    }, [params.uuid]);
 
     if (!ad) {
         return null;
@@ -61,15 +64,6 @@ const Preview = ({ match }) => {
             </Container>
         </div>
     );
-};
-
-
-Preview.propTypes = {
-    match: PropTypes.shape({
-        params: PropTypes.shape({
-            uuid: PropTypes.string
-        })
-    }).isRequired
 };
 
 export default Preview;
