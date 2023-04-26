@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactHtmlParser from 'react-html-parser';
+import parse from 'html-react-parser';
 import './AdText.less';
 
 export default function AdText({adText}) {
     if (adText) {
         return (
             <section className="AdText">
-                {ReactHtmlParser(adText)}
+                {parse(adText)}
             </section>
         );
     }
