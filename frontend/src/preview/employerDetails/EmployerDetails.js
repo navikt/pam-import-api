@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactHtmlParser from 'react-html-parser';
+import parse from 'html-react-parser';
 import { Undertittel } from 'nav-frontend-typografi';
 import fixLocationName from '../employmentDetails/fixLocationName';
 import { isValidUrl } from '../../utils';
@@ -99,7 +99,7 @@ export default function EmployerDetails({ stilling }) {
                     ]}
                 </dl>
                 {properties.employerdescription && (
-                    <div className="EmployerDetails__description">{ ReactHtmlParser(properties.employerdescription) }</div>
+                    <div className="EmployerDetails__description">{ parse(properties.employerdescription) }</div>
                 )}
             </div>
         </div>
