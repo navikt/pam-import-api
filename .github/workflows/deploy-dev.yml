@@ -14,6 +14,7 @@ jobs:
     with:
       NAIS_RESOURCE: naiserator.yml
       JAVA_VERSION: '17'
+      CODEQL_ENABLED: true
     secrets:
       NAIS_DEPLOY_APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
