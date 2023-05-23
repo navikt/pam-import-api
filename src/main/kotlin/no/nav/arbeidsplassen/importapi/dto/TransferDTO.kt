@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.dto
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import java.time.LocalDateTime
 
@@ -51,7 +52,7 @@ enum class CategoryType {
 }
 
 enum class PrivacyType {
-    SHOW_ALL, INTERNAL_NOT_SHOWN, @Deprecated("not_supported") DONT_SHOW_EMPLOYER
+   @JsonEnumDefaultValue SHOW_ALL, INTERNAL_NOT_SHOWN, @Deprecated("not_supported") DONT_SHOW_EMPLOYER
 }
 
 enum class AdStatus {
