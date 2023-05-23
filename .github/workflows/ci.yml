@@ -8,6 +8,7 @@ on:
       - "CODEOWNERS"
     branches:
       - '*'
+      - feature/sett_default_verdi_for_privacy
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -29,4 +30,4 @@ jobs:
           docker-compose stop
           docker-compose rm -f
           docker-compose up -d --build
-          ./wait-for-integration.sh ./gradlew integration
+          ./wait-for-integration.sh ./gradlew integration --info --stacktrace
