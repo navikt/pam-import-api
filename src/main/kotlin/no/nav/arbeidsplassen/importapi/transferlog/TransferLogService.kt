@@ -9,11 +9,16 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
+import org.slf4j.LoggerFactory
 
 @Singleton
 class TransferLogService(private val transferLogRepository: TransferLogRepository,
                          private val styrkCodeConverter: StyrkCodeConverter,
                          private val propertyNameValueValidation: PropertyNameValueValidation) {
+
+     companion object {
+        private val LOG = LoggerFactory.getLogger(TransferLogService::class.java)
+    }
 
 
     fun existsByProviderIdAndMd5(providerId: Long, md5: String):
@@ -59,6 +64,20 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         } else {
             return ad
         }
+    }
+
+    /** Vi ønsker å få inn annonsen selv om kategorien er feil, da vi uansett gjør en automatisk klassifisering mot Janzz */
+    fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
+        return ad.copy(categoryList = ad.categoryList.stream()
+            .filter { cat ->
+                val isPresent = styrkCodeConverter.lookup(cat.code).isPresent
+                if (!isPresent) {
+                    LOG.info("Ugyldig kategori: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
+                }
+                isPresent
+            }
+            .toList()
+        )
     }
 
     fun validate(ad: AdDTO) {
