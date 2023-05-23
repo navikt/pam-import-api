@@ -73,7 +73,7 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${DB_JDBC_URL:`jdbc:tc:postgresql:11:///puls?TC_INITSCRIPT=postgres/postgres-init.sql`}
+    url: ${DB_JDBC_URL:`jdbc:tc:postgresql:14:///puls?TC_INITSCRIPT=postgres/postgres-init.sql`}
     driverClassName: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
