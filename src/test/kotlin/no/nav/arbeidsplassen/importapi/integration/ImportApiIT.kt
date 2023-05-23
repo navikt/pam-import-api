@@ -62,6 +62,8 @@ class ImportApiIT(private val tokenService: TokenService, private val objectMapp
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .bearerAuth(adminToken)
         val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+
+        LOG.info("Provider som er opprettet: {}", provider)
         val providertoken = tokenService.token(provider!!)
         // start the transfer
         val post  = HttpRequest.POST("/api/v1/transfers/${provider.id}", objectMapper.readValue("""
