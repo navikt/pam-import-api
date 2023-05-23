@@ -69,9 +69,12 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     /** Vi ønsker å få inn annonsen selv om kategorien er feil, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
         return ad.copy(categoryList = ad.categoryList.stream()
-            .filter { cat -> val keep = !styrkCodeConverter.lookup(cat.code).isEmpty
-                LOG.info("Ugyldig kategori: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
-                keep
+            .filter { cat ->
+                val isPresent = styrkCodeConverter.lookup(cat.code).isPresent
+                if (!isPresent) {
+                    LOG.info("Ugyldig kategori: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
+                }
+                isPresent
             }
             .toList()
         )

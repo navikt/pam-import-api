@@ -45,16 +45,21 @@ class TransferController(private val transferLogService: TransferLogService,
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
-        val updatedAds = ads.map{transferLogService.updateExpiresIfNullAndStarttimeSnarest(it)}
+        val updatedAds = ads.map{
+            transferLogService.updateExpiresIfNullAndStarttimeSnarest(it)
+        }.map {
+            transferLogService.removeInvalidCategories(it, providerId, it.reference)
+        }
+
         val content = objectMapper.writeValueAsString(updatedAds)
         val md5 = content.toMD5Hex()
         val provider = providerService.findById(providerId)
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
              return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!))
         }
+
         updatedAds.stream().forEach {
             LOG.info("Got ad ${it.reference} for $providerId")
-            transferLogService.removeInvalidCategories(it, providerId, it.reference)
             transferLogService.validate(it)
         }
 
@@ -73,13 +78,13 @@ class TransferController(private val transferLogService: TransferLogService,
                 var ad = objectMapper.treeToValue(it, AdDTO::class.java)
                 LOG.info("Got ad ${ad.reference} for $providerId")
                 ad = transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad)
+                ad = transferLogService.removeInvalidCategories(ad, providerId, ad.reference)
                 val content = objectMapper.writeValueAsString(ad)
                 val md5 = content.toMD5Hex()
                 if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
                     TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!)
                 }
                 else {
-                    transferLogService.removeInvalidCategories(ad, providerId, ad.reference)
                     transferLogService.validate(ad)
                     transferLogService.save(TransferLogDTO(payload = content, md5 = md5, items = 1, providerId = provider.id!!)).apply {
                         payload = null
