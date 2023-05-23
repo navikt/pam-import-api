@@ -61,6 +61,14 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         }
     }
 
+    /** Vi ønsker å få inn annonsen selv om kategorien er feil, da vi uansett gjør en automatisk klassifisering mot Janzz */
+    fun removeInvalidCategories(ad: AdDTO): AdDTO {
+        return ad.copy(categoryList = ad.categoryList.stream()
+            .filter { cat -> !styrkCodeConverter.lookup(cat.code).isEmpty }
+            .toList()
+        )
+    }
+
     fun validate(ad: AdDTO) {
         if (ad.categoryList.count()>3) {
             throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE)

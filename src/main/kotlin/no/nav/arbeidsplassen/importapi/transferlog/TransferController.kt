@@ -54,6 +54,7 @@ class TransferController(private val transferLogService: TransferLogService,
         }
         updatedAds.stream().forEach {
             LOG.info("Got ad ${it.reference} for $providerId")
+            transferLogService.removeInvalidCategories(it)
             transferLogService.validate(it)
         }
 
@@ -78,6 +79,7 @@ class TransferController(private val transferLogService: TransferLogService,
                     TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!)
                 }
                 else {
+                    transferLogService.removeInvalidCategories(ad)
                     transferLogService.validate(ad)
                     transferLogService.save(TransferLogDTO(payload = content, md5 = md5, items = 1, providerId = provider.id!!)).apply {
                         payload = null
@@ -113,7 +115,7 @@ class TransferController(private val transferLogService: TransferLogService,
                 providerId = provider.id!!
             )
         }
-        LOG.error("Exception {} providerId: {}", transferLogDTO, provider.id)
+        LOG.error("Exception {} providerId: {}", transferLogDTO.message, provider.id)
         return transferLogDTO
     }
 
