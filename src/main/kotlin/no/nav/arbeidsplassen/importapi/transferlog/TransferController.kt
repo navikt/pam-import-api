@@ -41,6 +41,7 @@ class TransferController(private val transferLogService: TransferLogService,
     @Post("/batch/{providerId}")
     fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
         LOG.info("Streaming ${ads.size} for provider $providerId")
+
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
@@ -65,7 +66,7 @@ class TransferController(private val transferLogService: TransferLogService,
     @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
-        LOG.debug("Streaming for provider $providerId")
+        LOG.info("Streaming for provider $providerId")
         return json.subscribeOn(Schedulers.io()).map {
             runCatching {
                 var ad = objectMapper.treeToValue(it, AdDTO::class.java)
@@ -87,12 +88,33 @@ class TransferController(private val transferLogService: TransferLogService,
     }
 
     private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
-       return when (error) {
-            is JsonParseException -> TransferLogDTO(message="Parse error: at ${error.location}", status = TransferLogStatus.ERROR, providerId = provider.id!!)
-            is MissingKotlinParameterException -> TransferLogDTO(message="Missing parameter: ${error.parameter.name}", status = TransferLogStatus.ERROR, providerId = provider.id!!)
-            is InvalidFormatException ->TransferLogDTO(message="Invalid value: ${error.value} at ${error.pathReference}", status = TransferLogStatus.ERROR, providerId = provider.id!!)
-            else -> TransferLogDTO(message="Error: ${error.localizedMessage}", status = TransferLogStatus.ERROR,providerId = provider.id!!)
+        val transferLogDTO = when (error) {
+            is JsonParseException -> TransferLogDTO(
+                message = "Parse error: at ${error.location}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
+            )
+
+            is MissingKotlinParameterException -> TransferLogDTO(
+                message = "Missing parameter: ${error.parameter.name}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
+            )
+
+            is InvalidFormatException -> TransferLogDTO(
+                message = "Invalid value: ${error.value} at ${error.pathReference}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
+            )
+
+            else -> TransferLogDTO(
+                message = "Error: ${error.localizedMessage}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
+            )
         }
+        LOG.error("Exception {} providerId: {}", transferLogDTO, provider.id)
+        return transferLogDTO
     }
 
     @Get("/{providerId}/versions/{versionId}")
