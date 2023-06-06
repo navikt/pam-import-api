@@ -55,10 +55,6 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
-      frontend:
-        enabled: true
-        mapping: /frontend/**
-        paths: classpath:frontend
 endpoints:
   metrics:
     enabled: true

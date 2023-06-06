@@ -65,7 +65,6 @@ dependencies {
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:$htmlSanitizer"
     implementation('org.apache.commons:commons-text:1.10.0')
     implementation("io.micronaut.cache:micronaut-cache-caffeine")
-    runtimeOnly project(':frontend')
     implementation("io.micronaut.rxjava2:micronaut-rxjava2")
     implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
     testImplementation("org.testcontainers:postgresql:${tcVersion}")
