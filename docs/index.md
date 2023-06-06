@@ -620,7 +620,7 @@ Authorization: Bearer <secret key>
   "uuid" : "2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "status" : "DONE",
   "reference" : "12345",
-  "url" : "https://arbeidsplassen-api.nav.no/stillingimport/frontend/2afe26f3-9aef-4a12-97eb-20d6c06c513a",
+  "url" : "https://arbeidsplassen.nav.no/stillinger/stilling/2afe26f3-9aef-4a12-97eb-20d6c06c513a",
   "providerId" : 10000,
   "created" : "2020-04-20T13:18:41.04",
   "updated" : "2020-04-20T13:18:41.05",
@@ -629,7 +629,7 @@ Authorization: Bearer <secret key>
 }
 ```
 
-The url points to a place where you can preview the ad.
+The url points to the location of the ad at Arbeidsplassen.no. If the ad is marked as "INACTIVE" it will not be available in the ad search at Arbeidsplassen.no.
 If the ad is rejected, the publishStatus will be set to "REJECTED", and the message will tell the reason for rejection.
 
 Possible publishStatus values:
