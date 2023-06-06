@@ -1,6 +1,6 @@
 {
   "ingress": ["https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport", "https://pam-import-api.intern.dev.nav.no/stillingsimport"],
-  "ad_preview_url": "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport/frontend",
+  "ad_preview_url": "https://arbeidsplassen.ekstern.dev.nav.no/stillinger/stilling",
   "kafka_pool": "nav-dev",
   "adminstatus_kafka_topic": "teampam.stilling-intern-1",
   "cloudsql_tier": "db-custom-1-3840",
