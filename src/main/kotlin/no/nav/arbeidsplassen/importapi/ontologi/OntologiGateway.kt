@@ -43,7 +43,6 @@ class OntologiGateway(
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
         }
         if (responseCode >= 300 || responseBody == null) {
-            log.error("Fikk feil fra samtykke-api: $responseBody")
             throw RuntimeException("Fikk responskode $responseCode fra pam-ontologi og responsmelding $responseBody")
         }
 
