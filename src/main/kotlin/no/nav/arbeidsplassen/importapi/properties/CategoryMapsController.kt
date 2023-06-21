@@ -7,12 +7,19 @@ import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.lang.Exception
 import java.security.KeyStore
 import javax.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/api/v1/categories")
 class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter, private val ontologiGateway: OntologiGateway) {
+
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
+    }
 
     @Get("/pyrk/occupations")
     fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
@@ -29,7 +36,12 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter,
 
     @Get("/janzz/occupations")
     fun getJanzzCategories(): List<Typeahead> {
-        return ontologiGateway.hentTypeaheadStillingerFraOntologi()
+        try {
+            return ontologiGateway.hentTypeaheadStillingerFraOntologi()
+        } catch (e: Exception) {
+            log.error("Feilet i henting av typeahead stillinger fra ontologi.", e)
+            throw e;
+        }
     }
 
 }
