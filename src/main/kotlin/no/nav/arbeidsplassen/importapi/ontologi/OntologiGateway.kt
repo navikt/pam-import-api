@@ -31,6 +31,8 @@ class OntologiGateway(
         val url = "$baseurl/rest/typeahead/stillinger"
         val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
+            connectTimeout = 50000
+            readTimeout = 50000
 
             val bearerToken = tokenProvider.token
             setRequestProperty("Authorization", "Bearer $bearerToken")
