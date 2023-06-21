@@ -34,8 +34,8 @@ class OntologiGateway(
             connectTimeout = 50000
             readTimeout = 50000
 
-            val bearerToken = tokenProvider.token
-            setRequestProperty("Authorization", "Bearer $bearerToken")
+            //val bearerToken = tokenProvider.token
+            //setRequestProperty("Authorization", "Bearer $bearerToken")
             setRequestProperty("Content-Type", "application/json")
             setRequestProperty("Accept", "application/json")
 
