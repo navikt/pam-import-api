@@ -115,3 +115,4 @@ azure:
   token_uri: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT:https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/oauth2/v2.0/token}
   client-id: ${AZURE_APP_CLIENT_ID:3f89235b-1026-4f8d-a06b-d91b24316d2e}
   client-secret: ${AZURE_APP_CLIENT_SECRET:secret}
+nais_cluster: ${NAIS_CLUSTER_NAME:dev-gcp}

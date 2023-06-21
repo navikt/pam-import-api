@@ -16,10 +16,10 @@ import java.time.LocalDateTime
 
 @Singleton
 class LokalTypeaheadTokenProvider(
-    @param:Value("\${spring.security.oauth2.client.provider.azure-ad.token-uri}") private val issuerUri: String,
-    @param:Value("\${spring.security.oauth2.client.registration.azure-ad.client-id}") private val clientId: String,
-    @param:Value("\${spring.security.oauth2.client.registration.azure-ad.client-secret}") private val clientSecret: String,
-    @param:Value("\${nais_cluster}") private val naisClusterName: String,
+    @Value("\${azure.token-uri}") private val issuerUri: String,
+    @Value("\${azure.client-id}") private val clientId: String,
+    @Value("\${azure.client-secret}") private val clientSecret: String,
+    @Value("\${nais_cluster}") private val naisClusterName: String,
     private val objectMapper: ObjectMapper
 ) {
     private val httpClient = HttpClient.newBuilder() //.version(HttpClient.Version.HTTP_2)
