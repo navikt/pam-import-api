@@ -107,3 +107,7 @@ shedlock:
 ad:
   preview:
     url: ${AD_PREVIEW_URL:`http://localhost:8080/stillinger/intern`}
+pam:
+  ontologi:
+    typeahead:
+      url: www.ontologi.no

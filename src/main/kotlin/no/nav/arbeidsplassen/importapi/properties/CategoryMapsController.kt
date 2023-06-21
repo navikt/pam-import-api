@@ -3,6 +3,8 @@ package no.nav.arbeidsplassen.importapi.properties
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.QueryValue
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
 import java.security.KeyStore
@@ -10,7 +12,7 @@ import javax.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/api/v1/categories")
-class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter) {
+class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter, private val ontologiGateway: OntologiGateway) {
 
     @Get("/pyrk/occupations")
     fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
@@ -23,6 +25,11 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter)
             styrkCodeConverter.occupationMap.toList().sortedBy { (k, v) -> v.styrkDescription }.toMap()
         }
         else styrkCodeConverter.occupationMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
+    }
+
+    @Get("/janzz/occupations")
+    fun getJanzzCategories(): List<Typeahead> {
+        return ontologiGateway.hentTypeaheadStillingerFraOntologi()
     }
 
 }
