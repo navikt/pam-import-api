@@ -36,7 +36,6 @@ class OntologiGateway(
             readTimeout = 50000
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
-            setRequestProperty("Content-Type", "application/json")
             setRequestProperty("Accept", "application/json")
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
