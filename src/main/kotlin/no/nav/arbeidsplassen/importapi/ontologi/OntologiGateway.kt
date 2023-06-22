@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.ontologi
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,7 +19,6 @@ import java.util.*
 @Singleton
 class OntologiGateway(
     @Value("\${pam.ontologi.typeahead.url}") private val baseurl: String,
-    private val tokenProvider: LokalTypeaheadTokenProvider
 ) {
 
     companion object {
@@ -56,8 +56,9 @@ class OntologiGateway(
 
 @JsonIgnoreProperties
 data class Typeahead(
-    val konseptId: Long,
-    val styrk08: String,
-    val esco: String,
-    val label: String
+    @JsonAlias("konseptId")
+    val code: Long,
+    val categoryType: String = "JANZZ",
+    @JsonAlias("label")
+    val name: String
 ) : Serializable
