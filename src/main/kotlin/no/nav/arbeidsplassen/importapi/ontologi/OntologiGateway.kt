@@ -54,7 +54,7 @@ class OntologiGateway(
 
 }
 
-@JsonIgnoreProperties
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Typeahead(
     @JsonAlias("konseptId")
     val code: Long,
