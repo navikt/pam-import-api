@@ -13,6 +13,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 
 @Singleton
 class OntologiGateway(
@@ -34,8 +35,7 @@ class OntologiGateway(
             connectTimeout = 50000
             readTimeout = 50000
 
-            val bearerToken = tokenProvider.token
-            setRequestProperty("Authorization", "Bearer $bearerToken")
+            setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Content-Type", "application/json")
             setRequestProperty("Accept", "application/json")
 
