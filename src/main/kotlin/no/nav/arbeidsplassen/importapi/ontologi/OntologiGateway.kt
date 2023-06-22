@@ -33,12 +33,11 @@ class OntologiGateway(
             requestMethod = "GET"
             connectTimeout = 50000
             readTimeout = 50000
-            instanceFollowRedirects = true
 
             //val bearerToken = tokenProvider.token
             //setRequestProperty("Authorization", "Bearer $bearerToken")
-            //setRequestProperty("Content-Type", "application/json")
-            //setRequestProperty("Accept", "application/json")
+            setRequestProperty("Content-Type", "application/json")
+            setRequestProperty("Accept", "application/json")
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
