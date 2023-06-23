@@ -17,12 +17,12 @@ import java.net.URL
 import java.util.*
 
 @Singleton
-class OntologiGateway(
+class LokalOntologiGateway(
     @Value("\${pam.ontologi.typeahead.url}") private val baseurl: String,
 ) {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(OntologiGateway::class.java)
+        val log: Logger = LoggerFactory.getLogger(LokalOntologiGateway::class.java)
         val mapper: ObjectMapper = ObjectMapper()
             .registerKotlinModule()
             .registerModule(JavaTimeModule())
