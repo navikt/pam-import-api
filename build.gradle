@@ -41,9 +41,6 @@ dependencies {
     implementation "ch.qos.logback:logback-classic:$logbackVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion"
 
-    testImplementation "io.micronaut.test:micronaut-test-junit5"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
-
     implementation "io.micronaut.micrometer:micronaut-micrometer-core:$micronautVersion"
     implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus:$micronautVersion"
     implementation "io.micronaut:micronaut-management:$micronautVersion"
@@ -68,7 +65,10 @@ dependencies {
     implementation("io.micronaut.rxjava2:micronaut-rxjava2")
     implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
     testImplementation("org.testcontainers:postgresql:${tcVersion}")
- }
+    testImplementation "io.micronaut.test:micronaut-test-junit5"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
+    testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpserverVersion")
+}
 
 test.classpath += configurations.developmentOnly
 
