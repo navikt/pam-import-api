@@ -117,9 +117,14 @@ Authorization: Bearer <your secret key>
   },
   "categoryList": [
     {
-      "code": "2342",
-      "categoryType": "STYRK08",
+      "code": "266998",
+      "categoryType": "JANZZ",
       "name": "Barnehagelærer"
+    },    
+    {
+      "code": "266998",
+      "categoryType": "JANZZ",
+      "name": "Pedagogisk leder (barnehage/førskole)"
     }
   ]
 }
@@ -207,8 +212,8 @@ Authorization: Bearer <your secret key>
   },
   "categoryList": [
     {
-      "code": "2342",
-      "categoryType": "STYRK08",
+      "code": "266998",
+      "categoryType": "JANZZ",
       "name": "Barnehagelærer"
     }
   ]
@@ -381,8 +386,8 @@ Authorization: Bearer <secret key>
       },
       "categoryList": [
         {
-          "code": "2342",
-          "categoryType": "STYRK08",
+          "code": "266998",
+          "categoryType": "JANZZ",
           "name": "Barnehagelærer"
         }
       ]
@@ -522,10 +527,11 @@ This is the location address of the employer, see also below for work address/lo
 |country | String | Optional | Land | Country, defaults to Norge | Norge |
 
 ## Category
-Ads are classified by occupations, and these are divided in two levels. We support two types of classifications, `STYRK08` and `PYRK20`.  
+Ads are classified by occupations, and these are divided in two levels. We support three types of classifications, `JANZZ`, `STYRK08` and `PYRK20`.  
+`JANZZ` is a fine granulated classification for occupations, constantly updating with new professions. The list of updated supported JANZZ codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/janzz/occupations).
 `STYRK08` is [an official Norwegian standard for classification of occupations](https://www.ssb.no/en/klass/klassifikasjoner/7). A complete list of supported styrk-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations).  
 `PYRK20` is a broader classification that just includes the categories of occupations, which are the same categories we use for filtering ads at https://arbeidsplassen.nav.no/stillinger. A complete list of "pyrk"-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).  
-We reccomend using `STYRK08` codes if you are able to, as they are more specific and includes all the information from the corresponding `PYRK20` as well.
+We recommend using `JANZZ` codes if you are able to, as they are more specific.
 
 It is possible to have more than 1 and max 3 occupation categories for each ad.
 
@@ -535,7 +541,7 @@ It is possible to have more than 1 and max 3 occupation categories for each ad.
 | categoryType | ENUM | yes | type of occupation standard | STYRK08 |
 | name | String | optional | name of category | Barnehage |
 
-If you don't or can not support STYRK-occupations, and you are using another occupations category standard, please
+If you don't or can not support any of our category standards, and you are using another occupations category standard, please
 let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
 
 ## Optional Properties
