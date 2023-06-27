@@ -531,7 +531,7 @@ Ads are classified by occupations, and these are divided in two levels. We suppo
 `JANZZ` is a fine granulated classification for occupations, constantly updating with new professions. The list of updated supported JANZZ codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/janzz/occupations).
 `STYRK08` is [an official Norwegian standard for classification of occupations](https://www.ssb.no/en/klass/klassifikasjoner/7). A complete list of supported styrk-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations).  
 `PYRK20` is a broader classification that just includes the categories of occupations, which are the same categories we use for filtering ads at https://arbeidsplassen.nav.no/stillinger. A complete list of "pyrk"-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).  
-We reccomend using `STYRK08` codes if you are able to, as they are more specific and includes all the information from the corresponding `PYRK20` as well.
+We recommend using `JANZZ` codes if you are able to, as they are more specific.
 
 It is possible to have more than 1 and max 3 occupation categories for each ad.
 
