@@ -32,8 +32,8 @@ class LokalOntologiGatewayTest{
 
         val ontologiResponse = lokalOntologiGateway.hentTypeaheadStillingerFraOntologi()
 
-        assertEquals(19564L, ontologiResponse.get("Møbelsnekker/ interiørsnekker")?.code)
-        assertEquals("Møbelsnekker/ interiørsnekker", ontologiResponse.get("Møbelsnekker/ interiørsnekker")?.name)
+        assertEquals(19564L, ontologiResponse[0].code)
+        assertEquals("Møbelsnekker/ interiørsnekker", ontologiResponse[0].name)
 
         server.shutdown()
     }

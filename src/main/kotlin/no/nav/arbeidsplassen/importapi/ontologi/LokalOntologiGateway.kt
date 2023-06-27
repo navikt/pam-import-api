@@ -28,7 +28,7 @@ class LokalOntologiGateway(
             .registerModule(JavaTimeModule())
     }
 
-    fun hentTypeaheadStillingerFraOntologi() : Map<String, Typeahead> {
+    fun hentTypeaheadStillingerFraOntologi() : List<Typeahead> {
         val url = "$baseurl/rest/typeahead/stillinger"
         val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -47,7 +47,7 @@ class LokalOntologiGateway(
 
         return responseBody.let {
             val res = mapper.readValue(it, object : TypeReference<List<Typeahead>>() {})
-            res?.sortedBy { typeahead ->  typeahead.code}?.associate { typeahead -> typeahead.name to typeahead } ?: mapOf()
+            res ?: listOf()
         }
     }
 

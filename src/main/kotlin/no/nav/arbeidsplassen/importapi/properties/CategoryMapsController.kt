@@ -35,7 +35,7 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter,
     }
 
     @Get("/janzz/occupations")
-    fun getJanzzCategories(): Map<String, Typeahead> {
+    fun getJanzzCategories(): List<Typeahead> {
         try {
             log.info("Henter stillinger fra ontologi.")
             return ontologiGateway.hentTypeaheadStillingerFraOntologi()
