@@ -541,7 +541,7 @@ It is possible to have more than 1 and max 3 occupation categories for each ad.
 | categoryType | ENUM | yes | type of occupation standard | STYRK08 |
 | name | String | optional | name of category | Barnehage |
 
-If you don't or can not support STYRK-occupations, and you are using another occupations category standard, please
+If you don't or can not support any of our category standards, and you are using another occupations category standard, please
 let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
 
 ## Optional Properties
