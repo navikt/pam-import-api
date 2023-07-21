@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.junit.Assert
@@ -18,7 +19,8 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
         val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "Snarest")
         val publishedDate = LocalDateTime.now()
         val ad = AdDTO(published = publishedDate, properties = propertiesAd, expires = null,
-            adText = "adText", employer = null, reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
         Assert.assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
@@ -30,7 +32,8 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
         val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "01.05.2019")
         val publishedDate = LocalDateTime.now()
         val ad = AdDTO(published = publishedDate, properties = propertiesAd, expires = null,
-            adText = "adText", employer = null, reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
         Assert.assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
@@ -42,7 +45,8 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
         val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "Snarest")
         val expiredate = LocalDateTime.now()
         val ad = AdDTO(published = LocalDateTime.now(), properties = propertiesAd, expires = expiredate,
-            adText = "adText", employer = null, reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
         Assert.assertEquals("Dersom expire har en verdi skal expire bestå urørt",
