@@ -62,7 +62,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
     fun replaceAmpersandsHandleNullValues() {
         var result = transferLogTasks.sanitizeAd(AdDTO(
             adText = "?",
-            employer = null,
+            employer = EmployerDTO(null, "test", null, LocationDTO()),
             expires = null,
             published = null,
             reference = "?",
