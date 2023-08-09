@@ -137,6 +137,7 @@ class TransferController(private val transferLogService: TransferLogService,
     @Delete("/{providerId}/{reference}")
     fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String,
                                   @QueryValue(defaultValue = "false") delete: Boolean): TransferLogDTO {
+        LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
         val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
