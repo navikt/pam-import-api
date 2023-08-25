@@ -612,7 +612,7 @@ It is possible to have many contacts, we recommended at least one contact for ea
 
 ## Ad preview and status  
 In arbeidsplassen every ad is manually checked, if it doesn't follow 
-[NAVs guideline](https://arbeidsplassen.nav.no/retningslinjer) it will be rejected.
+[NAVs guidelines](https://arbeidsplassen.nav.no/vilkar-stillingsannonser) it will be rejected.
 You can check your ad if it is approved or rejected using this:
 
 ```
