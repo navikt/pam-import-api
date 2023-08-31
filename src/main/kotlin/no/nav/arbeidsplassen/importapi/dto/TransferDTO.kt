@@ -31,7 +31,14 @@ data class EmployerDTO(val reference: String?, val businessName: String, var org
     }
 }
 
-data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String?, val description: String?)
+data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String? = null, val description: String? = null) {
+    fun validCode(): Boolean {
+        if (categoryType == CategoryType.STYRK08) {
+            return code != "0000" && code != "9999"
+        }
+        return true
+    }
+}
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {
 

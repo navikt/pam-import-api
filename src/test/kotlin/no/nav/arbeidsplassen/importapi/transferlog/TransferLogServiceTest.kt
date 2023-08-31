@@ -2,10 +2,13 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.*
@@ -23,7 +26,7 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
             reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
-        Assert.assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
+        assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
             transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, publishedDate.plusDays(10))
     }
 
@@ -36,7 +39,7 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
             reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
-        Assert.assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
+        assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
             transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, null)
     }
 
@@ -49,7 +52,19 @@ class TransferLogServiceTest(private val transferLogService: TransferLogService)
             reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
 
-        Assert.assertEquals("Dersom expire har en verdi skal expire bestå urørt",
+        assertEquals("Dersom expire har en verdi skal expire bestå urørt",
             transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, expiredate)
+    }
+
+    @Test
+    fun `Invalid STYRK code is removed`() {
+        val ad = AdDTO(published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(postalCode = "0123")),
+            categoryList = listOf(CategoryDTO("0000", CategoryType.STYRK08,  "test", "test"))
+        )
+        val result = transferLogService.removeInvalidCategories(ad, 12, "test")
+        Assertions.assertEquals(0, result.categoryList.size)
     }
 }
