@@ -36,6 +36,9 @@ data class CategoryDTO(val code: String, val categoryType: CategoryType = Catego
         if (categoryType == CategoryType.STYRK08) {
             return code != "0000" && code != "9999"
         }
+        if (categoryType == CategoryType.PYRK20) {
+            return code != "0000"
+        }
         return true
     }
 }
