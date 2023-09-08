@@ -34,10 +34,19 @@ data class EmployerDTO(val reference: String?, val businessName: String, var org
 data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String? = null, val description: String? = null) {
     fun validCode(): Boolean {
         if (categoryType == CategoryType.STYRK08) {
-            return code != "0000" && code != "9999"
+           return try {
+                code.toInt() != 0 && code.toInt() != 9999
+            } catch (nfe: NumberFormatException) {
+                false
+            }
         }
+
         if (categoryType == CategoryType.PYRK20) {
-            return code != "0000"
+            return try {
+                code.toInt() != 0
+            } catch (nfe: NumberFormatException) {
+                false
+            }
         }
         return true
     }
