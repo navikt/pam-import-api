@@ -8,9 +8,15 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+      - feature/*
 jobs:
   call-workflow:
     uses: navikt/pam-deploy/.github/workflows/deploy-dev.yml@v4
+    permissions:
+      actions: read
+      contents: write
+      security-events: write
+      id-token: write
     with:
       NAIS_RESOURCE: naiserator.yml
       JAVA_VERSION: '17'
