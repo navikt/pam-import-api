@@ -6,6 +6,7 @@ import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
@@ -13,8 +14,9 @@ import org.slf4j.LoggerFactory
 
 @Singleton
 class TransferLogService(private val transferLogRepository: TransferLogRepository,
-                         private val styrkCodeConverter: StyrkCodeConverter,
-                         private val propertyNameValueValidation: PropertyNameValueValidation) {
+                         private val propertyNameValueValidation: PropertyNameValueValidation,
+                         private val ontologiGateway: LokalOntologiGateway
+) {
 
      companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogService::class.java)
@@ -69,15 +71,11 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
         return ad.copy(categoryList = ad.categoryList.stream()
+            .filter {cat ->
+                cat.name?.let { janzztittel -> ontologiGateway.hentTypeaheadStilling(janzztittel)
+                    .any { typeahead -> (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code) } } == true
+            }
             .filter { cat ->
-                // sjekker at koden eksisterer
-                val isPresent = styrkCodeConverter.lookup(cat.code).isPresent
-                if (!isPresent) {
-                    LOG.info("Ugyldig kategori: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
-                }
-                isPresent
-            }.filter { cat ->
-                // sjekker at det ikke er kode 0000 / 9999
                 val validCode = cat.validCode()
                 if (!validCode) {
                     LOG.info("Ugyldig kode: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
@@ -94,10 +92,6 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
         }
         if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
             throw ImportApiError("Location does not have postal code, or does not have county/municipality", ErrorType.INVALID_VALUE)
-        }
-        ad.categoryList.stream().forEach { cat ->
-            val optCat = styrkCodeConverter.lookup(cat.code)
-            if (optCat.isEmpty) throw ImportApiError("category ${cat.code} does not exist", ErrorType.INVALID_VALUE)
         }
         propertyNameValueValidation.checkOnlyValidValues(ad.properties)
     }

@@ -68,6 +68,7 @@ dependencies {
     testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
     testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpserverVersion")
+    testImplementation "org.mockito.kotlin:mockito-kotlin:5.1.0"
 }
 
 test.classpath += configurations.developmentOnly

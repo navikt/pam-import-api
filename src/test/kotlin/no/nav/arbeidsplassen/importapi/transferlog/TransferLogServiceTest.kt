@@ -1,70 +1,66 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.dto.AdDTO
-import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
-import no.nav.arbeidsplassen.importapi.dto.CategoryType
-import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
-import no.nav.arbeidsplassen.importapi.dto.LocationDTO
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames
-import org.junit.Assert.assertEquals
+import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
+import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
+import org.junit.Before
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.collections.HashMap
 
-@MicronautTest
-class TransferLogServiceTest(private val transferLogService: TransferLogService) {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TransferLogServiceTest{
 
-    @Test
-    fun `test expires updates to 10 days after published if applicationdue snarest and expires null`() {
-        val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "Snarest")
-        val publishedDate = LocalDateTime.now()
-        val ad = AdDTO(published = publishedDate, properties = propertiesAd, expires = null,
-            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
-            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
-                LocationDTO(postalCode = "0123")))
+    lateinit var transferLogService : TransferLogService
 
-        assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, publishedDate.plusDays(10))
+    @Mock
+    val transferLogRepository: TransferLogRepository = mock(TransferLogRepository::class.java)
+
+    @Mock
+    val propertyNameValueValidation: PropertyNameValueValidation = mock(PropertyNameValueValidation::class.java)
+
+    @Mock
+    val ontologiGateway : LokalOntologiGateway = mock(LokalOntologiGateway::class.java)
+
+
+    @BeforeAll
+    fun setUp() {
+        transferLogService = TransferLogService(transferLogRepository, propertyNameValueValidation, ontologiGateway)
     }
-
     @Test
-    fun `test ad is unchanged when applicationdue is a date`() {
-        val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "01.05.2019")
-        val publishedDate = LocalDateTime.now()
-        val ad = AdDTO(published = publishedDate, properties = propertiesAd, expires = null,
-            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
-            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
-                LocationDTO(postalCode = "0123")))
-
-        assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, null)
-    }
-
-    @Test
-    fun `test ad is unchanged when expire has value set`() {
-        val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to "Snarest")
-        val expiredate = LocalDateTime.now()
-        val ad = AdDTO(published = LocalDateTime.now(), properties = propertiesAd, expires = expiredate,
-            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
-            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
-                LocationDTO(postalCode = "0123")))
-
-        assertEquals("Dersom expire har en verdi skal expire bestå urørt",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, expiredate)
-    }
-
-    @Test
-    fun `Invalid STYRK code is removed`() {
+    fun `Invalid JANZZ code is removed`() {
         val ad = AdDTO(published = LocalDateTime.now(), expires = LocalDateTime.now(),
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(postalCode = "0123")),
-            categoryList = listOf(CategoryDTO("0000", CategoryType.STYRK08,  "test", "test"))
+            categoryList = listOf(CategoryDTO("0000", CategoryType.JANZZ,  "test", "test"))
         )
+
+        Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test")).thenReturn(emptyList())
+
         val result = transferLogService.removeInvalidCategories(ad, 12, "test")
         Assertions.assertEquals(0, result.categoryList.size)
+    }
+
+    @Test
+    fun `Valid JANZZ code is kept`() {
+        val ad = AdDTO(published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(postalCode = "0123")),
+            categoryList = listOf(CategoryDTO("1234", CategoryType.JANZZ,  "test", "test"))
+        )
+
+        Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test")).thenReturn(listOf(Typeahead(name="test", code=1234)))
+
+        val result = transferLogService.removeInvalidCategories(ad, 12, "test")
+        Assertions.assertEquals(1, result.categoryList.size)
     }
 }

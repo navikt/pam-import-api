@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Property
+import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
@@ -18,6 +19,11 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.concurrent.CompletableFuture
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
+import org.mockito.InjectMocks
+import org.mockito.Mockito.mock
 
 @MicronautTest
 @Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
@@ -31,6 +37,16 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
     @Inject
     @field:Client("\${micronaut.server.context-path}")
     lateinit var strClient: RxStreamingHttpClient
+
+    @Replaces(LokalOntologiGateway::class)
+    @Singleton
+    class MockLokalOntologiGateway : LokalOntologiGateway("URL") {
+        @Override
+        override fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
+            return listOf()
+        }
+    }
+
 
     @Test
     fun `create provider and then upload ads in batches`() {
