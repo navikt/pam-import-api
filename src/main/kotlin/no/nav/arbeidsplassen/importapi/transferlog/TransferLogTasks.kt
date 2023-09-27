@@ -21,7 +21,6 @@ import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
 import javax.transaction.Transactional
-import kotlin.streams.toList
 
 @Singleton
 @Open
@@ -100,7 +99,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             val occupation = styrkCodeConverter.lookup(it.code).get()
             "${occupation.categoryLevel1}/${occupation.categoryLevel2}"
         }.distinct().joinToString(separator =";")
-        props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations)
+        props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations) //se om denne logikken ikke skal endres mot janzz
 
 
         return ad.copy(
@@ -110,7 +109,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
             properties = props.toMap(),
-            categoryList = categoryList
         )
     }
 

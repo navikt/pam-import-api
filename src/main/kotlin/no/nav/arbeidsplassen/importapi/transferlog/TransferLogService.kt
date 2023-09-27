@@ -9,7 +9,6 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
-import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
 @Singleton
@@ -74,25 +73,19 @@ class TransferLogService(
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
-        LOG.info("Categories before {}", ad.categoryList.size)
         return ad.copy(categoryList = ad.categoryList.stream()
             .filter { cat ->
                 cat.name?.let { janzztittel ->
-                    val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
-                    LOG.info("Typeaheads : {} for janzztittel {}", typeaheads.size, janzztittel)
-                    typeaheads
-                        .any { typeahead ->
-                            val eksisterendeJanzz =
+                    try {
+                        val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
+                        typeaheads
+                            .any { typeahead ->
                                 (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
-                            LOG.info(
-                                "Janzztittel eksisterer {}. {} sendt inn av providerId: {} reference: {}",
-                                eksisterendeJanzz,
-                                janzztittel,
-                                providerId,
-                                reference
-                            )
-                            eksisterendeJanzz
-                        }
+                            }
+                    } catch (e: Exception) {
+                        LOG.error("Feiler i typeaheadkall mot ontologien", e)
+                        false
+                    }
                 } == true
             }
             .filter { cat ->
