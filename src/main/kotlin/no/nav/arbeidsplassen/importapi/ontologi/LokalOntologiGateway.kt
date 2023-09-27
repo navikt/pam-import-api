@@ -52,7 +52,7 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        val url = "$baseurl/rest/typeahead/stilling"
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
 
         val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -61,7 +61,6 @@ open class LokalOntologiGateway(
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("stillingstittel", stillingstittel)
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
