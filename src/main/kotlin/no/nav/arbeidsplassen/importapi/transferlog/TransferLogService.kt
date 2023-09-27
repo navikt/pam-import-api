@@ -78,18 +78,19 @@ class TransferLogService(
         return ad.copy(categoryList = ad.categoryList.stream()
             .filter { cat ->
                 cat.name?.let { janzztittel ->
-                    ontologiGateway.hentTypeaheadStilling(janzztittel)
+                    val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
+                    LOG.info("Typeaheads : {} for janzztittel {}", typeaheads.size, janzztittel)
+                    typeaheads
                         .any { typeahead ->
                             val eksisterendeJanzz =
                                 (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
-                            if (!eksisterendeJanzz) {
-                                LOG.info(
-                                    "Ugyldig janzztittel: {} sendt inn av providerId: {} reference: {}",
-                                    janzztittel,
-                                    providerId,
-                                    reference
-                                )
-                            }
+                            LOG.info(
+                                "Janzztittel eksisterer {}. {} sendt inn av providerId: {} reference: {}",
+                                eksisterendeJanzz,
+                                janzztittel,
+                                providerId,
+                                reference
+                            )
                             eksisterendeJanzz
                         }
                 } == true

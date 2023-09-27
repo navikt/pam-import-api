@@ -69,6 +69,7 @@ open class LokalOntologiGateway(
         if (responseCode >= 300 || responseBody == null) {
             throw RuntimeException("Fikk responskode $responseCode fra pam-ontologi og responsmelding $responseBody")
         }
+        log.info(responseBody.toString())
 
         return responseBody.let {
             val res = mapper.readValue(it, object : TypeReference<List<Typeahead>>() {})
