@@ -79,6 +79,7 @@ class TransferController(private val transferLogService: TransferLogService,
                 LOG.info("Got ad ${ad.reference} for $providerId")
                 ad = transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad)
                 ad = transferLogService.removeInvalidCategories(ad, providerId, ad.reference)
+                LOG.info("Categories after {}", ad.categoryList.size)
                 val content = objectMapper.writeValueAsString(ad)
                 val md5 = content.toMD5Hex()
                 if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {

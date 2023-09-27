@@ -74,6 +74,7 @@ class TransferLogService(
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
+        LOG.info("Categories before {}", ad.categoryList.size)
         return ad.copy(categoryList = ad.categoryList.stream()
             .filter { cat ->
                 cat.name?.let { janzztittel ->
