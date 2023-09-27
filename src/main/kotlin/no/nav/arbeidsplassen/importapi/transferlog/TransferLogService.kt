@@ -13,12 +13,13 @@ import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
 @Singleton
-class TransferLogService(private val transferLogRepository: TransferLogRepository,
-                         private val propertyNameValueValidation: PropertyNameValueValidation,
-                         private val ontologiGateway: LokalOntologiGateway
+class TransferLogService(
+    private val transferLogRepository: TransferLogRepository,
+    private val propertyNameValueValidation: PropertyNameValueValidation,
+    private val ontologiGateway: LokalOntologiGateway
 ) {
 
-     companion object {
+    companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogService::class.java)
     }
 
@@ -31,9 +32,9 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
-       return transferLogRepository.findByIdAndProviderId(versionId, providerId)
-               .orElseThrow{ ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
-               .toDTO()
+        return transferLogRepository.findByIdAndProviderId(versionId, providerId)
+            .orElseThrow { ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
+            .toDTO()
     }
 
     fun findByVersionId(versionId: Long): TransferLogDTO {
@@ -47,20 +48,23 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, message = message, status = status,
-                md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId)
+        return TransferLogDTO(
+            versionId = id!!, message = message, status = status,
+            md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId
+        )
     }
 
-    fun resend(versionId: Long):TransferLogDTO {
+    fun resend(versionId: Long): TransferLogDTO {
         val received = transferLogRepository.findById(versionId).orElseThrow {
             ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
         }.copy(status = TransferLogStatus.RECEIVED)
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO) : AdDTO {
+    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO): AdDTO {
         if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
-            && ad.expires == null) {
+            && ad.expires == null
+        ) {
             val newExpiryDate = ad.published?.plusDays(10)
             return ad.copy(expires = newExpiryDate)
         } else {
@@ -71,14 +75,33 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
         return ad.copy(categoryList = ad.categoryList.stream()
-            .filter {cat ->
-                cat.name?.let { janzztittel -> ontologiGateway.hentTypeaheadStilling(janzztittel)
-                    .any { typeahead -> (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code) } } == true
+            .filter { cat ->
+                cat.name?.let { janzztittel ->
+                    ontologiGateway.hentTypeaheadStilling(janzztittel)
+                        .any { typeahead ->
+                            val eksisterendeJanzz =
+                                (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
+                            if (!eksisterendeJanzz) {
+                                LOG.info(
+                                    "Ugyldig janzztittel: {} sendt inn av providerId: {} reference: {}",
+                                    janzztittel,
+                                    providerId,
+                                    reference
+                                )
+                            }
+                            eksisterendeJanzz
+                        }
+                } == true
             }
             .filter { cat ->
                 val validCode = cat.validCode()
                 if (!validCode) {
-                    LOG.info("Ugyldig kode: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
+                    LOG.info(
+                        "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
+                        cat,
+                        providerId,
+                        reference
+                    )
                 }
                 validCode
             }
@@ -87,16 +110,22 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     fun validate(ad: AdDTO) {
-        if (ad.categoryList.count()>3) {
-            throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE)
+        if (ad.categoryList.count() > 3) {
+            throw ImportApiError(
+                "category list is over 3, we only allow max 3 categories per ad",
+                ErrorType.INVALID_VALUE
+            )
         }
         if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
-            throw ImportApiError("Location does not have postal code, or does not have county/municipality", ErrorType.INVALID_VALUE)
+            throw ImportApiError(
+                "Location does not have postal code, or does not have county/municipality",
+                ErrorType.INVALID_VALUE
+            )
         }
         propertyNameValueValidation.checkOnlyValidValues(ad.properties)
     }
 
-    private fun locationMustHavePostalCodeOrCountyMunicipal(ad:AdDTO) = (ad.locationList.isNotEmpty()
+    private fun locationMustHavePostalCodeOrCountyMunicipal(ad: AdDTO) = (ad.locationList.isNotEmpty()
             && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
             (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
 
