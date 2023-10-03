@@ -61,7 +61,6 @@ open class LokalOntologiGateway(
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Accept", "application/json")
-            setRequestProperty("Content-Type", "application/json; charset=utf-8")
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
