@@ -16,7 +16,6 @@ import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 @Singleton
@@ -55,9 +54,7 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        log.info("Får inn stillingstittel {}", stillingstittel)
-
-        val url = "$baseurl/rest/typeahead/stilling"
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
 
         val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -65,10 +62,7 @@ open class LokalOntologiGateway(
             readTimeout = 50000
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
-            setRequestProperty("Accept", "application/json")
-            setRequestProperty("Content-Type", "application/json")
-            setRequestProperty("stillingstittel", stillingstittel)
-
+            setRequestProperty("Accept", "application/json;charset=UTF-8")
 
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
