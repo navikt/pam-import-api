@@ -7,13 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.micronaut.context.annotation.Value
+import io.micronaut.http.uri.UriTemplate
 import jakarta.inject.Singleton
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 @Singleton
@@ -52,7 +55,9 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
+        log.info("Får inn stillingstittel {}", stillingstittel)
+
+        val url = String("$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}".toByteArray(), StandardCharsets.UTF_8)
 
         val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -61,6 +66,7 @@ open class LokalOntologiGateway(
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Accept", "application/json")
+
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
