@@ -17,6 +17,7 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
 import java.util.*
+import kotlin.collections.HashMap
 
 @Singleton
 open class LokalOntologiGateway(
@@ -39,6 +40,7 @@ open class LokalOntologiGateway(
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Accept", "application/json")
+            setRequestProperty("Content-type", "application/json; charset=utf-8")
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
@@ -55,8 +57,9 @@ open class LokalOntologiGateway(
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
         val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
+        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
-        val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
+        val (responseCode, responseBody) = with(URL(uriTemplate).openConnection() as HttpURLConnection) {
             requestMethod = "GET"
             connectTimeout = 50000
             readTimeout = 50000
