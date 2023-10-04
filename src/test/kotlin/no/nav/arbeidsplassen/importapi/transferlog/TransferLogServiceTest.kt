@@ -4,7 +4,6 @@ import no.nav.arbeidsplassen.importapi.dto.*
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
-import org.junit.Before
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

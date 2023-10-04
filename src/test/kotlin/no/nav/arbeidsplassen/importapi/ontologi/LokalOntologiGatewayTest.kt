@@ -18,7 +18,7 @@ class LokalOntologiGatewayTest{
     lateinit var lokalOntologiGateway: LokalOntologiGateway
 
     @Test
-    fun `vi tester`() {
+    fun `testOntologiResponsParsesTilTypeaheadObjekt`() {
         val server = MockWebServer()
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
@@ -30,7 +30,7 @@ class LokalOntologiGatewayTest{
 
         lokalOntologiGateway = LokalOntologiGateway("http://" + server.hostName + ":" + server.port)
 
-        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStillingerFraOntologi()
+        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
 
         assertEquals(19564L, ontologiResponse[0].code)
         assertEquals("Møbelsnekker/ interiørsnekker", ontologiResponse[0].name)

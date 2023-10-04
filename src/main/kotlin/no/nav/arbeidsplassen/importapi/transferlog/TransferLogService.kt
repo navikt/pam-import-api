@@ -83,7 +83,7 @@ class TransferLogService(
                                 (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
                             }
                     } catch (e: Exception) {
-                        LOG.error("Feiler i typeaheadkall mot ontologien", e)
+                        LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
                         false
                     }
                 } == true

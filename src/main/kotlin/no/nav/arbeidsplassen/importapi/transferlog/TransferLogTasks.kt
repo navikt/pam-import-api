@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import javax.transaction.Transactional
 
 @Singleton
@@ -87,18 +88,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 else -> key to value
             }
         }.toMutableList()
-        /*
-        val categoryList = ad.categoryList.distinct().map {
-            val occupation = styrkCodeConverter.lookup(it.code).get()
-            it.copy(code=occupation.styrkCode)
-        }
-        val arbOccupations =  categoryList.map {
-            val occupation = styrkCodeConverter.lookup(it.code).get()
-            "${occupation.categoryLevel1}/${occupation.categoryLevel2}"
-        }.distinct().joinToString(separator =";")
-        props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations) //se om denne logikken ikke skal endres mot janzz
-
-        */
         return ad.copy(
             adText = sanitize(ad.adText),
             title = ad.title.replaceAmpersand(),
