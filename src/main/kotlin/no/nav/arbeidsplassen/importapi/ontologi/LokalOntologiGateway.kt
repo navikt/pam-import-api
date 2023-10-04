@@ -63,32 +63,6 @@ open class LokalOntologiGateway(
         val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
         val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
-        val (responseCode, responseBody) = with(URL(uriTemplate).openConnection() as HttpURLConnection) {
-            requestMethod = "GET"
-            connectTimeout = 50000
-            readTimeout = 50000
-
-            setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
-            setRequestProperty("Accept", "application/json;charset=UTF-8")
-
-
-            val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
-            responseCode to stream?.use { s -> s.bufferedReader().readText() }
-        }
-        if (responseCode >= 300 || responseBody == null) {
-            throw RuntimeException("Fikk responskode $responseCode fra pam-ontologi og responsmelding $responseBody")
-        }
-
-        return responseBody.let {
-            val res = mapper.readValue(it, object : TypeReference<List<Typeahead>>() {})
-            res ?: listOf()
-        }
-    }
-
-    open fun hentTypeaheadStillinger2(stillingstittel : String) : List<Typeahead> {
-        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
-        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
-
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()

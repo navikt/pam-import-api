@@ -83,17 +83,8 @@ class TransferLogService(
                                 (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
                             }
                     } catch (e: Exception) {
-                        try {
-                            val typeaheads = ontologiGateway.hentTypeaheadStillinger2(janzztittel)
-                            typeaheads
-                                .any { typeahead ->
-                                    (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
-                                }
-                        } catch (e: Exception) {
-
                         LOG.error("Feiler i typeaheadkall mot ontologien", e)
                         false
-                    }
                     }
                 } == true
             }
