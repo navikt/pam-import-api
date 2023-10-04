@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.uri.UriTemplate
@@ -16,6 +17,9 @@ import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -79,6 +83,20 @@ open class LokalOntologiGateway(
             val res = mapper.readValue(it, object : TypeReference<List<Typeahead>>() {})
             res ?: listOf()
         }
+    }
+
+    open fun hentTypeaheadStillinger2(stillingstittel : String) : List<Typeahead> {
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
+        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
+
+        val client = HttpClient.newBuilder().build();
+        val request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(uriTemplate))
+            .header("Nav-CallId", UUID.randomUUID().toString())
+            .build();
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
 }
 
