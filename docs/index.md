@@ -272,9 +272,9 @@ Authorization: Bearer <your secret key>
   },
   "categoryList": [
     {
-      "code": "214605",
-      "categoryType": "STYRK08",
-      "name": "Sivilingeniør"
+      "code" : 101507,
+      "categoryType" : "JANZZ",
+      "name" : "Sivilingeniør (offshoreteknologi)"
     }
   ]
 }
@@ -446,9 +446,9 @@ Authorization: Bearer <secret key>
       },
       "categoryList": [
         {
-          "code": "214605",
-          "categoryType": "PYRK20",
-          "name": "Sivilingeniør"
+              "code" : 101507,
+              "categoryType" : "JANZZ",
+              "name" : "Sivilingeniør (offshoreteknologi)"
         }
       ]
     }
@@ -527,19 +527,16 @@ This is the location address of the employer, see also below for work address/lo
 |country | String | Optional | Land | Country, defaults to Norge | Norge |
 
 ## Category
-Ads are classified by occupations, and these are divided in two levels. We support three types of classifications, `JANZZ`, `STYRK08` and `PYRK20`.  
+Ads are classified by occupations, and these are divided in two levels. We support one type of classification, `JANZZ`.  
 `JANZZ` is a fine granulated classification for occupations, constantly updating with new professions. The list of updated supported JANZZ codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/janzz/occupations).
-`STYRK08` is [an official Norwegian standard for classification of occupations](https://www.ssb.no/en/klass/klassifikasjoner/7). A complete list of supported styrk-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/styrk/occupations).  
-`PYRK20` is a broader classification that just includes the categories of occupations, which are the same categories we use for filtering ads at https://arbeidsplassen.nav.no/stillinger. A complete list of "pyrk"-codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/pyrk/occupations).  
-We recommend using `JANZZ` codes if you are able to, as they are more specific.
 
 It is possible to have more than 1 and max 3 occupation categories for each ad.
 
-|Name | Type | Required | Description | Example |
-|:----|:-----|:---------|:------------|:------|
-|code | String | yes | the code of occupation | 2342 |
-| categoryType | ENUM | yes | type of occupation standard | STYRK08 |
-| name | String | optional | name of category | Barnehage |
+|Name | Type | Required | Description | Example              |
+|:----|:-----|:---------|:------------|:---------------------|
+|code | String | yes | the code of occupation | 38689                 |
+| categoryType | ENUM | yes | type of occupation standard | JANZZ                |
+| name | String | optional | name of category | Barnehagemedarbeider |
 
 If you don't or can not support any of our category standards, and you are using another occupations category standard, please
 let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
