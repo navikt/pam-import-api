@@ -6,10 +6,14 @@ import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
+import java.util.stream.Collectors
+import kotlin.streams.toList
 
 @Singleton
 class TransferLogService(
@@ -72,37 +76,59 @@ class TransferLogService(
     }
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
-    fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
-        return ad.copy(categoryList = ad.categoryList.stream()
+    fun handleInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
+        val invalidCategories: List<CategoryDTO> = findInvalidCategories(ad, providerId, reference)
+        return ad.copy(properties = addInvalidCategoriesToProperties(invalidCategories, ad.properties.toMutableMap()),
+            categoryList = ad.categoryList.filter { cat -> !invalidCategories.contains(cat) })
+    }
+
+    private fun findInvalidCategories(ad: AdDTO, providerId: Long, reference: String): List<CategoryDTO> {
+        return ad.categoryList.stream()
             .filter { cat ->
-                cat.name?.let { janzztittel ->
-                    try {
-                        val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
-                        typeaheads
-                            .any { typeahead ->
-                                (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
-                            }
-                    } catch (e: Exception) {
-                        LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
-                        false
-                    }
-                } == true
-            }
-            .filter { cat ->
-                val validCode = cat.validCode()
-                if (!validCode) {
-                    LOG.info(
-                        "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
-                        cat,
-                        providerId,
-                        reference
-                    )
+                if (!cat.validCode()) {
+                    true
+                } else {
+                    cat.name?.let { janzztittel ->
+                        try {
+                            val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
+                            typeaheads
+                                .any { typeahead ->
+                                    (typeahead.name == janzztittel) && (typeahead.code.toString() == cat.code)
+                                }
+                        } catch (e: Exception) {
+                            LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
+                            false
+                        }
+                    } == false
                 }
-                validCode
+            }
+            .also {
+                LOG.info(
+                    "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
+                    it,
+                    providerId,
+                    reference
+                )
             }
             .toList()
-        )
     }
+
+    private fun addInvalidCategoriesToProperties(
+        invalidCategories: List<CategoryDTO>,
+        properties: MutableMap<PropertyNames, String>
+    ): MutableMap<PropertyNames, String> {
+        var invalidCategoriesFormatted = invalidCategories.stream()
+            .map { cat -> cat.name }.toList().joinToString(separator = ";")
+
+        properties[PropertyNames.keywords] =
+            if (!properties[PropertyNames.keywords].isNullOrEmpty() && !invalidCategoriesFormatted.isNullOrEmpty())
+                invalidCategoriesFormatted.plus(";").plus(properties[PropertyNames.keywords])
+            else
+                properties[PropertyNames.keywords] ?: invalidCategoriesFormatted
+
+        return properties
+    }
+
 
     fun validate(ad: AdDTO) {
         if (ad.categoryList.count() > 3) {

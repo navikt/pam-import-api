@@ -28,11 +28,13 @@ import java.time.LocalDateTime
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/transfers")
 @SecurityRequirement(name = "bearer-auth")
-class TransferController(private val transferLogService: TransferLogService,
-                         private val providerService: ProviderService,
-                         private val adStateService: AdStateService,
-                         private val objectMapper: ObjectMapper,
-                         @Value("\${transferlog.batch-size:100}") val adsSize: Int) {
+class TransferController(
+    private val transferLogService: TransferLogService,
+    private val providerService: ProviderService,
+    private val adStateService: AdStateService,
+    private val objectMapper: ObjectMapper,
+    @Value("\${transferlog.batch-size:100}") val adsSize: Int
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferController::class.java)
@@ -45,17 +47,25 @@ class TransferController(private val transferLogService: TransferLogService,
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
-        val updatedAds = ads.map{
+        val updatedAds = ads.map {
             transferLogService.updateExpiresIfNullAndStarttimeSnarest(it)
         }.map {
-            transferLogService.removeInvalidCategories(it, providerId, it.reference)
+            transferLogService.handleInvalidCategories(it, providerId, it.reference)
         }
 
         val content = objectMapper.writeValueAsString(updatedAds)
         val md5 = content.toMD5Hex()
         val provider = providerService.findById(providerId)
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-             return HttpResponse.ok(TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!))
+            return HttpResponse.ok(
+                TransferLogDTO(
+                    message = "Content already exist, skipping",
+                    status = TransferLogStatus.SKIPPED,
+                    items = 1,
+                    md5 = md5,
+                    providerId = provider.id!!
+                )
+            )
         }
 
         updatedAds.stream().forEach {
@@ -78,15 +88,27 @@ class TransferController(private val transferLogService: TransferLogService,
                 var ad = objectMapper.treeToValue(it, AdDTO::class.java)
                 LOG.info("Got ad ${ad.reference} for $providerId")
                 ad = transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad)
-                ad = transferLogService.removeInvalidCategories(ad, providerId, ad.reference)
+                ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
                 val content = objectMapper.writeValueAsString(ad)
                 val md5 = content.toMD5Hex()
                 if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                    TransferLogDTO(message = "Content already exist, skipping", status = TransferLogStatus.SKIPPED, items = 1, md5 = md5, providerId = provider.id!!)
-                }
-                else {
+                    TransferLogDTO(
+                        message = "Content already exist, skipping",
+                        status = TransferLogStatus.SKIPPED,
+                        items = 1,
+                        md5 = md5,
+                        providerId = provider.id!!
+                    )
+                } else {
                     transferLogService.validate(ad)
-                    transferLogService.save(TransferLogDTO(payload = content, md5 = md5, items = 1, providerId = provider.id!!)).apply {
+                    transferLogService.save(
+                        TransferLogDTO(
+                            payload = content,
+                            md5 = md5,
+                            items = 1,
+                            providerId = provider.id!!
+                        )
+                    ).apply {
                         payload = null
                     }
                 }
@@ -131,12 +153,16 @@ class TransferController(private val transferLogService: TransferLogService,
 
     @Get("/{providerId}/versions/{versionId}/payload")
     fun getTransferPayload(@PathVariable providerId: Long, @PathVariable versionId: Long): List<AdDTO> {
-        return objectMapper.readValue(transferLogService.findByVersionIdAndProviderId(versionId, providerId).payload, object: TypeReference<List<AdDTO>>(){})
+        return objectMapper.readValue(
+            transferLogService.findByVersionIdAndProviderId(versionId, providerId).payload,
+            object : TypeReference<List<AdDTO>>() {})
     }
 
     @Delete("/{providerId}/{reference}")
-    fun stopAdByProviderReference(@PathVariable providerId: Long, @PathVariable reference: String,
-                                  @QueryValue(defaultValue = "false") delete: Boolean): TransferLogDTO {
+    fun stopAdByProviderReference(
+        @PathVariable providerId: Long, @PathVariable reference: String,
+        @QueryValue(defaultValue = "false") delete: Boolean
+    ): TransferLogDTO {
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
@@ -144,7 +170,15 @@ class TransferController(private val transferLogService: TransferLogService,
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
-        return transferLogService.save(TransferLogDTO(message = adStatus.name , payload = jsonPayload, md5 = md5, items = 1,providerId = provider.id!!)).apply {
+        return transferLogService.save(
+            TransferLogDTO(
+                message = adStatus.name,
+                payload = jsonPayload,
+                md5 = md5,
+                items = 1,
+                providerId = provider.id!!
+            )
+        ).apply {
             payload = null
         }
     }
