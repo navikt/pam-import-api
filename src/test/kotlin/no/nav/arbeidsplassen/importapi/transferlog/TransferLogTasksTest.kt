@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.dao.*
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import org.junit.jupiter.api.Assertions.*
@@ -19,7 +20,8 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
                            private val transferLogRepository: TransferLogRepository,
                            private val providerRepository: ProviderRepository,
                            private val objectMapper: ObjectMapper,
-                           private val adStateRepository: AdStateRepository) {
+                           private val adStateRepository: AdStateRepository,
+                           private val lokalOntologiGateway: LokalOntologiGateway) {
 
     @Test
     fun doTransferLogTaskTest() {

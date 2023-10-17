@@ -18,7 +18,10 @@ import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import javax.transaction.Transactional
 
 @Singleton
@@ -29,6 +32,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val meterRegistry: MeterRegistry,
                        private val kafkaSender: AdstateKafkaSender,
                        private val eventPublisher: ApplicationEventPublisher<AdStateEvent>,
+                       private val styrkCodeConverter : StyrkCodeConverter,
+                       private val lokalOntologiGateway : LokalOntologiGateway,
                        @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
@@ -84,18 +89,58 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     fun sanitizeAd(ad: AdDTO): AdDTO {
         val props = ad.properties.map { (key, value) ->
             when (key.type) {
-                PropertyType.HTML -> key to sanitize(value.toString())
+                PropertyType.HTML -> key to sanitize(value)
                 else -> key to value
             }
         }.toMutableList()
+
+        ad.categoryList.forEach { janzzCategory ->
+            val konseptgruppering: KonseptGrupperingDTO? =
+                lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code)
+            if (konseptgruppering != null) {
+                addEscoToCategoriesIfExists(ad.categoryList.toMutableList(), konseptgruppering)
+                addStyrkToCategoriesIfExists(ad.categoryList.toMutableList(), konseptgruppering)
+            }
+        }
         return ad.copy(
             adText = sanitize(ad.adText),
             title = ad.title.replaceAmpersand(),
             employer = ad.employer?.copy(
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
+            categoryList = ad.categoryList,
             properties = props.toMap(),
         )
+    }
+
+    private fun addEscoToCategoriesIfExists(
+        categoryList: MutableList<CategoryDTO>,
+        konseptGruppering: KonseptGrupperingDTO
+    ) {
+        konseptGruppering.esco?.let { escoCategory ->
+            CategoryDTO(
+                code = escoCategory.uri,
+                categoryType = CategoryType.ESCO,
+                name = escoCategory.label,
+                description = "JANZZ-".plus(konseptGruppering.konseptId)
+            )
+        }?.let { categoryList.add(it)}
+    }
+
+    private fun addStyrkToCategoriesIfExists(
+        categoryList: MutableList<CategoryDTO>,
+        konseptGruppering: KonseptGrupperingDTO
+    ) {
+        konseptGruppering.styrk08SSB?.first()?.let { styrkCode ->
+            styrkCodeConverter.lookup(styrkCode).get()?.let {
+                CategoryDTO(
+                    code = it.styrkCode,
+                    categoryType = CategoryType.STYRK08,
+                    name = it.styrkDescription,
+                    description = "JANZZ-".plus(konseptGruppering.konseptId)
+                )
+            }
+        }?.let { categoryList.add(it)}
     }
 
     private fun String.replaceAmpersand(): String {

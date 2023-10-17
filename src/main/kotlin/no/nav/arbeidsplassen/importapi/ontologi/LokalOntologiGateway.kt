@@ -72,7 +72,22 @@ open class LokalOntologiGateway(
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
+
+    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: String) : KonseptGrupperingDTO? {
+        val url = "$baseurl/rest/ontologi/konseptGruppering/konseptId=${konseptId}"
+        val uriTemplate = UriTemplate.of(url).expand(mapOf("konseptId" to konseptId))
+
+        val client = HttpClient.newBuilder().build();
+        val request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(uriTemplate))
+            .header("Nav-CallId", UUID.randomUUID().toString())
+            .build();
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return jacksonObjectMapper().readValue(response.body(), object : TypeReference<KonseptGrupperingDTO>() {})
+    }
 }
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Typeahead(
@@ -82,3 +97,37 @@ data class Typeahead(
     @JsonAlias("label")
     val name: String
 ) : Serializable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class KonseptDTO(val konseptId: Long,
+                      val type: String,
+                      val noLabel: String,
+                      val enLabel: String,
+                      val nnLabel: String,
+                      val styrk08SSB: List<String>,
+                      val esco: List<String>,
+                      val umbrella: Boolean,
+                      val noDescription: String,
+                      val enDescription: String,
+                      val termer: List<TermDTO>
+)
+
+data class TermDTO(val id: Int,
+                   val konseptId: Long,
+                   val tag: String,
+                   val spraak: String,
+                   val verdi: String
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class KonseptGrupperingDTO(
+    val konseptId: Long,
+    val noLabel: String?,
+    val styrk08SSB: List<String>,
+    val esco: EscoDTO?
+)
+
+data class EscoDTO(
+    val label: String?,
+    val uri: String
+)
