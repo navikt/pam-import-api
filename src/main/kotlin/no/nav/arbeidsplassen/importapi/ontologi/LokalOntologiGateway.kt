@@ -73,7 +73,7 @@ open class LokalOntologiGateway(
         return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
 
-    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: String) : KonseptGrupperingDTO? {
+    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long) : KonseptGrupperingDTO? {
         val url = "$baseurl/rest/ontologi/konseptGruppering/konseptId=${konseptId}"
         val uriTemplate = UriTemplate.of(url).expand(mapOf("konseptId" to konseptId))
 

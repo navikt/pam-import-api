@@ -20,7 +20,7 @@ class TestConfig {
         }
 
         @Override
-        override fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: String): KonseptGrupperingDTO? {
+        override fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long): KonseptGrupperingDTO? {
             return null
         }
     }
