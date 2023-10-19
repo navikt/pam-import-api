@@ -86,6 +86,7 @@ class TransferLogService(
         return ad.categoryList
             .filter { cat ->
                 if (cat.categoryType != CategoryType.JANZZ) {
+                    LOG.info("Ugyldig kode {} innsendt av provider {} med referanse {}", cat, providerId, reference)
                     true
                 } else {
                     cat.name?.let { janzztittel ->
@@ -93,7 +94,11 @@ class TransferLogService(
                             val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
                             typeaheads
                                 .any { typeahead ->
-                                    (janzztittel.equals(typeahead.name, ignoreCase=true)) && (typeahead.code.toString() == cat.code)
+                                    if (janzztittel.equals(typeahead.name, ignoreCase=true) && (typeahead.code.toString() == cat.code)) {
+                                        false
+                                    }
+                                    LOG.info("Ugyldig janzzklassifisering {} innsendt av provider {} med referanse {}", cat, providerId, reference)
+                                    true
                                 }
                         } catch (e: Exception) {
                             LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
@@ -102,16 +107,10 @@ class TransferLogService(
                     } == false
                 }
             }
-            .also {category ->
-                LOG.info(
-                    "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
-                    category,
-                    providerId,
-                    reference
-                )
-            }
             .toList()
     }
+
+
 
     private fun addInvalidCategoriesToProperties(
         invalidCategories: List<CategoryDTO>,
