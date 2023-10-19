@@ -93,6 +93,7 @@ class TransferLogService(
                             val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
                             typeaheads
                                 .any { typeahead ->
+                                    LOG.info("Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name, janzztittel, typeahead.code.toString(), cat.code)
                                     (janzztittel.equals(typeahead.name, ignoreCase=true)) && (typeahead.code.toString() == cat.code)
                                 }
                         } catch (e: Exception) {
