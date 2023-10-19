@@ -109,7 +109,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 LOG.warn("Feilet i kall mot pam-ontologi for reference {}", ad.reference, e)
             }
         }
-        return ad.copy(
+        val returnAd = ad.copy(
             adText = sanitize(ad.adText),
             title = ad.title.replaceAmpersand(),
             employer = ad.employer?.copy(
@@ -118,6 +118,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             categoryList = mutCategoryList,
             properties = props.toMap(),
         )
+        LOG.info(returnAd.categoryList.toString())
+        return returnAd
     }
 
     private fun addEscoToCategoriesIfExists(
