@@ -22,6 +22,7 @@ import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
+import org.apache.commons.lang3.mutable.Mutable
 import javax.transaction.Transactional
 
 @Singleton
@@ -94,13 +95,15 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             }
         }.toMutableList()
 
+        var mutCategoryList = ad.categoryList.toMutableList()
+
         ad.categoryList.forEach { janzzCategory ->
             try {
                 val konseptgruppering: KonseptGrupperingDTO? =
                     lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code.toLong())
                 if (konseptgruppering != null) {
-                    addEscoToCategoriesIfExists(ad.categoryList.toMutableList(), konseptgruppering)
-                    addStyrkToCategoriesIfExists(ad.categoryList.toMutableList(), konseptgruppering)
+                    addEscoToCategoriesIfExists(mutCategoryList, konseptgruppering)
+                    addStyrkToCategoriesIfExists(mutCategoryList, konseptgruppering)
                 }
             } catch (e: Exception) {
                 LOG.warn("Feilet i kall mot pam-ontologi for reference {}", ad.reference, e)
@@ -112,7 +115,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             employer = ad.employer?.copy(
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
-            categoryList = ad.categoryList,
+            categoryList = mutCategoryList,
             properties = props.toMap(),
         )
     }
@@ -120,7 +123,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     private fun addEscoToCategoriesIfExists(
         categoryList: MutableList<CategoryDTO>,
         konseptGruppering: KonseptGrupperingDTO
-    ) {
+    ){
         konseptGruppering.esco?.let { escoCategory ->
             CategoryDTO(
                 code = escoCategory.uri,
@@ -134,7 +137,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     private fun addStyrkToCategoriesIfExists(
         categoryList: MutableList<CategoryDTO>,
         konseptGruppering: KonseptGrupperingDTO
-    ) {
+    ){
         konseptGruppering.styrk08SSB?.first()?.let { styrkCode ->
             styrkCodeConverter.lookup(styrkCode).get()?.let {
                 CategoryDTO(
