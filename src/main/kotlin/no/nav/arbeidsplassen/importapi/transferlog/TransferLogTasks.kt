@@ -95,15 +95,15 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             }
         }.toMutableList()
 
-        var mutCategoryList = ad.categoryList.toMutableList()
+        val categoryList = ad.categoryList.toMutableList()
 
         ad.categoryList.forEach { janzzCategory ->
             try {
                 val konseptgruppering: KonseptGrupperingDTO? =
                     lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code.toLong())
                 if (konseptgruppering != null) {
-                    addEscoToCategoriesIfExists(mutCategoryList, konseptgruppering)
-                    addStyrkToCategoriesIfExists(mutCategoryList, konseptgruppering)
+                    addEscoToCategoriesIfExists(categoryList, konseptgruppering)
+                    addStyrkToCategoriesIfExists(categoryList, konseptgruppering)
                 }
             } catch (e: Exception) {
                 LOG.warn("Feilet i kall mot pam-ontologi for reference {}", ad.reference, e)
@@ -115,7 +115,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             employer = ad.employer?.copy(
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
-            categoryList = mutCategoryList,
+            categoryList = categoryList,
             properties = props.toMap(),
         )
         LOG.info(returnAd.categoryList.toString())
