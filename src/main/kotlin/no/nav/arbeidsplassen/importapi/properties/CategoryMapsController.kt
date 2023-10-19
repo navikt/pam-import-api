@@ -5,7 +5,6 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.QueryValue
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
-import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,23 +14,10 @@ import javax.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/api/v1/categories")
-class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter, private val ontologiGateway: LokalOntologiGateway) {
+class CategoryMapsController(private val ontologiGateway: LokalOntologiGateway) {
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
-    }
-
-    @Get("/pyrk/occupations")
-    fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
-        return styrkCodeConverter.occupationMap.toList().distinctBy { (k,v) -> v.categoryLevel2 }.sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues{it.value.simplyfy()}
-    }
-
-    @Get("/styrk/occupations")
-    fun getStyrkCategoryMap(@QueryValue(defaultValue = "code") sort: String): Map<String, Occupation> {
-        return if ("alfa"==sort) {
-            styrkCodeConverter.occupationMap.toList().sortedBy { (k, v) -> v.styrkDescription }.toMap()
-        }
-        else styrkCodeConverter.occupationMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
     }
 
     @Get("/janzz/occupations")
@@ -46,6 +32,3 @@ class CategoryMapsController(private val styrkCodeConverter: StyrkCodeConverter,
     }
 
 }
-
-data class PyrkOccupation(val styrkCode: String, val categoryLevel1: String, val categoryLevel2: String)
-fun Occupation.simplyfy(): PyrkOccupation = PyrkOccupation(styrkCode, categoryLevel1, categoryLevel2)

@@ -5,19 +5,26 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.micronaut.context.annotation.Value
+import io.micronaut.http.uri.UriTemplate
 import jakarta.inject.Singleton
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.*
+import kotlin.collections.HashMap
 
 @Singleton
-class LokalOntologiGateway(
+open class LokalOntologiGateway(
     @Value("\${pam.ontologi.typeahead.url}") private val baseurl: String,
 ) {
 
@@ -37,6 +44,7 @@ class LokalOntologiGateway(
 
             setRequestProperty("Nav-CallId", UUID.randomUUID().toString())
             setRequestProperty("Accept", "application/json")
+            setRequestProperty("Content-type", "application/json; charset=utf-8")
 
             val stream: InputStream? = if (responseCode < 300) this.inputStream else this.errorStream
             responseCode to stream?.use { s -> s.bufferedReader().readText() }
@@ -51,7 +59,19 @@ class LokalOntologiGateway(
         }
     }
 
+    open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
+        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
+        val client = HttpClient.newBuilder().build();
+        val request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(uriTemplate))
+            .header("Nav-CallId", UUID.randomUUID().toString())
+            .build();
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
+    }
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

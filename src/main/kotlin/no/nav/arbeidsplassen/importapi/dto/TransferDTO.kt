@@ -32,24 +32,6 @@ data class EmployerDTO(val reference: String?, val businessName: String, var org
 }
 
 data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.STYRK08, val name: String? = null, val description: String? = null) {
-    fun validCode(): Boolean {
-        if (categoryType == CategoryType.STYRK08) {
-           return try {
-                code.toInt() != 0 && code.toInt() != 9999
-            } catch (nfe: NumberFormatException) {
-                false
-            }
-        }
-
-        if (categoryType == CategoryType.PYRK20) {
-            return try {
-                code.toInt() != 0
-            } catch (nfe: NumberFormatException) {
-                false
-            }
-        }
-        return true
-    }
 }
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {
@@ -68,7 +50,7 @@ data class LocationDTO(val address: String?=null, val postalCode: String?=null, 
                        val latitude: String?=null, val longitude: String?=null)
 
 enum class CategoryType {
-    STYRK08, PYRK20
+    STYRK08, PYRK20, JANZZ
 }
 
 enum class PrivacyType {

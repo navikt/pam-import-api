@@ -6,17 +6,23 @@ import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
+import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
-import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
+import java.util.stream.Collectors
+import kotlin.streams.toList
 
 @Singleton
-class TransferLogService(private val transferLogRepository: TransferLogRepository,
-                         private val styrkCodeConverter: StyrkCodeConverter,
-                         private val propertyNameValueValidation: PropertyNameValueValidation) {
+class TransferLogService(
+    private val transferLogRepository: TransferLogRepository,
+    private val propertyNameValueValidation: PropertyNameValueValidation,
+    private val ontologiGateway: LokalOntologiGateway
+) {
 
-     companion object {
+    companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogService::class.java)
     }
 
@@ -29,9 +35,9 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
-       return transferLogRepository.findByIdAndProviderId(versionId, providerId)
-               .orElseThrow{ ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
-               .toDTO()
+        return transferLogRepository.findByIdAndProviderId(versionId, providerId)
+            .orElseThrow { ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
+            .toDTO()
     }
 
     fun findByVersionId(versionId: Long): TransferLogDTO {
@@ -45,20 +51,23 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     private fun TransferLog.toDTO(): TransferLogDTO {
-        return TransferLogDTO(versionId = id!!, message = message, status = status,
-                md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId)
+        return TransferLogDTO(
+            versionId = id!!, message = message, status = status,
+            md5 = md5, created = created, updated = updated, payload = payload, items = items, providerId = providerId
+        )
     }
 
-    fun resend(versionId: Long):TransferLogDTO {
+    fun resend(versionId: Long): TransferLogDTO {
         val received = transferLogRepository.findById(versionId).orElseThrow {
             ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
         }.copy(status = TransferLogStatus.RECEIVED)
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO) : AdDTO {
+    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO): AdDTO {
         if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
-            && ad.expires == null) {
+            && ad.expires == null
+        ) {
             val newExpiryDate = ad.published?.plusDays(10)
             return ad.copy(expires = newExpiryDate)
         } else {
@@ -67,42 +76,77 @@ class TransferLogService(private val transferLogRepository: TransferLogRepositor
     }
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
-    fun removeInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
-        return ad.copy(categoryList = ad.categoryList.stream()
-            .filter { cat ->
-                // sjekker at koden eksisterer
-                val isPresent = styrkCodeConverter.lookup(cat.code).isPresent
-                if (!isPresent) {
-                    LOG.info("Ugyldig kategori: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
-                }
-                isPresent
-            }.filter { cat ->
-                // sjekker at det ikke er kode 0000 / 9999
-                val validCode = cat.validCode()
-                if (!validCode) {
-                    LOG.info("Ugyldig kode: {} sendt inn av providerId: {} reference: {}", cat, providerId, reference)
-                }
-                validCode
-            }
-            .toList()
-        )
+    fun handleInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
+        val invalidCategories: List<CategoryDTO> = findInvalidCategories(ad, providerId, reference)
+        return ad.copy(properties = addInvalidCategoriesToProperties(invalidCategories, ad.properties.toMutableMap()),
+            categoryList = ad.categoryList.filter { cat -> !invalidCategories.contains(cat) })
     }
 
+    private fun findInvalidCategories(ad: AdDTO, providerId: Long, reference: String): List<CategoryDTO> {
+        return ad.categoryList
+            .filter { cat ->
+                if (cat.categoryType != CategoryType.JANZZ) {
+                    true
+                } else {
+                    cat.name?.let { janzztittel ->
+                        try {
+                            val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
+                            typeaheads
+                                .any { typeahead ->
+                                    (janzztittel.equals(typeahead.name, ignoreCase=true)) && (typeahead.code.toString() == cat.code)
+                                }
+                        } catch (e: Exception) {
+                            LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
+                            false
+                        }
+                    } == false
+                }
+            }
+            .also {category ->
+                LOG.info(
+                    "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
+                    category,
+                    providerId,
+                    reference
+                )
+            }
+            .toList()
+    }
+
+    private fun addInvalidCategoriesToProperties(
+        invalidCategories: List<CategoryDTO>,
+        properties: MutableMap<PropertyNames, String>
+    ): MutableMap<PropertyNames, String> {
+        var invalidCategoriesFormatted = invalidCategories.stream()
+            .map { cat -> cat.name }.toList().joinToString(separator = ";")
+
+        properties[PropertyNames.keywords] =
+            if (!properties[PropertyNames.keywords].isNullOrEmpty() && !invalidCategoriesFormatted.isNullOrEmpty())
+                invalidCategoriesFormatted.plus(";").plus(properties[PropertyNames.keywords])
+            else
+                properties[PropertyNames.keywords] ?: invalidCategoriesFormatted
+
+        return properties
+    }
+
+
     fun validate(ad: AdDTO) {
-        if (ad.categoryList.count()>3) {
-            throw ImportApiError("category list is over 3, we only allow max 3 categories per ad", ErrorType.INVALID_VALUE)
+        if (ad.categoryList.count() > 3) {
+            throw ImportApiError(
+                "category list is over 3, we only allow max 3 categories per ad",
+                ErrorType.INVALID_VALUE
+            )
         }
         if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
-            throw ImportApiError("Location does not have postal code, or does not have county/municipality", ErrorType.INVALID_VALUE)
-        }
-        ad.categoryList.stream().forEach { cat ->
-            val optCat = styrkCodeConverter.lookup(cat.code)
-            if (optCat.isEmpty) throw ImportApiError("category ${cat.code} does not exist", ErrorType.INVALID_VALUE)
+            throw ImportApiError(
+                "Location does not have postal code, or does not have county/municipality",
+                ErrorType.INVALID_VALUE
+            )
         }
         propertyNameValueValidation.checkOnlyValidValues(ad.properties)
     }
 
-    private fun locationMustHavePostalCodeOrCountyMunicipal(ad:AdDTO) = (ad.locationList.isNotEmpty()
+    private fun locationMustHavePostalCodeOrCountyMunicipal(ad: AdDTO) = (ad.locationList.isNotEmpty()
             && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
             (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
 

@@ -13,15 +13,13 @@ import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
 import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.time.LocalDateTime
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import javax.transaction.Transactional
-import kotlin.streams.toList
 
 @Singleton
 @Open
@@ -31,7 +29,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val meterRegistry: MeterRegistry,
                        private val kafkaSender: AdstateKafkaSender,
                        private val eventPublisher: ApplicationEventPublisher<AdStateEvent>,
-                       private val styrkCodeConverter: StyrkCodeConverter,
                        @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
@@ -91,18 +88,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 else -> key to value
             }
         }.toMutableList()
-
-        val categoryList = ad.categoryList.distinct().map {
-            val occupation = styrkCodeConverter.lookup(it.code).get()
-            it.copy(code=occupation.styrkCode)
-        }
-        val arbOccupations =  categoryList.map {
-            val occupation = styrkCodeConverter.lookup(it.code).get()
-            "${occupation.categoryLevel1}/${occupation.categoryLevel2}"
-        }.distinct().joinToString(separator =";")
-        props.add(PropertyNames.arbeidsplassenoccupation to arbOccupations)
-
-
         return ad.copy(
             adText = sanitize(ad.adText),
             title = ad.title.replaceAmpersand(),
@@ -110,7 +95,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
             properties = props.toMap(),
-            categoryList = categoryList
         )
     }
 
