@@ -74,13 +74,12 @@ open class LokalOntologiGateway(
     }
 
     open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long) : KonseptGrupperingDTO? {
-        val url = "$baseurl/rest/ontologi/konseptGruppering/konseptId=${konseptId}"
-        val uriTemplate = UriTemplate.of(url).expand(mapOf("konseptId" to konseptId))
+        val uri = URI("$baseurl/rest/ontologi/konseptGruppering/$konseptId")
 
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(uriTemplate))
+            .uri(uri)
             .header("Nav-CallId", UUID.randomUUID().toString())
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
