@@ -60,13 +60,12 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
-        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
+        val uri = URI("$baseurl/rest/typeahead/stilling?${stillingstittel}")
 
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(uriTemplate))
+            .uri(uri)
             .header("Nav-CallId", UUID.randomUUID().toString())
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
