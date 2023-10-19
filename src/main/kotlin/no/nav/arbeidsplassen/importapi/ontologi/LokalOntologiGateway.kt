@@ -63,7 +63,8 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        val uri = URI(URLEncoder.encode("$baseurl/rest/typeahead/stilling?${stillingstittel}", StandardCharsets.UTF_8.toString()))
+        val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
+        val uri = URI("$baseurl/rest/typeahead/stilling?${encodedPath}")
 
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
