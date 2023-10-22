@@ -64,12 +64,13 @@ open class LokalOntologiGateway(
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
         val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
-        val uri = URI("$baseurl/rest/typeahead/stilling?${encodedPath}")
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${encodedPath}"
+        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()
-            .uri(uri)
+            .uri(URI.create(uriTemplate))
             .header("Nav-CallId", UUID.randomUUID().toString())
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
