@@ -20,9 +20,7 @@ import java.time.LocalDateTime
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
-import org.apache.commons.lang3.mutable.Mutable
 import javax.transaction.Transactional
 
 @Singleton

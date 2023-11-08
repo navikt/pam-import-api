@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.micronaut.context.annotation.Value
-import io.micronaut.http.uri.UriBuilder
 import io.micronaut.http.uri.UriTemplate
 import jakarta.inject.Singleton
 import org.slf4j.Logger
@@ -24,7 +23,6 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import java.util.*
-import kotlin.collections.HashMap
 
 @Singleton
 open class LokalOntologiGateway(

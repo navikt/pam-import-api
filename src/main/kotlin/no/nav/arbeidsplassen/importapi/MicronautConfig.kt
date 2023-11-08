@@ -7,6 +7,7 @@ import jakarta.inject.Singleton
 @Factory
 class MicronautConfig {
 
+
     @Singleton
     fun styrkCodeConverter(): StyrkCodeConverter {
         return StyrkCodeConverter()
