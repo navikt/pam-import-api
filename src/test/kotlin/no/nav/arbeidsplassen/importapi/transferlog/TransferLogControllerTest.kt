@@ -38,16 +38,6 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
     @field:Client("\${micronaut.server.context-path}")
     lateinit var strClient: RxStreamingHttpClient
 
-    @Replaces(LokalOntologiGateway::class)
-    @Singleton
-    class MockLokalOntologiGateway : LokalOntologiGateway("URL") {
-        @Override
-        override fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-            return listOf()
-        }
-    }
-
-
     @Test
     fun `create provider and then upload ads in batches`() {
         // create provider

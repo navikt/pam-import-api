@@ -11,7 +11,6 @@ import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 @Factory
 class TestConfig {
 
-
     @Replaces(LokalOntologiGateway::class)
     @Singleton
     class MockLokalOntologiGateway : LokalOntologiGateway("URL") {

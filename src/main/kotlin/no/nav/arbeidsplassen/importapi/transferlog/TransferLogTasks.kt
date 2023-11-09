@@ -138,8 +138,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         categoryList: MutableList<CategoryDTO>,
         konseptGruppering: KonseptGrupperingDTO
     ){
-        konseptGruppering.styrk08SSB?.first()?.let { styrkCode ->
-            styrkCodeConverter.lookup(styrkCode).get()?.let {
+        konseptGruppering.styrk08SSB.first()?.let { styrkCode ->
+            styrkCodeConverter.lookup(styrkCode).get().let {
                 CategoryDTO(
                     code = it.styrkCode,
                     categoryType = CategoryType.STYRK08,
