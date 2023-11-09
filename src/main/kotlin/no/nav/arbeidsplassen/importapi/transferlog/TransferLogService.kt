@@ -87,6 +87,8 @@ class TransferLogService(
             .filter { cat ->
                 if (cat.categoryType != CategoryType.JANZZ) {
                     true
+                } else if (cat.categoryType == CategoryType.JANZZ && (cat.name.isNullOrEmpty() || cat.code.isNullOrEmpty())) {
+                    true
                 } else {
                     cat.name?.let { janzztittel ->
                         try {
