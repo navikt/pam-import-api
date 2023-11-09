@@ -21,17 +21,6 @@ class CategoryMapsController(private val ontologiGateway: LokalOntologiGateway, 
         val log: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
     }
 
-    @Get("/janzz/occupations")
-    fun getJanzzCategories(): List<Typeahead> {
-        try {
-            log.info("Henter stillinger fra ontologi.")
-            return ontologiGateway.hentTypeaheadStillingerFraOntologi()
-        } catch (e: Exception) {
-            log.error("Feilet i henting av typeahead stillinger fra ontologi.", e)
-            throw e;
-        }
-    }
-
     @Get("/pyrk/occupations")
     fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
         return styrkCodeConverter.occupationMap.toList().distinctBy { (k,v) -> v.categoryLevel2 }.sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues{it.value.simplyfy()}
@@ -43,6 +32,17 @@ class CategoryMapsController(private val ontologiGateway: LokalOntologiGateway, 
             styrkCodeConverter.occupationMap.toList().sortedBy { (k, v) -> v.styrkDescription }.toMap()
         }
         else styrkCodeConverter.occupationMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
+    }
+
+    @Get("/janzz/occupations")
+    fun getJanzzCategories(): List<Typeahead> {
+        try {
+            log.info("Henter stillinger fra ontologi.")
+            return ontologiGateway.hentTypeaheadStillingerFraOntologi()
+        } catch (e: Exception) {
+            log.error("Feilet i henting av typeahead stillinger fra ontologi.", e)
+            throw e;
+        }
     }
 
     data class PyrkOccupation(val styrkCode: String, val categoryLevel1: String, val categoryLevel2: String)

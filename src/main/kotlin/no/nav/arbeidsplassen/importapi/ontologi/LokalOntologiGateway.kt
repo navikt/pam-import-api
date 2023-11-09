@@ -17,11 +17,12 @@ import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
 import java.util.*
-import kotlin.collections.HashMap
 
 @Singleton
 open class LokalOntologiGateway(
@@ -60,7 +61,8 @@ open class LokalOntologiGateway(
     }
 
     open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
-        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${stillingstittel}"
+        val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
+        val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${encodedPath}"
         val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
         val client = HttpClient.newBuilder().build();
@@ -72,7 +74,21 @@ open class LokalOntologiGateway(
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
+
+    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long) : KonseptGrupperingDTO? {
+        val uri = URI("$baseurl/rest/ontologi/konseptGruppering/$konseptId")
+
+        val client = HttpClient.newBuilder().build();
+        val request = HttpRequest.newBuilder()
+            .GET()
+            .uri(uri)
+            .header("Nav-CallId", UUID.randomUUID().toString())
+            .build();
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return jacksonObjectMapper().readValue(response.body(), object : TypeReference<KonseptGrupperingDTO>() {})
+    }
 }
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Typeahead(
@@ -82,3 +98,37 @@ data class Typeahead(
     @JsonAlias("label")
     val name: String
 ) : Serializable
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class KonseptDTO(val konseptId: Long,
+                      val type: String,
+                      val noLabel: String,
+                      val enLabel: String,
+                      val nnLabel: String,
+                      val styrk08SSB: List<String>,
+                      val esco: List<String>,
+                      val umbrella: Boolean,
+                      val noDescription: String,
+                      val enDescription: String,
+                      val termer: List<TermDTO>
+)
+
+data class TermDTO(val id: Int,
+                   val konseptId: Long,
+                   val tag: String,
+                   val spraak: String,
+                   val verdi: String
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class KonseptGrupperingDTO(
+    val konseptId: Long,
+    val noLabel: String?,
+    val styrk08SSB: List<String>,
+    val esco: EscoDTO?
+)
+
+data class EscoDTO(
+    val label: String?,
+    val uri: String
+)
