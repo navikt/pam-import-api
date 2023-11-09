@@ -86,7 +86,6 @@ class TransferLogService(
         return ad.categoryList
             .filter { cat ->
                 if (cat.categoryType != CategoryType.JANZZ) {
-                    LOG.info("Mottatt typeahead som ikke er JANZZ fra provider {} med referanse", providerId, reference)
                     true
                 } else {
                     cat.name?.let { janzztittel ->
@@ -103,14 +102,6 @@ class TransferLogService(
                         }
                     } == false
                 }
-            }
-            .also {category ->
-                LOG.info(
-                    "Ugyldig kode: {} sendt inn av providerId: {} reference: {}",
-                    category,
-                    providerId,
-                    reference
-                )
             }
             .toList()
     }
