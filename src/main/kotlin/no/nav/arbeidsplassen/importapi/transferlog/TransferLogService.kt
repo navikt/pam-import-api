@@ -132,7 +132,7 @@ class TransferLogService(
                 ErrorType.INVALID_VALUE
             )
         }
-        if (!locationMustHavePostalCodeOrCountyMunicipal(ad)) {
+        if (!locationMustHavePostalCodeOrCountyMunicipal(ad) && !isCountryAbroad(ad)) {
             throw ImportApiError(
                 "Location does not have postal code, or does not have county/municipality",
                 ErrorType.INVALID_VALUE
@@ -144,5 +144,8 @@ class TransferLogService(
     private fun locationMustHavePostalCodeOrCountyMunicipal(ad: AdDTO) = (ad.locationList.isNotEmpty()
             && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
             (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
+
+    private fun isCountryAbroad(ad: AdDTO) = ad.locationList.isNotEmpty() && ad.locationList[0].hasOnlyCountrySet()
+            && listOf("NORGE", "NOREG", "NORWAY").contains(ad.locationList[0].country?.uppercase())
 
 }
