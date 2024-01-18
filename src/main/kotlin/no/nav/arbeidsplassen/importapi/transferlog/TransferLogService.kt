@@ -146,6 +146,6 @@ class TransferLogService(
             (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
 
     private fun isCountryAbroad(ad: AdDTO) = ad.locationList.isNotEmpty() && ad.locationList[0].hasOnlyCountrySet()
-            && listOf("NORGE", "NOREG", "NORWAY") .contains(ad.locationList[0].country?.uppercase())
+            && listOf("NORGE", "NOREG", "NORWAY").contains(ad.locationList[0].country?.uppercase())
 
 }
