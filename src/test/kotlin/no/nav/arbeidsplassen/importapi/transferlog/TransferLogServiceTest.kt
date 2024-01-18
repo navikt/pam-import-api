@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
@@ -107,5 +109,31 @@ class TransferLogServiceTest {
         val result = transferLogService.handleInvalidCategories(ad, 12, "test")
         Assertions.assertEquals(0, result.categoryList.size)
         Assertions.assertEquals("test", result.properties[PropertyNames.keywords])
+    }
+
+    @Test
+    fun `Accepts ad with country Danmark set`() {
+        val ad = AdDTO(
+            published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(country = "Danmark"))
+        )
+
+        transferLogService.validate(ad)
+    }
+
+    @Test
+    fun `Does not accept ad with only country Norge set`() {
+        val ad = AdDTO(
+            published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(country = "Norge"))
+        )
+         val exception = assertThrows<ImportApiError> {
+            transferLogService.validate(ad)
+        }
+        Assertions.assertEquals("Location does not have postal code, or does not have county/municipality", exception.message)
     }
 }
