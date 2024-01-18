@@ -133,6 +133,7 @@ class TransferLogService(
             )
         }
         if (!locationMustHavePostalCodeOrCountyMunicipal(ad) && !isCountryAbroad(ad)) {
+            LOG.info("Avviser stilling da den ikke har postnummer eller fylke/kommune satt (og ikke er utenlandsstilling). Location: ${ad.locationList.firstOrNull()}");
             throw ImportApiError(
                 "Location does not have postal code, or does not have county/municipality",
                 ErrorType.INVALID_VALUE
