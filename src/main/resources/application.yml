@@ -95,6 +95,12 @@ pulsevent:
   kafka:
     enabled: true
     topic: teampam.puls-intern-2
+adoutbox:
+  kafka:
+    enabled: true
+    topic: ${ANNONSEMOTTAK_TOPIC:`teampam.annonsemottak-1`}
+  scheduler:
+    enabled: true
 adminstatussync:
   kafka:
     enabled: true
