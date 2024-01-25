@@ -19,4 +19,14 @@ class AdOutboxKafkaProducer(
         adOutboxProducer.send(ProducerRecord(topic, uuid, adOutbox)).get()
 
     fun unhealthy() = kafkaStateRegistry.setProducerToError("ad-outbox-producer")
+
+    data class AnnonsemottakKafkaPayload(
+        val stillingId: String,
+        val payload: String?,
+        val meldingstype: Meldingstype
+    )
+
+    enum class Meldingstype {
+        IMPORT_API, ANNONSEMOTTAK
+    }
 }
