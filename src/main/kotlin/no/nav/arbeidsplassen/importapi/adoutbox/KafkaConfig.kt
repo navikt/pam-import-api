@@ -1,5 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
+import io.micronaut.context.annotation.Value
+import jakarta.inject.Singleton
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -9,35 +11,44 @@ import org.apache.kafka.common.serialization.StringSerializer
 import java.net.InetAddress
 import java.util.*
 
-open class KafkaConfig {
-    private val env = System.getenv()
-
-    open fun kafkaProducer() : KafkaProducer<String, String?> {
+@Singleton
+open class KafkaConfig(
+    @Value("\${kafka.brokers}") private val brokers: String,
+    @Value("\${kafka.credstorepass}") private val credstorePassword: String?,
+    @Value("\${kafka.truststorepath}") private val truststorePath: String?,
+    @Value("\${kafka.keystorepath}") private val keystorePath: String?,
+    @Value("\${appname}") private val appName: String?,
+){
+    open fun kafkaProducer() : KafkaProducer<String, ByteArray?> {
         return KafkaProducer(kafkaProducerProperties())
     }
 
-    private fun generateInstanceId(): String {
-        if (env.containsKey("NAIS_APP_NAME")) return env["NAIS_APP_NAME"] + ":" + InetAddress.getLocalHost().hostName
-        return UUID.randomUUID().toString()
-    }
+    private fun generateInstanceId(): String =
+        appName?.let { "$it:${InetAddress.getLocalHost().hostName}" } ?: UUID.randomUUID().toString()
+
 
     private fun kafkaProducerProperties(): Map<String, Any> {
         val clientId = generateInstanceId()
 
         val props = mutableMapOf<String, Any>()
-        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]!!
+        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = brokers
 
-        if (!env["KAFKA_CREDSTORE_PASSWORD"].isNullOrBlank()) {
-            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
+        if (!credstorePassword.isNullOrBlank()) {
+            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = credstorePassword
+            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = credstorePassword
+            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = credstorePassword
             props[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
             props[SslConfigs.SSL_KEYSTORE_TYPE_CONFIG] = "PKCS12"
         }
 
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_KEYSTORE_PATH"]?.let { props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL" }
+        if (!truststorePath.isNullOrBlank()) {
+            props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = truststorePath
+            props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL"
+        }
+
+        if (!keystorePath.isNullOrBlank()) {
+            props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = keystorePath
+        }
 
         props[ProducerConfig.CLIENT_ID_CONFIG] = clientId
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = ByteArraySerializer::class.java.name

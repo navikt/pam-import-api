@@ -51,7 +51,7 @@ class AdOutboxService(
         uprossesserteMeldinger.forEach { adOutbox ->
             try {
                 val melding = AnnonsemottakKafkaPayload(adOutbox.uuid, adOutbox.payload, IMPORT_API)
-                adOutboxKafkaProducer.sendAndGet(adOutbox.uuid, objectMapper.writeValueAsString(melding))
+                adOutboxKafkaProducer.sendAndGet(adOutbox.uuid, objectMapper.writeValueAsBytes(melding))
                 markerSomProsesert(adOutbox)
             } catch (e: KafkaException) {
                 LOG.warn("Feil ved prosessering av adOutbox med id ${adOutbox.id} - Stilling ${adOutbox.uuid} - $e")

@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.adoutbox
 import io.micronaut.configuration.kafka.annotation.KafkaClient
 import io.micronaut.context.annotation.Value
 import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.exception.KafkaStateRegistry
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -11,11 +12,11 @@ import org.apache.kafka.clients.producer.RecordMetadata
 
 @Singleton
 class AdOutboxKafkaProducer(
-    @KafkaClient("ad-outbox-producer") private val adOutboxProducer: KafkaProducer<String, String?>,
+    @KafkaClient("ad-outbox-producer") private val adOutboxProducer: KafkaProducer<String, ByteArray?>,
     @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}") private val topic: String,
     private val kafkaStateRegistry: KafkaStateRegistry
 ) {
-    fun sendAndGet(uuid: String, adOutbox: String): RecordMetadata =
+    fun sendAndGet(uuid: String, adOutbox: ByteArray): RecordMetadata =
         adOutboxProducer.send(ProducerRecord(topic, uuid, adOutbox)).get()
 
     fun unhealthy() = kafkaStateRegistry.setProducerToError("ad-outbox-producer")

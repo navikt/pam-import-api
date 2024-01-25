@@ -21,5 +21,5 @@ class MicronautConfig {
     }
 
     @Singleton
-    fun adOutboxProducer(): KafkaProducer<String, String?> = KafkaConfig().kafkaProducer()
+    fun adOutboxProducer(kafkaConfig: KafkaConfig): KafkaProducer<String, ByteArray?> = kafkaConfig.kafkaProducer()
 }
