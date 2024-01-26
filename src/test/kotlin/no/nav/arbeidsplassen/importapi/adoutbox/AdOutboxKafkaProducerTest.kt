@@ -14,9 +14,9 @@ class AdOutboxKafkaProducerTest {
     fun `AdOutboxKafkaProducer starter og klarer å produsere melding`() {
         KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
             container.start()
-            val config: Map<String, Any> = Collections.singletonMap(
-                "kafka.brokers",
-                container.getBootstrapServers()
+            val config: Map<String, Any> = mapOf(
+                "kafka.brokers" to container.getBootstrapServers(),
+                "adoutbox.kafka.enabled" to "true"
             )
 
             ApplicationContext.run(config).use { ctx ->

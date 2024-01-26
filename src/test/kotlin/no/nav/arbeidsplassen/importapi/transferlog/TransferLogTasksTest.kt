@@ -3,26 +3,27 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
-import no.nav.arbeidsplassen.importapi.dao.*
+import no.nav.arbeidsplassen.importapi.dao.newTestProvider
+import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.ontologi.EscoDTO
-import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
-import no.nav.arbeidsplassen.importapi.toMD5Hex
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import org.junit.jupiter.api.Assertions.*
+import no.nav.arbeidsplassen.importapi.toMD5Hex
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import java.time.LocalDateTime
 
 @MicronautTest
-class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
-                           private val transferLogRepository: TransferLogRepository,
-                           private val providerRepository: ProviderRepository,
-                           private val objectMapper: ObjectMapper,
-                           private val adStateRepository: AdStateRepository) {
-
+class TransferLogTasksTest(
+    private val transferLogTasks: TransferLogTasks,
+    private val transferLogRepository: TransferLogRepository,
+    private val providerRepository: ProviderRepository,
+    private val objectMapper: ObjectMapper,
+    private val adStateRepository: AdStateRepository,
+    private val adOutboxRepository: AdOutboxRepository
+) {
     @Test
     fun doTransferLogTaskTest() {
         val payload = objectMapper.transferJsonString()
@@ -34,6 +35,8 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
         assertEquals(2, adstates.count())
         val transferLog = transferLogRepository.findByStatus(TransferLogStatus.DONE, Pageable.from(0))
         assertEquals(1, transferLog.count())
+        val adOutbox = adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0)
+        assertEquals(2, adOutbox.size)
     }
 
     @Test

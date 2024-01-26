@@ -6,5 +6,6 @@
   "cloudsql_tier": "db-custom-1-3840",
   "pulsevent_kafka_topic": "teampam.pam-puls-intern-2",
   "pulsevent_kafka_enabled": "true",
-  "annonsemottak_topic": "teampam.annonsemottak-1"
+  "annonsemottak_topic": "teampam.annonsemottak-1",
+  "ad_outbox_kafka_enabled": "true"
 }

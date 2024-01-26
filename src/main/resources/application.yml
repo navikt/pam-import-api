@@ -97,7 +97,7 @@ pulsevent:
     topic: teampam.puls-intern-2
 adoutbox:
   kafka:
-    enabled: true
+    enabled: ${AD_OUTBOX_KAFKA_ENABLED:false}
     topic: ${ANNONSEMOTTAK_TOPIC:`teampam.annonsemottak-1`}
   scheduler:
     enabled: true

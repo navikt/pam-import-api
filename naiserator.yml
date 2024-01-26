@@ -54,6 +54,8 @@ spec:
       value: "{{ pulsevent_kafka_enabled }}"
     - name: ANNONSEMOTTAK_TOPIC
       value: "{{ annonsemottak_topic }}"
+    - name: AD_OUTBOX_KAFKA_ENABLED
+      value: "{{ annonsemottak_topic }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling

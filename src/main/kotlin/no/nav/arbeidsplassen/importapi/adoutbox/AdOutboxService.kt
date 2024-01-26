@@ -33,14 +33,13 @@ class AdOutboxService(
     }
 
     fun markerSomFeilet(adOutbox: AdOutbox): AdOutbox {
-        val newValue = if (!adOutbox.harFeilet) adOutbox.copy(harFeilet = true)
-        else adOutbox.copy(antallForsøk = adOutbox.antallForsøk + 1, sisteForsøkDato = LocalDateTime.now())
-
+        val newValue = adOutbox.copy(harFeilet = true, antallForsøk = adOutbox.antallForsøk + 1, sisteForsøkDato = LocalDateTime.now())
         adOutboxRepository.markerSomFeilet(newValue)
         return newValue
     }
 
-    fun hentUprosesserteMeldinger(): List<AdOutbox> = adOutboxRepository.hentUprosesserteMeldinger()
+    fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> =
+        adOutboxRepository.hentUprosesserteMeldinger(batchSize, outboxDelay)
 
     fun prosesserAdOutboxMeldinger() {
         val uprossesserteMeldinger = hentUprosesserteMeldinger()

@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<AdOutbox, Long> {
-    private fun ResultSet.toAdOutbox() = AdOutbox(
+    fun ResultSet.toAdOutbox() = AdOutbox(
         id = this.getLong("id"),
         uuid = this.getString("uuid"),
         payload = this.getString("payload"),
@@ -45,7 +45,7 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
         val sql = """
             SELECT id, uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato 
             FROM ad_outbox
-            WHERE prossesert_dato is null AND opprettet_dato <= ?
+            WHERE prosessert_dato is null AND opprettet_dato <= ?
             ORDER BY opprettet_dato ASC
             LIMIT ?
         """.trimIndent()
