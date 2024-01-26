@@ -100,7 +100,7 @@ adoutbox:
     enabled: ${AD_OUTBOX_KAFKA_ENABLED:false}
     topic: ${ANNONSEMOTTAK_TOPIC:`teampam.annonsemottak-1`}
   scheduler:
-    enabled: true
+    enabled: ${AD_OUTBOX_SCHEDULER_ENABLED:false}
 adminstatussync:
   kafka:
     enabled: true

@@ -56,6 +56,8 @@ spec:
       value: "{{ annonsemottak_topic }}"
     - name: AD_OUTBOX_KAFKA_ENABLED
       value: "{{ annonsemottak_topic }}"
+    - name: AD_OUTBOX_SCHEDULER_ENABLED
+      value: "{{ ad_outbox_scheduler_enabled }}"
   gcp:
     sqlInstances:
       - name: import-api-stilling
