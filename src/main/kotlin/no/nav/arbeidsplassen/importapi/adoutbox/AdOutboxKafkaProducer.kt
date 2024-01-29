@@ -11,7 +11,7 @@ import org.apache.kafka.common.header.internals.RecordHeader
 
 @Singleton
 open class AdOutboxKafkaProducer(
-    @KafkaClient("ad-outbox-producer") private val adOutboxProducer: KafkaProducer<String, ByteArray?>,
+    @KafkaClient("adOutboxProducer") private val adOutboxProducer: KafkaProducer<String, ByteArray?>,
     @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}") private val topic: String,
     private val kafkaStateRegistry: KafkaStateRegistry
 ) {
@@ -20,7 +20,7 @@ open class AdOutboxKafkaProducer(
     open fun sendAndGet(uuid: String, payload: ByteArray, meldingstype: Meldingstype): RecordMetadata =
         adOutboxProducer.send(ProducerRecord(topic, null, uuid, payload, headers)).get()
 
-    fun unhealthy() = kafkaStateRegistry.setProducerToError("ad-outbox-producer")
+    fun unhealthy() = kafkaStateRegistry.setProducerToError("adOutboxProducer")
 
     enum class Meldingstype {
         IMPORT_API, ANNONSEMOTTAK

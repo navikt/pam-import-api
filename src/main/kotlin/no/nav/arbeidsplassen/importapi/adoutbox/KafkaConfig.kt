@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import io.micronaut.context.annotation.Requires
 import io.micronaut.context.annotation.Value
 import jakarta.inject.Singleton
 import org.apache.kafka.clients.CommonClientConfigs
@@ -13,7 +12,6 @@ import java.net.InetAddress
 import java.util.*
 
 @Singleton
-@Requires(property = "adoutbox.kafka.enabled", value="true")
 open class KafkaConfig(
     @Value("\${kafka.brokers}") private val brokers: String,
     @Value("\${kafka.credstorepass}") private val credstorePassword: String?,
