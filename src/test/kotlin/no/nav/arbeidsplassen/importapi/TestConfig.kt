@@ -40,7 +40,7 @@ class TestConfig {
     @Singleton
     @Requires(property = "adoutbox.kafka.enabled", value = "false")
     class AdOutboxKafkaProducerMock(kafkaStateRegistry: KafkaStateRegistry) : AdOutboxKafkaProducer(mock { Mockito.mock(KafkaProducer::class.java) }, "test", kafkaStateRegistry) {
-        override fun sendAndGet(uuid: String, adOutbox: ByteArray): RecordMetadata =
+        override fun sendAndGet(uuid: String, payload: ByteArray, meldingstype: Meldingstype): RecordMetadata =
             RecordMetadata(TopicPartition("test", 0), 0, 0, 0, 0, 0, 0)
     }
 }

@@ -7,7 +7,7 @@ import no.nav.arbeidsplassen.importapi.exception.KafkaStateRegistry
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
-
+import org.apache.kafka.common.header.internals.RecordHeader
 
 @Singleton
 open class AdOutboxKafkaProducer(
@@ -15,16 +15,12 @@ open class AdOutboxKafkaProducer(
     @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}") private val topic: String,
     private val kafkaStateRegistry: KafkaStateRegistry
 ) {
-    open fun sendAndGet(uuid: String, adOutbox: ByteArray): RecordMetadata =
-        adOutboxProducer.send(ProducerRecord(topic, uuid, adOutbox)).get()
+    private val headers = listOf(RecordHeader("@meldingstype", Meldingstype.IMPORT_API.name.toByteArray()))
+
+    open fun sendAndGet(uuid: String, payload: ByteArray, meldingstype: Meldingstype): RecordMetadata =
+        adOutboxProducer.send(ProducerRecord(topic, null, uuid, payload, headers)).get()
 
     fun unhealthy() = kafkaStateRegistry.setProducerToError("ad-outbox-producer")
-
-    data class AnnonsemottakKafkaPayload(
-        val stillingId: String,
-        val payload: String?,
-        val meldingstype: Meldingstype
-    )
 
     enum class Meldingstype {
         IMPORT_API, ANNONSEMOTTAK

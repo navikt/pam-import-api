@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
 import io.micronaut.context.ApplicationContext
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxKafkaProducer.Meldingstype.IMPORT_API
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -21,8 +22,7 @@ class AdOutboxKafkaProducerTest {
 
             ApplicationContext.run(config).use { ctx ->
                 val producer: AdOutboxKafkaProducer = ctx.getBean(AdOutboxKafkaProducer::class.java)
-                val recordMetadata = producer.sendAndGet(UUID.randomUUID().toString(), "hallo :)".toByteArray())
-                recordMetadata.serializedValueSize()
+                val recordMetadata = producer.sendAndGet(UUID.randomUUID().toString(), "hallo :)".toByteArray(), IMPORT_API)
 
                 assertEquals("hallo :)".toByteArray().size, recordMetadata.serializedValueSize())
             }
