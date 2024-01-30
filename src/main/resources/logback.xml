@@ -5,5 +5,4 @@
     <root level="info">
         <appender-ref ref="stdout_json"/>
     </root>
-    <logger name="io.micronaut.context.condition" level="TRACE"/>
 </configuration>
