@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxKafkaProducer.Meldingstype.IMPORT_API
 import no.nav.arbeidsplassen.importapi.adstate.AdState
+import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import org.apache.kafka.common.KafkaException
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
@@ -12,6 +13,7 @@ import java.time.LocalDateTime
 class AdOutboxService(
     private val adOutboxKafkaProducer: AdOutboxKafkaProducer,
     private val adOutboxRepository: AdOutboxRepository,
+    private val adStateService: AdStateService,
     private val objectMapper: ObjectMapper
 ) {
     companion object {
@@ -19,10 +21,10 @@ class AdOutboxService(
     }
 
     fun lagreTilOutbox(adState: AdState) =
-        adOutboxRepository.lagre(AdOutbox(uuid = adState.uuid, payload = objectMapper.writeValueAsString(adState)))
+        adOutboxRepository.lagre(AdOutbox(uuid = adState.uuid, payload = objectMapper.writeValueAsString(adStateService.convertToInternalDto(adState))))
 
     fun lagreFlereTilOutbox(adStates: Iterable<AdState>) = adStates
-        .map { AdOutbox(uuid = it.uuid, payload = objectMapper.writeValueAsString(it)) }
+        .map { AdOutbox(uuid = it.uuid, payload = objectMapper.writeValueAsString(adStateService.convertToInternalDto(it))) }
         .let { adOutboxRepository.lagreFlere(it) }
 
     fun markerSomProsesert(adOutbox: AdOutbox): AdOutbox {

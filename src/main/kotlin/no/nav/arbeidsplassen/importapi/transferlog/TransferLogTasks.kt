@@ -8,20 +8,21 @@ import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import io.micronaut.transaction.annotation.TransactionalEventListener
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.Open
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
-import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.time.LocalDateTime
-import jakarta.inject.Singleton
-import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
+import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Singleton

@@ -3,15 +3,15 @@ package no.nav.arbeidsplassen.importapi.adstate
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
-import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
+import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.provider.info
 import java.time.LocalDateTime
-import jakarta.inject.Singleton
 
 @Singleton
 class AdStateService(private val adStateRepository: AdStateRepository,
@@ -71,6 +71,7 @@ class AdStateService(private val adStateRepository: AdStateRepository,
     private fun AdState.toInternalDTO(): AdStateDTO {
         return AdStateDTO(uuid = uuid, versionId = versionId, reference = reference,
                 ad = objectMapper.readValue(jsonPayload, AdDTO::class.java), updated = updated, created = created, provider = providerService.findById(providerId).info())
-
     }
+
+    fun convertToInternalDto(adState: AdState) = adState.toInternalDTO()
 }
