@@ -78,7 +78,7 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
      * TestConfig inneholder en mock på lokalOntologiGateway og responsen med Styrk og Esco som assertes her
      */
     @Test
-    fun addStyrkAndEscoToCategoryList() {
+    fun addStyrkAndEscoToCategoryGroupList() {
         val janzzKonseptId = 123L
 
         var result = transferLogTasks.sanitizeAd(
@@ -94,12 +94,13 @@ class TransferLogTasksTest(private val transferLogTasks: TransferLogTasks,
             )
         )
 
-        assertEquals(3, result.categoryList.size)
-        assertEquals(janzzKonseptId.toString(), result.categoryList.find{ cat -> cat.categoryType==CategoryType.JANZZ}?.code)
-        assertEquals("Janzzname", result.categoryList.find{ cat -> cat.categoryType==CategoryType.JANZZ}?.name)
-        assertEquals("Spesialsykepleiere", result.categoryList.find{cat -> cat.categoryType==CategoryType.STYRK08}?.name)
-        assertEquals("2221", result.categoryList.find{cat -> cat.categoryType==CategoryType.STYRK08}?.code)
-        assertEquals("escolabelForKonseptId=$janzzKonseptId", result.categoryList.find{cat -> cat.categoryType==CategoryType.ESCO}?.name)
-        assertEquals("escouriForKonseptId=$janzzKonseptId", result.categoryList.find{cat -> cat.categoryType==CategoryType.ESCO}?.code)
+        assertEquals(1, result.categoryGroupList.size)
+        assertEquals(3, result.categoryGroupList[0].categoryList.size)
+        assertEquals(janzzKonseptId.toString(), result.categoryGroupList[0].categoryList.find{ cat -> cat.categoryType==CategoryType.JANZZ}?.code)
+        assertEquals("Janzzname", result.categoryGroupList[0].categoryList.find{ cat -> cat.categoryType==CategoryType.JANZZ}?.name)
+        assertEquals("Spesialsykepleiere", result.categoryGroupList[0].categoryList.find{cat -> cat.categoryType==CategoryType.STYRK08}?.name)
+        assertEquals("2221", result.categoryGroupList[0].categoryList.find{cat -> cat.categoryType==CategoryType.STYRK08}?.code)
+        assertEquals("escolabelForKonseptId=$janzzKonseptId", result.categoryGroupList[0].categoryList.find{cat -> cat.categoryType==CategoryType.ESCO}?.name)
+        assertEquals("escouriForKonseptId=$janzzKonseptId", result.categoryGroupList[0].categoryList.find{cat -> cat.categoryType==CategoryType.ESCO}?.code)
     }
 }

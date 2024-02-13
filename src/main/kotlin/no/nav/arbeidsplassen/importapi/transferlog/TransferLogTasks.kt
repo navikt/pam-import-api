@@ -93,16 +93,18 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             }
         }.toMutableList()
 
-        val categoryList = ad.categoryList.toMutableList()
+        val categoryGroupList = ad.categoryGroupList.toMutableList()
 
         ad.categoryList.forEach { janzzCategory ->
             try {
+                val categoryGroup = CategoryGroupDTO(mutableListOf(janzzCategory))
                 val konseptgruppering: KonseptGrupperingDTO? =
                     lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code.toLong())
                 if (konseptgruppering != null) {
-                    addEscoToCategoriesIfExists(categoryList, konseptgruppering)
-                    addStyrkToCategoriesIfExists(categoryList, konseptgruppering)
+                    addEscoToCategoriesIfExists(categoryGroup, konseptgruppering)
+                    addStyrkToCategoriesIfExists(categoryGroup, konseptgruppering)
                 }
+                categoryGroupList.add(categoryGroup)
             } catch (e: Exception) {
                 LOG.warn("Feilet i kall mot pam-ontologi for reference {}", ad.reference, e)
             }
@@ -113,7 +115,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             employer = ad.employer?.copy(
                 businessName = ad.employer.businessName.replaceAmpersand()
             ),
-            categoryList = categoryList,
+            categoryGroupList = categoryGroupList,
             properties = props.toMap(),
         )
         LOG.info(returnAd.categoryList.toString())
@@ -121,21 +123,20 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     private fun addEscoToCategoriesIfExists(
-        categoryList: MutableList<CategoryDTO>,
+        categoryGroup: CategoryGroupDTO,
         konseptGruppering: KonseptGrupperingDTO
     ){
         konseptGruppering.esco?.let { escoCategory ->
             CategoryDTO(
                 code = escoCategory.uri,
                 categoryType = CategoryType.ESCO,
-                name = escoCategory.label,
-                description = "JANZZ-".plus(konseptGruppering.konseptId)
+                name = escoCategory.label
             )
-        }?.let { categoryList.add(it)}
+        }?.let { categoryGroup.categoryList.add(it)}
     }
 
     private fun addStyrkToCategoriesIfExists(
-        categoryList: MutableList<CategoryDTO>,
+        categoryGroup: CategoryGroupDTO,
         konseptGruppering: KonseptGrupperingDTO
     ){
         konseptGruppering.styrk08SSB.first()?.let { styrkCode ->
@@ -143,11 +144,10 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 CategoryDTO(
                     code = it.styrkCode,
                     categoryType = CategoryType.STYRK08,
-                    name = it.styrkDescription,
-                    description = "JANZZ-".plus(konseptGruppering.konseptId)
+                    name = it.styrkDescription
                 )
             }
-        }?.let { categoryList.add(it)}
+        }?.let { categoryGroup.categoryList.add(it)}
     }
 
     private fun String.replaceAmpersand(): String {

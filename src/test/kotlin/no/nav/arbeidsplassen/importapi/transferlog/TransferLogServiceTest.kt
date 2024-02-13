@@ -46,7 +46,7 @@ class TransferLogServiceTest {
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(postalCode = "0123")),
-            categoryList = listOf(CategoryDTO("0000", CategoryType.JANZZ, "test", "test"))
+            categoryList = listOf(CategoryDTO("0000", CategoryType.JANZZ, "test"))
         )
 
         Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test")).thenReturn(emptyList())
@@ -63,7 +63,7 @@ class TransferLogServiceTest {
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(postalCode = "0123")),
-            categoryList = listOf(CategoryDTO("1234", CategoryType.JANZZ, "test", "test"))
+            categoryList = listOf(CategoryDTO("1234", CategoryType.JANZZ, "test"))
         )
 
         Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test"))
@@ -82,7 +82,7 @@ class TransferLogServiceTest {
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(postalCode = "0123")),
-            categoryList = listOf(CategoryDTO("1234", CategoryType.STYRK08, "test", "test"))
+            categoryList = listOf(CategoryDTO("1234", CategoryType.STYRK08, "test"))
         )
 
         Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test"))
@@ -100,7 +100,7 @@ class TransferLogServiceTest {
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(postalCode = "0123")),
-            categoryList = listOf(CategoryDTO("1234", CategoryType.PYRK20, "test", "test"))
+            categoryList = listOf(CategoryDTO("1234", CategoryType.PYRK20, "test"))
         )
 
         Mockito.`when`(ontologiGateway.hentTypeaheadStilling("test"))
