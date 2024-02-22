@@ -65,6 +65,7 @@ dependencies {
     implementation("io.micronaut.rxjava2:micronaut-rxjava2")
     implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
     testImplementation("org.testcontainers:postgresql:${tcVersion}")
+    testImplementation("org.testcontainers:kafka:${tcVersion}")
     testImplementation "io.micronaut.test:micronaut-test-junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
     testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpserverVersion")

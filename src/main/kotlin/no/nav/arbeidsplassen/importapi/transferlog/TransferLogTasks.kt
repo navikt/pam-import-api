@@ -8,19 +8,21 @@ import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import io.micronaut.transaction.annotation.TransactionalEventListener
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.Open
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
-import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.time.LocalDateTime
-import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
+import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Singleton
@@ -33,6 +35,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val eventPublisher: ApplicationEventPublisher<AdStateEvent>,
                        private val styrkCodeConverter : StyrkCodeConverter,
                        private val lokalOntologiGateway : LokalOntologiGateway,
+                       private val adOutboxService: AdOutboxService,
                        @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
@@ -64,6 +67,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
             meterRegistry.counter("ads_received", "provider", it.providerId.toString()).increment(adList.size.toDouble())
             eventPublisher.publishEvent(AdStateEvent(savedList, it.providerId))
+            adOutboxService.lagreFlereTilOutbox(savedList)
         } catch (e: Exception) {
             LOG.error("Got exception while handling transfer log ${it.id}", e)
             transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))

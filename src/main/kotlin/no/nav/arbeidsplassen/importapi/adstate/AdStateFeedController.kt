@@ -17,7 +17,8 @@ class AdStateFeedController(private val adStateService: AdStateService, private 
 
     @Get("/")
     fun getAdStates(@QueryValue updated: String, pageable: Pageable): Slice<AdStateDTO> {
-        return adStateService.getAdStatesByUpdatedForInternalUse(LocalDateTime.parse(updated), pageable)
+        return Slice.of(emptyList(), pageable)
+        // return adStateService.getAdStatesByUpdatedForInternalUse(LocalDateTime.parse(updated), pageable) TODO: Legg tilbake denne når alt er på plass?
     }
 
 }

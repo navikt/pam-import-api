@@ -19,6 +19,10 @@ class KafkaStateRegistry {
         stateRegistry[consumer] = KafkaState.RUNNING
     }
 
+    fun setProducerToError(producer: String) {
+        stateRegistry[producer] = KafkaState.ERROR
+    }
+
     fun hasError(): Boolean {
        return (stateRegistry.isNotEmpty() && stateRegistry.values.contains(KafkaState.ERROR))
     }
