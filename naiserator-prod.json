@@ -8,5 +8,5 @@
   "pulsevent_kafka_enabled": "true",
   "annonsemottak_topic": "teampam.annonsemottak-v1",
   "ad_outbox_scheduler_enabled": "true",
-  "ad_outbox_kafka_enabled": "false"
+  "ad_outbox_kafka_enabled": "true"
 }
