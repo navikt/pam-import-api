@@ -1,19 +1,20 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
-import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
+import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
-import java.util.stream.Collectors
-import kotlin.streams.toList
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+
 
 @Singleton
 class TransferLogService(
@@ -64,15 +65,20 @@ class TransferLogService(
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO): AdDTO {
-        if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
-            && ad.expires == null
-        ) {
-            val newExpiryDate = ad.published?.plusDays(10)
-            return ad.copy(expires = newExpiryDate)
-        } else {
-            return ad
+    fun handleInvalidExpiryAndStarttimeCombinations(ad: AdDTO) : AdDTO {
+        val format = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        try {
+            if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
+                && ad.expires == null) {
+                val newExpiryDate = ad.published?.plusDays(10)
+                return ad.copy(expires = newExpiryDate)
+            } else if (LocalDateTime.parse(ad.properties[PropertyNames.applicationdue], format).isBefore(ad.expires)) {
+                return ad.copy(expires = LocalDateTime.parse(ad.properties[PropertyNames.applicationdue], format))
+            }
+        } catch (e : DateTimeParseException) {
+           LOG.debug("Parser error, returning original ad.")
         }
+        return ad
     }
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */

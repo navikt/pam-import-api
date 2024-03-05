@@ -24,7 +24,7 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, publishedDate.plusDays(10))
+            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, publishedDate.plusDays(10))
     }
 
     @Test
@@ -37,7 +37,7 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, null)
+            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, null)
     }
 
     @Test
@@ -50,7 +50,7 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Dersom expire har en verdi skal expire bestå urørt",
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad).expires, expiredate)
+            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, expiredate)
     }
 
 
