@@ -118,7 +118,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             categoryGroupList = categoryGroupList,
             properties = props.toMap(),
         )
-        LOG.info(returnAd.categoryList.toString())
         return returnAd
     }
 
