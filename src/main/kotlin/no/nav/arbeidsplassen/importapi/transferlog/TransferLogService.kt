@@ -11,7 +11,7 @@ import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
@@ -66,14 +66,14 @@ class TransferLogService(
     }
 
     fun handleInvalidExpiryAndStarttimeCombinations(ad: AdDTO) : AdDTO {
-        val format = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         try {
             if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
                 && ad.expires == null) {
                 val newExpiryDate = ad.published?.plusDays(10)
                 return ad.copy(expires = newExpiryDate)
-            } else if (LocalDateTime.parse(ad.properties[PropertyNames.applicationdue], format).isBefore(ad.expires)) {
-                return ad.copy(expires = LocalDateTime.parse(ad.properties[PropertyNames.applicationdue], format))
+            } else if (ad.expires?.isAfter(LocalDate.parse(ad.properties[PropertyNames.applicationdue], format).atStartOfDay()) == true) {
+                return ad.copy(expires = LocalDate.parse(ad.properties[PropertyNames.applicationdue], format).atStartOfDay())
             }
         } catch (e : DateTimeParseException) {
            LOG.debug("Parser error, returning original ad.")

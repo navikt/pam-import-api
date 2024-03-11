@@ -7,7 +7,10 @@ import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -53,5 +56,18 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
             transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, expiredate)
     }
 
-
+    @Test
+    fun `test expiry date is set to later than application due`() {
+        val nextYear = LocalDate.now().year.plus(1)
+        val applicationdue = "24.03.".plus(nextYear)
+        val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to applicationdue)
+        val expiryDateLaterThanApplicationDue = LocalDateTime.of(LocalDate.of(nextYear, 3, 30), LocalTime.now())
+        val ad = AdDTO(published = LocalDateTime.now(), properties = propertiesAd, expires = expiryDateLaterThanApplicationDue,
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
+                LocationDTO(postalCode = "0123")))
+        assertEquals("Dersom expirydate er lengre enn søknadsfrist, skal den settes til søknadsfrist",
+            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires?.toLocalDate(),
+            LocalDate.parse(applicationdue, DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+    }
 }
