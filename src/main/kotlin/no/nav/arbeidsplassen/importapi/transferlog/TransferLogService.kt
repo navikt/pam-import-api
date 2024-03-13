@@ -67,36 +67,36 @@ class TransferLogService(
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun handleExpiryAndStarttimeCombinations(ad: AdDTO) : AdDTO {
-        try {
-            if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
-                && ad.expires == null) {
-                val newExpiryDate = ad.published?.plusDays(10)
-                return ad.copy(expires = newExpiryDate)
+    fun handleExpiryAndStarttimeCombinations(ad: AdDTO): AdDTO {
+        if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
+            && ad.expires == null
+        ) {
+            val newExpiryDate = ad.published?.plusDays(10)
+            return ad.copy(expires = newExpiryDate)
+        }
+        parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()?.run {
+            if (ad.expires != null && this.isBefore(ad.expires)) {
+                return ad.copy(expires = this)
             }
-            parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()?.run {
-                if (ad.expires != null && this.isBefore(ad.expires)) {
-                    return ad.copy(expires = this)
-                }
-            }
-
-        } catch (e : DateTimeParseException) {
-           LOG.debug("Parser error, returning original ad.")
         }
         return ad
     }
 
 
-    private fun parseApplicationDueDate(applicationDue : String?) : LocalDate? {
+    private fun parseApplicationDueDate(applicationDue: String?): LocalDate? {
         val dateTimeFormatterBuilder = DateTimeFormatterBuilder()
-            .append(DateTimeFormatter.ofPattern("[yyyy-MM-dd'T'HH:mm:ss]"
-                    + "[yyyy-MM-dd'T'HH:mm]"
-                    + "[dd.MM.yyyy]"))
+            .append(
+                DateTimeFormatter.ofPattern(
+                    "[yyyy-MM-dd'T'HH:mm:ss]"
+                            + "[yyyy-MM-dd'T'HH:mm]"
+                            + "[dd.MM.yyyy]"
+                )
+            )
 
         val dateTimeFormatter = dateTimeFormatterBuilder.toFormatter()
         return try {
             LocalDate.parse(applicationDue, dateTimeFormatter)
-        } catch (e : DateTimeParseException) {
+        } catch (e: DateTimeParseException) {
             null
         }
     }
@@ -121,8 +121,16 @@ class TransferLogService(
                             val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
                             typeaheads
                                 .any { typeahead ->
-                                    LOG.info("Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name, janzztittel, typeahead.code.toString(), cat.code)
-                                    (janzztittel.equals(typeahead.name, ignoreCase=true)) && (typeahead.code.toString() == cat.code)
+                                    LOG.info(
+                                        "Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name,
+                                        janzztittel,
+                                        typeahead.code.toString(),
+                                        cat.code
+                                    )
+                                    (janzztittel.equals(
+                                        typeahead.name,
+                                        ignoreCase = true
+                                    )) && (typeahead.code.toString() == cat.code)
                                 }
                         } catch (e: Exception) {
                             LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)
