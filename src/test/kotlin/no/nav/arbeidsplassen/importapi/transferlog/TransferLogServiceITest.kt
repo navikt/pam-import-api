@@ -6,6 +6,7 @@ import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,7 +28,7 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Expire skal settes 10 dager fra published dersom den er null og applicationdue er Snarest",
-            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, publishedDate.plusDays(10))
+            transferLogService.handleExpiryAndStarttimeCombinations(ad).expires, publishedDate.plusDays(10))
     }
 
     @Test
@@ -40,7 +41,7 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Dersom applicationdue er en dato skal expire bestå urørt",
-            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, null)
+            transferLogService.handleExpiryAndStarttimeCombinations(ad).expires, null)
     }
 
     @Test
@@ -53,11 +54,11 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
                 LocationDTO(postalCode = "0123")))
 
         assertEquals("Dersom expire har en verdi skal expire bestå urørt",
-            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires, expiredate)
+            transferLogService.handleExpiryAndStarttimeCombinations(ad).expires, expiredate)
     }
 
     @Test
-    fun `test expiry date is set to later than application due`() {
+    fun `test expiry localdate string is set to later than application due`() {
         val nextYear = LocalDate.now().year.plus(1)
         val applicationdue = "24.03.".plus(nextYear)
         val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to applicationdue)
@@ -67,7 +68,34 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
             reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
                 LocationDTO(postalCode = "0123")))
         assertEquals("Dersom expirydate er lengre enn søknadsfrist, skal den settes til søknadsfrist",
-            transferLogService.handleInvalidExpiryAndStarttimeCombinations(ad).expires?.toLocalDate(),
+            transferLogService.handleExpiryAndStarttimeCombinations(ad).expires?.toLocalDate(),
             LocalDate.parse(applicationdue, DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+    }
+
+    @Test
+    fun `yo test expiry localdatetime string is set to later than application due`() {
+        val nextYear = LocalDate.now().year.plus(1)
+        val applicationdue = nextYear.toString().plus("-03-24T00:00:00")
+        val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to applicationdue)
+        val expiryDateLaterThanApplicationDue = LocalDateTime.of(LocalDate.of(nextYear, 3, 30), LocalTime.now())
+        println("TEST SE HER")
+        println(expiryDateLaterThanApplicationDue)
+        val ad = AdDTO(published = LocalDateTime.now(), properties = propertiesAd, expires = expiryDateLaterThanApplicationDue,
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
+                LocationDTO(postalCode = "0123")))
+        assertEquals("Dersom expirydate er lengre enn søknadsfrist, skal den settes til søknadsfrist",
+            transferLogService.handleExpiryAndStarttimeCombinations(ad).expires?.toLocalDate(),
+            LocalDate.parse(applicationdue, DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+    }
+
+    @Test
+    fun `teeeest`() {
+        val nextYear = LocalDate.now().year.plus(1)
+        val applicationdue = nextYear.toString().plus("-03-24T00:00:00")
+        println((transferLogService.parseApplicationDueDate("2024-03-24T00:00")))
+        println((transferLogService.parseApplicationDueDate("01.01.2024")))
+        println(transferLogService.parseApplicationDueDate(applicationdue))
+        assertTrue(true)
     }
 }

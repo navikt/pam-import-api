@@ -12,7 +12,9 @@ import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 
 
@@ -65,20 +67,38 @@ class TransferLogService(
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun handleInvalidExpiryAndStarttimeCombinations(ad: AdDTO) : AdDTO {
-        val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    fun handleExpiryAndStarttimeCombinations(ad: AdDTO) : AdDTO {
         try {
             if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
                 && ad.expires == null) {
                 val newExpiryDate = ad.published?.plusDays(10)
                 return ad.copy(expires = newExpiryDate)
-            } else if (ad.expires?.isAfter(LocalDate.parse(ad.properties[PropertyNames.applicationdue], format).atStartOfDay()) == true) {
-                return ad.copy(expires = LocalDate.parse(ad.properties[PropertyNames.applicationdue], format).atStartOfDay())
             }
+            parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()?.run {
+                if (ad.expires != null && this.isBefore(ad.expires)) {
+                    return ad.copy(expires = this)
+                }
+            }
+
         } catch (e : DateTimeParseException) {
            LOG.debug("Parser error, returning original ad.")
         }
         return ad
+    }
+
+
+    fun parseApplicationDueDate(applicationDue : String?) : LocalDate? {
+        val dateTimeFormatterBuilder = DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ofPattern("[yyyy-MM-dd'T'HH:mm:ss]"
+                    + "[yyyy-MM-dd'T'HH:mm]"
+                    + "[dd.MM.yyyy]"))
+
+        val dateTimeFormatter = dateTimeFormatterBuilder.toFormatter()
+        return try {
+            LocalDate.parse(applicationDue, dateTimeFormatter)
+        } catch (e : DateTimeParseException) {
+            null
+        }
     }
 
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
