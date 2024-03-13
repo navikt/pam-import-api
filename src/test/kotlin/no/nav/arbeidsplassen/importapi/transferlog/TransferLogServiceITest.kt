@@ -73,13 +73,11 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
     }
 
     @Test
-    fun `yo test expiry localdatetime string is set to later than application due`() {
+    fun `test expiry localdatetime string is set to later than application due`() {
         val nextYear = LocalDate.now().year.plus(1)
         val applicationdue = nextYear.toString().plus("-03-24T00:00:00")
         val propertiesAd: HashMap<PropertyNames, String> = hashMapOf(PropertyNames.applicationdue to applicationdue)
         val expiryDateLaterThanApplicationDue = LocalDateTime.of(LocalDate.of(nextYear, 3, 30), LocalTime.now())
-        println("TEST SE HER")
-        println(expiryDateLaterThanApplicationDue)
         val ad = AdDTO(published = LocalDateTime.now(), properties = propertiesAd, expires = expiryDateLaterThanApplicationDue,
             adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
             reference = UUID.randomUUID().toString(), title = "title", locationList = listOf(
@@ -87,15 +85,5 @@ class TransferLogServiceITest(private val transferLogService: TransferLogService
         assertEquals("Dersom expirydate er lengre enn søknadsfrist, skal den settes til søknadsfrist",
             transferLogService.handleExpiryAndStarttimeCombinations(ad).expires?.toLocalDate(),
             LocalDate.parse(applicationdue, DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-    }
-
-    @Test
-    fun `teeeest`() {
-        val nextYear = LocalDate.now().year.plus(1)
-        val applicationdue = nextYear.toString().plus("-03-24T00:00:00")
-        println((transferLogService.parseApplicationDueDate("2024-03-24T00:00")))
-        println((transferLogService.parseApplicationDueDate("01.01.2024")))
-        println(transferLogService.parseApplicationDueDate(applicationdue))
-        assertTrue(true)
     }
 }

@@ -87,7 +87,7 @@ class TransferLogService(
     }
 
 
-    fun parseApplicationDueDate(applicationDue : String?) : LocalDate? {
+    private fun parseApplicationDueDate(applicationDue : String?) : LocalDate? {
         val dateTimeFormatterBuilder = DateTimeFormatterBuilder()
             .append(DateTimeFormatter.ofPattern("[yyyy-MM-dd'T'HH:mm:ss]"
                     + "[yyyy-MM-dd'T'HH:mm]"
