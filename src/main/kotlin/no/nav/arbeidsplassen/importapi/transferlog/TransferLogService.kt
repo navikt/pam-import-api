@@ -74,10 +74,10 @@ class TransferLogService(
             val newExpiryDate = ad.published?.plusDays(10)
             return ad.copy(expires = newExpiryDate)
         }
-        parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()?.run {
-            if (ad.expires != null && this.isBefore(ad.expires)) {
-                return ad.copy(expires = this)
-            }
+
+        val dueDate = parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()
+        if (dueDate != null && ad.expires != null && dueDate.isBefore(ad.expires)) {
+            return ad.copy(expires = dueDate)
         }
         return ad
     }
