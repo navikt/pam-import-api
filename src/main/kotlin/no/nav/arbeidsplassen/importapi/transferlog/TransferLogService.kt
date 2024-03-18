@@ -1,19 +1,22 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
-import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
+import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
+import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
-import java.util.stream.Collectors
-import kotlin.streams.toList
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
+
 
 @Singleton
 class TransferLogService(
@@ -64,14 +67,37 @@ class TransferLogService(
         return transferLogRepository.save(received).toDTO()
     }
 
-    fun updateExpiresIfNullAndStarttimeSnarest(ad: AdDTO): AdDTO {
+    fun handleExpiryAndStarttimeCombinations(ad: AdDTO): AdDTO {
         if ("SNAREST" == ad.properties[PropertyNames.applicationdue]?.uppercase()
             && ad.expires == null
         ) {
             val newExpiryDate = ad.published?.plusDays(10)
             return ad.copy(expires = newExpiryDate)
-        } else {
-            return ad
+        }
+
+        val dueDate = parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()
+        if (dueDate != null && ad.expires != null && dueDate.isBefore(ad.expires)) {
+            return ad.copy(expires = dueDate)
+        }
+        return ad
+    }
+
+
+    private fun parseApplicationDueDate(applicationDue: String?): LocalDate? {
+        val dateTimeFormatterBuilder = DateTimeFormatterBuilder()
+            .append(
+                DateTimeFormatter.ofPattern(
+                    "[yyyy-MM-dd'T'HH:mm:ss]"
+                            + "[yyyy-MM-dd'T'HH:mm]"
+                            + "[dd.MM.yyyy]"
+                )
+            )
+
+        val dateTimeFormatter = dateTimeFormatterBuilder.toFormatter()
+        return try {
+            LocalDate.parse(applicationDue, dateTimeFormatter)
+        } catch (e: DateTimeParseException) {
+            null
         }
     }
 
@@ -95,8 +121,16 @@ class TransferLogService(
                             val typeaheads = ontologiGateway.hentTypeaheadStilling(janzztittel)
                             typeaheads
                                 .any { typeahead ->
-                                    LOG.info("Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name, janzztittel, typeahead.code.toString(), cat.code)
-                                    (janzztittel.equals(typeahead.name, ignoreCase=true)) && (typeahead.code.toString() == cat.code)
+                                    LOG.info(
+                                        "Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name,
+                                        janzztittel,
+                                        typeahead.code.toString(),
+                                        cat.code
+                                    )
+                                    (janzztittel.equals(
+                                        typeahead.name,
+                                        ignoreCase = true
+                                    )) && (typeahead.code.toString() == cat.code)
                                 }
                         } catch (e: Exception) {
                             LOG.error("Feiler i typeaheadkall mot ontologien og vil fjerne satt JANZZ-kategori", e)

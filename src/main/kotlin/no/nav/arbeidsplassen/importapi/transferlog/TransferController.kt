@@ -48,7 +48,7 @@ class TransferController(
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
         }
         val updatedAds = ads.map {
-            transferLogService.updateExpiresIfNullAndStarttimeSnarest(it)
+            transferLogService.handleExpiryAndStarttimeCombinations(it)
         }.map {
             transferLogService.handleInvalidCategories(it, providerId, it.reference)
         }
@@ -87,7 +87,7 @@ class TransferController(
             runCatching {
                 var ad = objectMapper.treeToValue(it, AdDTO::class.java)
                 LOG.info("Got ad ${ad.reference} for $providerId")
-                ad = transferLogService.updateExpiresIfNullAndStarttimeSnarest(ad)
+                ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
                 ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
                 val content = objectMapper.writeValueAsString(ad)
                 val md5 = content.toMD5Hex()
