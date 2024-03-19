@@ -75,7 +75,7 @@ class TransferLogService(
             return ad.copy(expires = newExpiryDate)
         }
 
-        val dueDate = parseApplicationDueDate(ad.properties[PropertyNames.applicationdue])?.atStartOfDay()
+        val dueDate = ad.properties[PropertyNames.applicationdue]?.let {parseApplicationDueDate(it)?.atStartOfDay() }
         if (dueDate != null && ad.expires != null && dueDate.isBefore(ad.expires)) {
             return ad.copy(expires = dueDate)
         }
@@ -83,7 +83,7 @@ class TransferLogService(
     }
 
 
-    private fun parseApplicationDueDate(applicationDue: String?): LocalDate? {
+    private fun parseApplicationDueDate(applicationDue: String): LocalDate? {
         val dateTimeFormatterBuilder = DateTimeFormatterBuilder()
             .append(
                 DateTimeFormatter.ofPattern(
