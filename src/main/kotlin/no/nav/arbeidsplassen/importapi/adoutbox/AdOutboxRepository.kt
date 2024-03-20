@@ -7,11 +7,11 @@ import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<AdOutbox, Long> {
-    fun ResultSet.toAdOutbox() = AdOutbox(
+    open fun ResultSet.toAdOutbox() = AdOutbox(
         id = this.getLong("id"),
         uuid = this.getString("uuid"),
         payload = this.getString("payload"),
@@ -23,7 +23,7 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
     )
 
     @Transactional
-    fun lagre(entity: AdOutbox): Int {
+    open fun lagre(entity: AdOutbox): Int {
         val sql = """
             INSERT INTO ad_outbox (uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -41,7 +41,7 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
     }
 
     @Transactional
-    fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> {
+    open fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> {
         val sql = """
             SELECT id, uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato 
             FROM ad_outbox
@@ -61,10 +61,10 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
     }
 
     @Transactional
-    fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
+    open fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
 
     @Transactional
-    fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
+    open fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
         val sql = """UPDATE ad_outbox SET prosessert_dato = ? WHERE id = ?"""
 
         return connection.prepareStatement(sql).apply {
@@ -74,7 +74,7 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
     }
 
     @Transactional
-    fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
+    open fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
         val sql = """UPDATE ad_outbox SET har_feilet = ?, antall_forsok = ?, siste_forsok_dato = ? WHERE id = ?"""
 
         return connection.prepareStatement(sql).apply {

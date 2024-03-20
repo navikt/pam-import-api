@@ -1,5 +1,6 @@
 package no.nav.arbeidsplassen.importapi.security
 
+import io.micronaut.http.HttpAttributes
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.authentication.Authentication
 import io.micronaut.security.rules.AbstractSecurityRule
@@ -18,7 +19,7 @@ import org.reactivestreams.Publisher
 
 @Singleton
 class ProviderAllowRule(rolesFinder: RolesFinder,
-                        private val providerService: ProviderService): AbstractSecurityRule(rolesFinder) {
+                        private val providerService: ProviderService): AbstractSecurityRule<HttpRequest<*>>(rolesFinder) {
 
     private val ORDER = SecuredAnnotationRule.ORDER - 1
 
@@ -26,7 +27,8 @@ class ProviderAllowRule(rolesFinder: RolesFinder,
         private val LOG = LoggerFactory.getLogger(ProviderAllowRule::class.java)
     }
 
-    override fun check(request: HttpRequest<*>, routeMatch: RouteMatch<*>?, authentication: Authentication?): Publisher<SecurityRuleResult> {
+    override fun check(request: HttpRequest<*>, authentication: Authentication?): Publisher<SecurityRuleResult> {
+        val routeMatch: RouteMatch<*>? = request.getAttribute(HttpAttributes.ROUTE_MATCH, RouteMatch::class.java).orElse(null)
         if (routeMatch is MethodBasedRouteMatch<*, *> && authentication!=null ) {
             if (routeMatch.hasAnnotation(ProviderAllowed::class.java)) {
                 val values = routeMatch.getValue(ProviderAllowed::class.java, Array<String>::class.java).get().toMutableList()
@@ -52,5 +54,4 @@ class ProviderAllowRule(rolesFinder: RolesFinder,
     }
 
     override fun getOrder(): Int = ORDER
-
 }

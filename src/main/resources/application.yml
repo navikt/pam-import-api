@@ -69,7 +69,9 @@ jackson:
     indentOutput: true
 datasources:
   default:
-    url: ${DB_JDBC_URL:`jdbc:tc:postgresql:14:///puls?TC_INITSCRIPT=postgres/postgres-init.sql`}
+    url: ${DB_JDBC_URL:`jdbc:tc:postgresql:15:///puls?TC_INITSCRIPT=postgres/postgres-init.sql`}
+    db-type: postgres
+    dialect: POSTGRES
     driverClassName: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
     username: ${DB_USERNAME:sa}
     password: ${DB_PASSWORD:''}
@@ -80,6 +82,7 @@ flyway:
   datasources:
     default:
       locations: classpath:db/migration
+      enabled: true
       #clean-on-validation-error: true
 transferlog:
   batch-size: 100

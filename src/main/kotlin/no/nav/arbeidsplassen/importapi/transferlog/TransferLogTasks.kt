@@ -23,7 +23,7 @@ import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @Singleton
 @Open

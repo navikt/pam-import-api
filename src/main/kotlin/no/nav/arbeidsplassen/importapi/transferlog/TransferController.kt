@@ -5,7 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.fasterxml.jackson.databind.exc.InvalidNullException
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
@@ -17,6 +18,7 @@ import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.*
+import no.nav.arbeidsplassen.importapi.exception.ErrorMessage
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
@@ -124,16 +126,22 @@ class TransferController(
                 providerId = provider.id!!
             )
 
-            is MissingKotlinParameterException -> TransferLogDTO(
-                message = "Missing parameter: ${error.parameter.name}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-
             is InvalidFormatException -> TransferLogDTO(
                 message = "Invalid value: ${error.value} at ${error.pathReference}",
                 status = TransferLogStatus.ERROR,
                 providerId = provider.id!!
+            )
+
+            is InvalidNullException -> TransferLogDTO(
+                    message = "Missing parameter: ${error.propertyName.simpleName}",
+                    status = TransferLogStatus.ERROR,
+                    providerId = provider.id!!
+            )
+
+            is MismatchedInputException -> TransferLogDTO(
+                    message = "Missing parameter: ${error.pathReference}",
+                    status = TransferLogStatus.ERROR,
+                    providerId = provider.id!!
             )
 
             else -> TransferLogDTO(

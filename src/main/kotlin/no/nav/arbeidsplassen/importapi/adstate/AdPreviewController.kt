@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.URL
 import java.util.*
-import javax.annotation.security.PermitAll
+import jakarta.annotation.security.PermitAll
 
 @PermitAll
 @Controller

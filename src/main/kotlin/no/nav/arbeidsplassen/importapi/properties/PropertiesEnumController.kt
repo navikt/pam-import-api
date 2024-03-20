@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.properties
 
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import javax.annotation.security.PermitAll
+import jakarta.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/api/v1/properties")

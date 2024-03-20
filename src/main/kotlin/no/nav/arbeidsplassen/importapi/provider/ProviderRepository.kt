@@ -11,7 +11,8 @@ import java.sql.PreparedStatement
 import java.sql.Statement
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
+import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
@@ -42,7 +43,7 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     }
 
     @Transactional
-    fun saveOnMigrate(entities: Iterable<Provider>) {
+    open fun saveOnMigrate(entities: Iterable<Provider>) {
         entities.forEach {
             connection.prepareStatement(migrateSQL).apply {
                 setString(1, it.jwtid)
@@ -59,7 +60,8 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
     }
 
     @Transactional
-    override fun <S : Provider> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : Provider> saveAll(entities: Iterable<S>): List<S> {
+
         return entities.map { save(it) }.toList()
     }
 
