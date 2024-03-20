@@ -8,9 +8,7 @@ import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
 import java.util.*
-import javax.annotation.security.PermitAll
 
 
 @ProviderAllowed(value = [Roles.ROLE_ADMIN])

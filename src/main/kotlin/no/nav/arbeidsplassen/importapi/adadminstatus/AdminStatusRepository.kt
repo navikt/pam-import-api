@@ -9,7 +9,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
 import java.util.*
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
@@ -59,7 +59,7 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
     }
 
     @Transactional
-    override fun <S : AdminStatus> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : AdminStatus> saveAll(entities: Iterable<S>): List<S> {
         return entities.map { save(it) }.toList()
     }
 

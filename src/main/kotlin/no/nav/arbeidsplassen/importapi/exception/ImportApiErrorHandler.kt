@@ -3,8 +3,9 @@ package no.nav.arbeidsplassen.importapi.exception
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.databind.exc.InvalidNullException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
 import io.micronaut.http.*
@@ -65,11 +66,13 @@ private fun handleJsonProcessingException(error: JsonProcessingException): HttpR
     return when (error) {
         is JsonParseException -> HttpResponse
                 .badRequest(ErrorMessage("Parse error: at ${error.location}", PARSE_ERROR))
-        is MissingKotlinParameterException -> HttpResponse
-                .badRequest(ErrorMessage("Missing parameter: ${error.parameter.name}", MISSING_PARAMETER))
         is InvalidFormatException -> HttpResponse
                 .badRequest(ErrorMessage("Invalid value: ${error.value} at ${error.pathReference}", INVALID_VALUE))
         is ValueInstantiationException -> HttpResponse.badRequest(ErrorMessage("Wrong value: ${error.message} at ${error.pathReference}", INVALID_VALUE))
+        is InvalidNullException -> HttpResponse
+                .badRequest(ErrorMessage("Missing parameter: ${error.propertyName.simpleName}", MISSING_PARAMETER))
+        is MismatchedInputException -> HttpResponse
+                .badRequest(ErrorMessage("Missing parameter: ${error.pathReference}", MISSING_PARAMETER))
         else -> HttpResponse.badRequest(ErrorMessage("Bad Json: ${error.localizedMessage}", UNKNOWN))
     }
 }

@@ -12,7 +12,7 @@ import java.sql.PreparedStatement
 import java.sql.Statement
 import java.time.LocalDateTime
 import java.util.*
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
@@ -55,7 +55,7 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
     @Transactional
     abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<TransferLog>
 
-    override fun <S : TransferLog> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : TransferLog> saveAll(entities: Iterable<S>): List<S> {
         return entities.map { save(it) }.toList()
     }
 

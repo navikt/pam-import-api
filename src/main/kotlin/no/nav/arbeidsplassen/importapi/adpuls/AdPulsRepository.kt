@@ -12,7 +12,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
 import java.time.LocalDateTime
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdPulsRepository(private val connection: Connection, private val objectMapper: ObjectMapper):
@@ -43,7 +43,7 @@ abstract class AdPulsRepository(private val connection: Connection, private val 
     }
 
     @Transactional
-    override fun <S : AdPuls> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : AdPuls> saveAll(entities: Iterable<S>): List<S> {
         return entities.map { save(it) }
     }
 

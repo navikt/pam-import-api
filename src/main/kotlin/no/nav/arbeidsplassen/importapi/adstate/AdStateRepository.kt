@@ -12,7 +12,7 @@ import java.sql.PreparedStatement
 import java.sql.Statement
 import java.time.LocalDateTime
 import java.util.*
-import javax.transaction.Transactional
+import jakarta.transaction.Transactional
 
 @JdbcRepository(dialect = Dialect.POSTGRES)
 abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
@@ -58,7 +58,7 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
     }
 
     @Transactional
-    override fun <S : AdState> saveAll(entities: Iterable<S>): Iterable<S> {
+    override fun <S : AdState> saveAll(entities: Iterable<S>): List<S> {
         return entities.map { save(it) }.toList()
     }
 

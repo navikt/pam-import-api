@@ -11,7 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.security.KeyStore
-import javax.annotation.security.PermitAll
+import jakarta.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/api/v1/categories")

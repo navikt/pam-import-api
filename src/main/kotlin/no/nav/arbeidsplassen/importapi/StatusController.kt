@@ -9,7 +9,7 @@ import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfigura
 import io.swagger.v3.oas.annotations.Hidden
 import no.nav.arbeidsplassen.importapi.exception.KafkaStateRegistry
 import org.slf4j.LoggerFactory
-import javax.annotation.security.PermitAll
+import jakarta.annotation.security.PermitAll
 
 @PermitAll
 @Controller("/internal")
