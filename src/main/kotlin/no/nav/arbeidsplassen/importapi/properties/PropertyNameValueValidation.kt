@@ -24,7 +24,7 @@ class PropertyNameValueValidation {
         validValues[workhours] = Arbeidstid.values().flatMap { it.tekster().values }.toHashSet()
         // does not exist in AnsettelseKodeVerk
         validValues[sector] = hashSetOf("Privat", "Offentlig")
-        validValues[remote] = hashSetOf("Hjemmekontor", "Hybridkontor")
+        validValues[remote] = hashSetOf("Hjemmekontor", "Hybridkontor", "Hjemmekontor ikke mulig")
         validValues[euresflagg] = hashSetOf("true", "false")
     }
 
