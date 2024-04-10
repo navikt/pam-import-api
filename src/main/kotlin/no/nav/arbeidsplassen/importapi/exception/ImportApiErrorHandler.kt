@@ -4,19 +4,22 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.InvalidNullException
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import io.micronaut.context.annotation.Replaces
 import io.micronaut.core.convert.exceptions.ConversionErrorException
-import io.micronaut.http.*
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpResponseFactory
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.annotation.Produces
 import io.micronaut.http.server.exceptions.ConversionErrorHandler
 import io.micronaut.http.server.exceptions.ExceptionHandler
 import io.micronaut.http.server.exceptions.JsonExceptionHandler
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.exception.ErrorType.*
 import org.slf4j.LoggerFactory
 import java.util.*
-import jakarta.inject.Singleton
 
 @Produces
 @Singleton
@@ -67,14 +70,20 @@ private fun handleJsonProcessingException(error: JsonProcessingException): HttpR
         is JsonParseException -> HttpResponse
                 .badRequest(ErrorMessage("Parse error: at ${error.location}", PARSE_ERROR))
         is InvalidFormatException -> HttpResponse
-                .badRequest(ErrorMessage("Invalid value: ${error.value} at ${error.pathReference}", INVALID_VALUE))
-        is ValueInstantiationException -> HttpResponse.badRequest(ErrorMessage("Wrong value: ${error.message} at ${error.pathReference}", INVALID_VALUE))
+                .badRequest(ErrorMessage("Invalid value: ${error.value} at field ${feltFraPathReference(error.pathReference)}", INVALID_VALUE))
+        is ValueInstantiationException -> HttpResponse.badRequest(ErrorMessage("Wrong value: ${error.message} at field ${feltFraPathReference(error.pathReference)}", INVALID_VALUE))
         is InvalidNullException -> HttpResponse
                 .badRequest(ErrorMessage("Missing parameter: ${error.propertyName.simpleName}", MISSING_PARAMETER))
         is MismatchedInputException -> HttpResponse
-                .badRequest(ErrorMessage("Missing parameter: ${error.pathReference}", MISSING_PARAMETER))
+                .badRequest(ErrorMessage("Missing parameter: ${feltFraPathReference(error.pathReference)}", MISSING_PARAMETER))
         else -> HttpResponse.badRequest(ErrorMessage("Bad Json: ${error.localizedMessage}", UNKNOWN))
     }
+}
+
+private fun feltFraPathReference(pathReference: String): String {
+    val regex = """\["(.*?)"]""".toRegex() // Matcher grupper i hakeparantes
+    val matches = regex.findAll(pathReference).map { it.groupValues[1] }.toList()
+    return matches.lastOrNull() ?: pathReference
 }
 
 enum class ErrorType {
