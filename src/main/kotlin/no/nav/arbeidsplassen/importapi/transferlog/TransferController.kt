@@ -14,11 +14,13 @@ import io.micronaut.http.annotation.*
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import no.nav.arbeidsplassen.importapi.adstate.AdStateService
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.AdStatus
+import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.adstate.AdStateService
-import no.nav.arbeidsplassen.importapi.dto.*
-import no.nav.arbeidsplassen.importapi.exception.ErrorMessage
+import no.nav.arbeidsplassen.importapi.exception.feltFraPathReference
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
@@ -127,7 +129,7 @@ class TransferController(
             )
 
             is InvalidFormatException -> TransferLogDTO(
-                message = "Invalid value: ${error.value} at ${error.pathReference}",
+                message = "Invalid value: ${error.value} at ${feltFraPathReference(error.pathReference)}",
                 status = TransferLogStatus.ERROR,
                 providerId = provider.id!!
             )
@@ -139,7 +141,7 @@ class TransferController(
             )
 
             is MismatchedInputException -> TransferLogDTO(
-                    message = "Missing parameter: ${error.pathReference}",
+                    message = "Missing parameter: ${feltFraPathReference(error.pathReference)}",
                     status = TransferLogStatus.ERROR,
                     providerId = provider.id!!
             )

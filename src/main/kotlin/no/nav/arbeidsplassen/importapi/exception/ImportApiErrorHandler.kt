@@ -80,7 +80,7 @@ private fun handleJsonProcessingException(error: JsonProcessingException): HttpR
     }
 }
 
-private fun feltFraPathReference(pathReference: String): String {
+fun feltFraPathReference(pathReference: String): String {
     val regex = """\["(.*?)"]""".toRegex() // Matcher grupper i hakeparantes
     val matches = regex.findAll(pathReference).map { it.groupValues[1] }.toList()
     return matches.lastOrNull() ?: pathReference
