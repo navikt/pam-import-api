@@ -47,6 +47,7 @@ micronaut:
           secret:
             generator:
               secret: ${JWT_SECRET:Thisisaverylongsecretandcanonlybeusedintest}
+    intercept-url-map-prepend-pattern-with-context-path: false
   router:
     static-resources:
       swagger:
