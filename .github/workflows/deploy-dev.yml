@@ -8,6 +8,7 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+      - feature/**
 jobs:
   call-workflow:
     uses: navikt/pam-deploy/.github/workflows/deploy-dev.yml@v7
