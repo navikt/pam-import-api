@@ -33,7 +33,7 @@ data class EmployerDTO(val reference: String?, val businessName: String, var org
     }
 }
 
-data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.JANZZ, val name: String? = null, val janzzParentId: String? = null) {
+data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.JANZZ, val name: String? = null, var janzzParentId: String? = null) {
 }
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {

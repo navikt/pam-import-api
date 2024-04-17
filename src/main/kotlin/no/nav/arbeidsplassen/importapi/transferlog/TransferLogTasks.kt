@@ -101,6 +101,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
         ad.categoryList.forEach { janzzCategory ->
             try {
+                janzzCategory.janzzParentId = janzzCategory.code
                 val konseptgruppering: KonseptGrupperingDTO? =
                     lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code.toLong())
                 if (konseptgruppering != null) {
