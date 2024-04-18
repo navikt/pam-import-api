@@ -101,6 +101,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
         ad.categoryList.forEach { janzzCategory ->
             try {
+                janzzCategory.janzzParentId = janzzCategory.code
                 val konseptgruppering: KonseptGrupperingDTO? =
                     lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(janzzCategory.code.toLong())
                 if (konseptgruppering != null) {
@@ -133,7 +134,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 code = escoCategory.uri,
                 categoryType = CategoryType.ESCO,
                 name = escoCategory.label,
-                description = "JANZZ-".plus(konseptGruppering.konseptId)
+                janzzParentId = konseptGruppering.konseptId.toString()
             )
         }?.let { categoryList.add(it)}
     }
@@ -148,7 +149,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                     code = it.styrkCode,
                     categoryType = CategoryType.STYRK08,
                     name = it.styrkDescription,
-                    description = "JANZZ-".plus(konseptGruppering.konseptId)
+                    janzzParentId = konseptGruppering.konseptId.toString()
                 )
             }
         }?.let { categoryList.add(it)}

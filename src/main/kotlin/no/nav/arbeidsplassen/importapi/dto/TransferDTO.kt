@@ -1,9 +1,11 @@
 package no.nav.arbeidsplassen.importapi.dto
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import java.time.LocalDateTime
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
                  val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
                  val properties: Map<PropertyNames, String> = hashMapOf(), val title: String, val adText: String,
@@ -31,7 +33,7 @@ data class EmployerDTO(val reference: String?, val businessName: String, var org
     }
 }
 
-data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.JANZZ, val name: String? = null, val description: String? = null) {
+data class CategoryDTO(val code: String, val categoryType: CategoryType = CategoryType.JANZZ, val name: String? = null, var janzzParentId: String? = null) {
 }
 
 data class ContactDTO(val name: String?, val title: String?, val email: String?, val phone: String?, val role: String?) {
