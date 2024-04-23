@@ -31,6 +31,7 @@ enum class PropertyNames(val type: PropertyType) {
     remote(PropertyType.TEXT),
     arbeidsplassenoccupation(PropertyType.TEXT),
     euresflagg(PropertyType.TEXT),
+    workLanguage(PropertyType.TEXT)
 }
 
 enum class PropertyType {

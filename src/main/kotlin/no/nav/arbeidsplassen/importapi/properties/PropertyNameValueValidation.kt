@@ -10,7 +10,7 @@ import jakarta.inject.Singleton
 class PropertyNameValueValidation {
 
     private val propertiesToValidate =
-        listOf(extent, engagementtype, jobarrangement, workday, workhours, sector, remote, euresflagg)
+        listOf(extent, engagementtype, jobarrangement, workday, workhours, workLanguage, sector, remote, euresflagg)
 
     private val supportsMultipleValues = listOf(workday, workhours)
 
@@ -23,6 +23,7 @@ class PropertyNameValueValidation {
         validValues[workday] = Arbeidsdager.values().flatMap { it.tekster().values }.toHashSet()
         validValues[workhours] = Arbeidstid.values().flatMap { it.tekster().values }.toHashSet()
         // does not exist in AnsettelseKodeVerk
+        validValues[workLanguage] = hashSetOf("Norsk", "Engelsk", "Skandinavisk", "Samisk")
         validValues[sector] = hashSetOf("Privat", "Offentlig")
         validValues[remote] = hashSetOf("Hjemmekontor", "Hybridkontor", "Hjemmekontor ikke mulig")
         validValues[euresflagg] = hashSetOf("true", "false")
