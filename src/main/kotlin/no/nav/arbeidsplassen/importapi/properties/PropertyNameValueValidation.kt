@@ -12,7 +12,7 @@ class PropertyNameValueValidation {
     private val propertiesToValidate =
         listOf(extent, engagementtype, jobarrangement, workday, workhours, workLanguage, sector, remote, euresflagg)
 
-    private val supportsMultipleValues = listOf(workday, workhours)
+    private val supportsMultipleValues = listOf(workday, workhours, workLanguage)
 
     val validValues = HashMap<PropertyNames, Set<String>>()
 
