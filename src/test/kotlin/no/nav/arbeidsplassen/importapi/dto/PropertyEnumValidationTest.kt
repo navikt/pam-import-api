@@ -41,19 +41,23 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
     fun `Properties that support multiple values are validated correctly`() {
         val stringifyedLists = hashMapOf(
             workday to """["Ukedager", "Lørdag", "Søndag"]""",
-            workhours to """["Dagtid","Kveld" ,"Natt"]"""
+            workhours to """["Dagtid","Kveld" ,"Natt"]""",
+            workLanguage to """["Norsk","Engelsk"]"""
         )
         propertyEnumValidation.checkOnlyValidValues(stringifyedLists)
 
         val stringifiedListsWithSingleValue = hashMapOf(
             workday to """["Ukedager"]""",
             workhours to """["Dagtid"]""",
+            workLanguage to """["Norsk"]"""
         )
         propertyEnumValidation.checkOnlyValidValues(stringifiedListsWithSingleValue)
 
         val stringifyedListsWithBadValues = hashMapOf(
             workday to """["Ukebager", "Blørdag"]""",
-            workhours to """["Kveldd"]""")
+            workhours to """["Kveldd"]""",
+            workLanguage to """["Torsk"]"""
+        )
 
         val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
