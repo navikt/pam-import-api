@@ -6,11 +6,21 @@ import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import java.time.LocalDateTime
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class AdDTO(val reference: String, val published: LocalDateTime?, val expires: LocalDateTime?,
-                 val contactList: List<ContactDTO> = listOf(), val locationList: List<LocationDTO> = listOf(),
-                 val properties: Map<PropertyNames, String> = hashMapOf(), val title: String, val adText: String,
-                 val status:  AdStatus = AdStatus.RECEIVED, val privacy: PrivacyType = PrivacyType.SHOW_ALL,
-                 val positions: Int = 1, val employer: EmployerDTO?, val categoryList: List<CategoryDTO> = listOf()) {
+data class AdDTO(
+    val reference: String,
+    val published: LocalDateTime?,
+    val expires: LocalDateTime?,
+    val contactList: List<ContactDTO> = listOf(),
+    val locationList: List<LocationDTO> = listOf(),
+    val properties: Map<PropertyNames, String> = hashMapOf(),
+    val title: String,
+    val adText: String,
+    val status: AdStatus = AdStatus.RECEIVED,
+    val privacy: PrivacyType = PrivacyType.SHOW_ALL,
+    val positions: Int = 1,
+    val employer: EmployerDTO?,
+    val categoryList: List<CategoryDTO> = listOf()
+) {
     init {
         require(reference.isNotBlank() && reference.length<255) {"reference is blank or size > 255"}
         require(title.isNotBlank() && title.length<512) {"title is blank or size > 512"}
