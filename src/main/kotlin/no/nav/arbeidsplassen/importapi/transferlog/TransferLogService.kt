@@ -122,7 +122,8 @@ class TransferLogService(
                             typeaheads
                                 .any { typeahead ->
                                     LOG.info(
-                                        "Mottatt typeahead {} for {} og kode {} for kode {}" + typeahead.name,
+                                        "Mottatt typeahead {} for {} og kode {} for kode {}",
+                                        typeahead.name,
                                         janzztittel,
                                         typeahead.code.toString(),
                                         cat.code

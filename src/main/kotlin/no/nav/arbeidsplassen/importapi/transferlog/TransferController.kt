@@ -176,7 +176,8 @@ class TransferController(
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
-        val ad = adState.ad.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
+        val adWithoutInvalidCategories = transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
+        val ad = adWithoutInvalidCategories.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
