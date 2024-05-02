@@ -12,7 +12,6 @@ import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
@@ -181,7 +180,6 @@ class TransferLogService(
             && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
             (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
 
-    private fun isCountryAbroad(ad: AdDTO) = ad.locationList.isNotEmpty() && ad.locationList[0].hasOnlyCountrySet()
-            && !listOf("NORGE", "NOREG", "NORWAY").contains(ad.locationList[0].country?.uppercase())
+    private fun isCountryAbroad(ad: AdDTO) = ad.locationList.isNotEmpty() && ad.locationList[0].isCountryAbroad()
 
 }

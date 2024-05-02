@@ -61,8 +61,7 @@ data class LocationDTO(val address: String?=null, val postalCode: String?=null, 
                        val county: String?=null, val municipal: String?=null, val city: String?=null,
                        val latitude: String?=null, val longitude: String?=null) {
 
-    fun hasOnlyCountrySet(): Boolean = !country.isNullOrEmpty() && address.isNullOrEmpty() && postalCode.isNullOrEmpty()
-            && county.isNullOrEmpty() && municipal.isNullOrEmpty() && city.isNullOrEmpty() && latitude.isNullOrEmpty() && longitude.isNullOrEmpty()
+     fun isCountryAbroad() = !country.isNullOrEmpty() && !listOf("NORGE", "NOREG", "NORWAY", "NO").contains(country.uppercase())
 }
 
 enum class CategoryType {

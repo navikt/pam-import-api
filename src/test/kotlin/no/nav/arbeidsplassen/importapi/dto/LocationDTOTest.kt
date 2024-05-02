@@ -6,10 +6,15 @@ import org.junit.jupiter.api.Test
 class LocationDTOTest {
 
     @Test
-    fun hasOnlyCountrySet() {
-        assertTrue(LocationDTO(null, null, "Norge", null, null, null, null, null).hasOnlyCountrySet())
-        assertTrue(LocationDTO("", "", "Norge", "", "", "", "", "").hasOnlyCountrySet())
-        assertFalse(LocationDTO("", "", "", "", "", "", "", "").hasOnlyCountrySet())
-        assertFalse(LocationDTO("", "", "Norge", "", "", "Oslo", "", "").hasOnlyCountrySet())
+    fun isCountryAbroad() {
+        assertFalse(LocationDTO(country = "Norge").isCountryAbroad())
+        assertFalse(LocationDTO(country = "Norway").isCountryAbroad())
+        assertFalse(LocationDTO(country = "Noreg").isCountryAbroad())
+        assertFalse(LocationDTO(country = "NO").isCountryAbroad())
+        assertFalse(LocationDTO(country = "").isCountryAbroad())
+        assertFalse(LocationDTO(country = null).isCountryAbroad())
+
+        assertTrue(LocationDTO(country = "Sverige").isCountryAbroad())
+        assertTrue(LocationDTO(country = "Danmark").isCountryAbroad())
     }
 }
