@@ -1,6 +1,8 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
+import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.core.JsonToken
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,6 +13,8 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -27,6 +31,7 @@ import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 import java.time.LocalDateTime
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
@@ -87,45 +92,46 @@ class TransferController(
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
         LOG.info("Streaming for provider $providerId")
-        try {
-            return json.subscribeOn(Schedulers.io()).map {
-                runCatching {
-                    var ad = objectMapper.treeToValue(it, AdDTO::class.java)
-                    LOG.info("Got ad ${ad.reference} for $providerId")
-                    ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
-                    ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
-                    val content = objectMapper.writeValueAsString(ad)
-                    val md5 = content.toMD5Hex()
-                    if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                        TransferLogDTO(
-                                message = "Content already exist, skipping",
-                                status = TransferLogStatus.SKIPPED,
-                                items = 1,
-                                md5 = md5,
-                                providerId = provider.id!!
-                        )
-                    } else {
-                        transferLogService.validate(ad)
-                        transferLogService.save(
-                                TransferLogDTO(
-                                        payload = content,
-                                        md5 = md5,
-                                        items = 1,
-                                        providerId = provider.id!!
-                                )
-                        ).apply {
-                            payload = null
-                        }
-                    }
-                }.getOrElse { handleError(it, provider) }
+
+        return json.subscribeOn(Schedulers.io())
+            .onErrorReturn {
+                LOG.warn("Greide ikke å parse ad for providerId: $providerId: {}", it.message, it)
+                objectMapper.valueToTree(TransferLogDTO(
+                        message = "Parse error: ${it.message}",
+                        status = TransferLogStatus.ERROR,
+                        providerId = provider.id!!
+                ))
             }
-        } catch (e: Exception) {
-            LOG.error("Greide ikke å parse json stream fra providerId: {} : {}", providerId, e.message, e)
-            return Flowable.just(TransferLogDTO(
-                    message = "JSON Error: ${e.localizedMessage}",
-                    status = TransferLogStatus.ERROR,
-                    providerId = provider.id!!
-            ))
+            .map {
+            runCatching {
+                var ad = objectMapper.treeToValue(it, AdDTO::class.java)
+                LOG.info("Got ad ${ad.reference} for $providerId")
+                ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
+                ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
+                val content = objectMapper.writeValueAsString(ad)
+                val md5 = content.toMD5Hex()
+                if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
+                    TransferLogDTO(
+                            message = "Content already exist, skipping",
+                            status = TransferLogStatus.SKIPPED,
+                            items = 1,
+                            md5 = md5,
+                            providerId = provider.id!!
+                    )
+                } else {
+                    transferLogService.validate(ad)
+                    transferLogService.save(
+                            TransferLogDTO(
+                                    payload = content,
+                                    md5 = md5,
+                                    items = 1,
+                                    providerId = provider.id!!
+                            )
+                    ).apply {
+                        payload = null
+                    }
+                }
+            }.getOrElse { handleError(it, provider) }
         }
     }
 
