@@ -87,36 +87,45 @@ class TransferController(
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
         LOG.info("Streaming for provider $providerId")
-        return json.subscribeOn(Schedulers.io()).map {
-            runCatching {
-                var ad = objectMapper.treeToValue(it, AdDTO::class.java)
-                LOG.info("Got ad ${ad.reference} for $providerId")
-                ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
-                ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
-                val content = objectMapper.writeValueAsString(ad)
-                val md5 = content.toMD5Hex()
-                if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                    TransferLogDTO(
-                        message = "Content already exist, skipping",
-                        status = TransferLogStatus.SKIPPED,
-                        items = 1,
-                        md5 = md5,
-                        providerId = provider.id!!
-                    )
-                } else {
-                    transferLogService.validate(ad)
-                    transferLogService.save(
+        try {
+            return json.subscribeOn(Schedulers.io()).map {
+                runCatching {
+                    var ad = objectMapper.treeToValue(it, AdDTO::class.java)
+                    LOG.info("Got ad ${ad.reference} for $providerId")
+                    ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
+                    ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
+                    val content = objectMapper.writeValueAsString(ad)
+                    val md5 = content.toMD5Hex()
+                    if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
                         TransferLogDTO(
-                            payload = content,
-                            md5 = md5,
-                            items = 1,
-                            providerId = provider.id!!
+                                message = "Content already exist, skipping",
+                                status = TransferLogStatus.SKIPPED,
+                                items = 1,
+                                md5 = md5,
+                                providerId = provider.id!!
                         )
-                    ).apply {
-                        payload = null
+                    } else {
+                        transferLogService.validate(ad)
+                        transferLogService.save(
+                                TransferLogDTO(
+                                        payload = content,
+                                        md5 = md5,
+                                        items = 1,
+                                        providerId = provider.id!!
+                                )
+                        ).apply {
+                            payload = null
+                        }
                     }
-                }
-            }.getOrElse { handleError(it, provider) }
+                }.getOrElse { handleError(it, provider) }
+            }
+        } catch (e: Exception) {
+            LOG.error("Greide ikke å parse json stream fra providerId: {} : {}", providerId, e.message, e)
+            return Flowable.just(TransferLogDTO(
+                    message = "JSON Error: ${e.localizedMessage}",
+                    status = TransferLogStatus.ERROR,
+                    providerId = provider.id!!
+            ))
         }
     }
 
