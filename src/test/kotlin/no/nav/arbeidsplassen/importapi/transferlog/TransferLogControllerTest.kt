@@ -169,7 +169,7 @@ class TransferLogControllerTest(private val objectMapper: ObjectMapper,
     @Test
     fun `create provider then upload ads in stream with failure`() {
         val adminToken = tokenService.adminToken()
-        val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "test2", email = "test2@test2.no", phone = "123"))
+        val postProvider = HttpRequest.POST("/internal/providers", ProviderDTO(identifier = "test3", email = "test3@test3.no", phone = "124"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
