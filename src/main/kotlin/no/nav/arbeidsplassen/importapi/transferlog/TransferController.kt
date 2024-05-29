@@ -86,16 +86,6 @@ class TransferController(
         })
     }
 
-    @Error()
-    fun handleStreamError(e: CodecException): HttpResponse<TransferLogDTO> {
-        LOG.error("Handle stream error ${e.message}")
-        return HttpResponse.badRequest(TransferLogDTO(
-                message = "Parse error: ${e.message}",
-                status = TransferLogStatus.ERROR,
-                providerId = 0//provider.id!!
-        ))
-    }
-
     @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
@@ -206,7 +196,7 @@ class TransferController(
                 providerId = provider.id!!
             )
         }
-        LOG.error("Exception {} providerId: {}", transferLogDTO.message, provider.id)
+        LOG.warn("Exception {} providerId: {}", transferLogDTO.message, provider.id)
         return transferLogDTO
     }
 
