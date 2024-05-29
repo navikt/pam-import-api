@@ -3,14 +3,14 @@ package no.nav.arbeidsplassen.importapi
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.rxjava2.http.client.RxHttpClient
+import io.micronaut.rxjava3.http.client.Rx3HttpClient
+import jakarta.inject.Singleton
 import org.slf4j.LoggerFactory
 import java.net.InetAddress
 import java.time.LocalDateTime
-import jakarta.inject.Singleton
 
 @Singleton
-class LeaderElection(@Client("LeaderElect") val client: RxHttpClient,
+class LeaderElection(@Client("LeaderElect") val client: Rx3HttpClient,
                      @Value("\${ELECTOR_PATH:NOLEADERELECTION}") val electorPath: String,
                      val objectMapper: ObjectMapper) {
 

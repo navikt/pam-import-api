@@ -7,12 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.InvalidNullException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import com.fasterxml.jackson.module.kotlin.treeToValue
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
-import io.reactivex.Flowable
-import io.reactivex.schedulers.Schedulers
+import io.netty.handler.codec.CodecException
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.exceptions.CompositeException
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
@@ -83,45 +86,96 @@ class TransferController(
         })
     }
 
+    @Error()
+    fun handleStreamError(e: CodecException): HttpResponse<TransferLogDTO> {
+        LOG.error("Handle stream error ${e.message}")
+        return HttpResponse.badRequest(TransferLogDTO(
+                message = "Parse error: ${e.message}",
+                status = TransferLogStatus.ERROR,
+                providerId = 0//provider.id!!
+        ))
+    }
+
     @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
     fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
         val provider = providerService.findById(providerId)
         LOG.info("Streaming for provider $providerId")
-        return json.subscribeOn(Schedulers.io()).map {
-            runCatching {
-                var ad = objectMapper.treeToValue(it, AdDTO::class.java)
-                LOG.info("Got ad ${ad.reference} for $providerId")
-                ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
-                ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
-                val content = objectMapper.writeValueAsString(ad)
-                val md5 = content.toMD5Hex()
-                if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-                    TransferLogDTO(
+
+        val o = json.subscribeOn(Schedulers.io())
+                .onErrorReturn {
+                    LOG.warn("Feil ved streaming av ads fra provider $providerId: ${it.message}")
+                    objectMapper.valueToTree(listOf(TransferLogDTO(
+                            message = "JSON Parse error: ${it.localizedMessage}",
+                            status = TransferLogStatus.ERROR,
+                            providerId = provider.id!!
+                    )))
+                }
+                .map {
+                    receiveAd(it, provider)
+                }
+
+        return o;
+    }
+
+    private fun receiveAd(jsonNode: JsonNode, provider: ProviderDTO) : TransferLogDTO {
+        return runCatching {
+            if (jsonNode.isArray) {
+                val errorDto = objectMapper.treeToValue<List<TransferLogDTO>>(jsonNode)
+                return@runCatching errorDto[0]
+            }
+            var ad = objectMapper.treeToValue(jsonNode, AdDTO::class.java)
+            LOG.info("Got ad ${ad.reference} for ${provider.id!!}")
+            ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
+            ad = transferLogService.handleInvalidCategories(ad, provider.id!!, ad.reference)
+            val content = objectMapper.writeValueAsString(ad)
+            val md5 = content.toMD5Hex()
+            if (transferLogService.existsByProviderIdAndMd5(provider.id!!, md5)) {
+                TransferLogDTO(
                         message = "Content already exist, skipping",
                         status = TransferLogStatus.SKIPPED,
                         items = 1,
                         md5 = md5,
                         providerId = provider.id!!
-                    )
-                } else {
-                    transferLogService.validate(ad)
-                    transferLogService.save(
+                )
+            } else {
+                transferLogService.validate(ad)
+                transferLogService.save(
                         TransferLogDTO(
-                            payload = content,
-                            md5 = md5,
-                            items = 1,
-                            providerId = provider.id!!
+                                payload = content,
+                                md5 = md5,
+                                items = 1,
+                                providerId = provider.id!!
                         )
-                    ).apply {
-                        payload = null
-                    }
+                ).apply {
+                    payload = null
                 }
-            }.getOrElse { handleError(it, provider) }
-        }
+            }
+        }.getOrElse { handleError(it, provider) }
     }
 
     private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
         val transferLogDTO = when (error) {
+            is CompositeException -> {
+                val codecException = error.exceptions.find { it is CodecException }
+                codecException?.let { c->
+                    TransferLogDTO(
+                            message = "JSON Parse error: ${c.localizedMessage}",
+                            status = TransferLogStatus.ERROR,
+                            providerId = provider.id!!
+                    )
+                } ?:
+                TransferLogDTO(
+                        message = "Parse error: ${error.exceptions.firstOrNull()?.localizedMessage}",
+                        status = TransferLogStatus.ERROR,
+                        providerId = provider.id!!
+                )
+            }
+            is CodecException -> TransferLogDTO(
+                    message = "JSON Parse error: at ${error.localizedMessage}",
+                    status = TransferLogStatus.ERROR,
+                    providerId = provider.id!!
+            )
+
             is JsonParseException -> TransferLogDTO(
                 message = "Parse error: at ${error.location}",
                 status = TransferLogStatus.ERROR,

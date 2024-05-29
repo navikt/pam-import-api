@@ -9,6 +9,7 @@ import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import io.micronaut.transaction.annotation.TransactionalEventListener
 import jakarta.inject.Singleton
+import jakarta.transaction.Transactional
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
@@ -23,7 +24,6 @@ import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import jakarta.transaction.Transactional
 
 @Singleton
 @Open

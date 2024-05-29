@@ -4,12 +4,12 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest.*
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.rxjava2.http.client.RxHttpClient
+import io.micronaut.rxjava3.http.client.Rx3HttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import jakarta.inject.Inject
 
 
 @MicronautTest
@@ -18,7 +18,7 @@ class ProviderControllerTest(private val tokenService: TokenService) {
 
     @Inject
     @field:Client("\${micronaut.server.context-path}")
-    lateinit var client: RxHttpClient
+    lateinit var client: Rx3HttpClient
 
     @Test
     fun `create read update provider`() {

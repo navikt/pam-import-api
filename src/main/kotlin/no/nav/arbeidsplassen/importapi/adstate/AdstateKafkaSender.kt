@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.adstate
 
 import io.micronaut.configuration.kafka.annotation.KafkaClient
 import io.micronaut.configuration.kafka.annotation.Topic
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import no.nav.arbeidsplassen.importapi.Open
 import org.apache.kafka.clients.producer.RecordMetadata
 
