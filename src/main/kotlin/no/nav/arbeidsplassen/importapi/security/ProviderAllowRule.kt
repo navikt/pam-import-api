@@ -9,12 +9,12 @@ import io.micronaut.security.rules.SecurityRuleResult
 import io.micronaut.security.token.RolesFinder
 import io.micronaut.web.router.MethodBasedRouteMatch
 import io.micronaut.web.router.RouteMatch
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import java.util.*
-import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
 
 
 @Singleton

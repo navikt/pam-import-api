@@ -5,8 +5,9 @@ import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.annotation.Client
-import io.micronaut.rxjava2.http.client.RxHttpClient
+import io.micronaut.rxjava3.http.client.Rx3HttpClient
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
-import jakarta.inject.Inject
 
 
 @MicronautTest
@@ -35,7 +35,7 @@ class AdminStatusControllerTest(private val tokenService: TokenService,
 
     @Inject
     @field:Client("\${micronaut.server.context-path}")
-    lateinit var client: RxHttpClient
+    lateinit var client: Rx3HttpClient
 
     @BeforeEach
     fun createAdminStatus() {
