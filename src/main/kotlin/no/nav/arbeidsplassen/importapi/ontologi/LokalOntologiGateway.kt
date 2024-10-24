@@ -38,7 +38,7 @@ open class LokalOntologiGateway(
 
     fun hentTypeaheadStillingerFraOntologi() : List<Typeahead> {
         val url = "$baseurl/rest/typeahead/stillinger"
-        val (responseCode, responseBody) = with(URL(url).openConnection() as HttpURLConnection) {
+        val (responseCode, responseBody) = with(URI(url).toURL().openConnection() as HttpURLConnection) {
             requestMethod = "GET"
             connectTimeout = 50000
             readTimeout = 50000

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
     id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
@@ -102,16 +104,16 @@ kapt {
 }
 
 compileKotlin {
-    kotlinOptions {
-        jvmTarget = "21"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
         //Will retain parameter names for Java reflection
         javaParameters = true
     }
 }
 
 compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "21"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
         javaParameters = true
     }
 }
