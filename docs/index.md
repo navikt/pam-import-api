@@ -114,19 +114,7 @@ Authorization: Bearer <your secret key>
       "municipal": "Oslo",
       "city": "Oslo"
     }
-  },
-  "categoryList": [
-    {
-      "code": "266998",
-      "categoryType": "JANZZ",
-      "name": "Barnehagelærer"
-    },    
-    {
-      "code": "266998",
-      "categoryType": "JANZZ",
-      "name": "Pedagogisk leder (barnehage/førskole)"
-    }
-  ]
+  }
 }
 ```
 
@@ -209,14 +197,7 @@ Authorization: Bearer <your secret key>
       "municipal": "Oslo",
       "city": "Oslo"
     }
-  },
-  "categoryList": [
-    {
-      "code": "266998",
-      "categoryType": "JANZZ",
-      "name": "Barnehagelærer"
-    }
-  ]
+  }
 }
 {
   "reference": "1214567",
@@ -269,14 +250,7 @@ Authorization: Bearer <your secret key>
     },
     "businessName": "Aker Solutions AS",
     "orgnr": "974220954"
-  },
-  "categoryList": [
-    {
-      "code" : 101507,
-      "categoryType" : "JANZZ",
-      "name" : "Sivilingeniør (offshoreteknologi)"
-    }
-  ]
+  }
 }
 . 
 .
@@ -383,14 +357,7 @@ Authorization: Bearer <secret key>
           "municipal": "Oslo",
           "city": "Oslo"
         }
-      },
-      "categoryList": [
-        {
-          "code": "266998",
-          "categoryType": "JANZZ",
-          "name": "Barnehagelærer"
-        }
-      ]
+      }
     },
     {
       "reference": "1214567",
@@ -444,14 +411,7 @@ Authorization: Bearer <secret key>
         },
         "businessName": "Aker Solutions AS",
         "orgnr": "974220954"
-      },
-      "categoryList": [
-        {
-              "code" : 101507,
-              "categoryType" : "JANZZ",
-              "name" : "Sivilingeniør (offshoreteknologi)"
-        }
-      ]
+      }
     }
 ]
 
@@ -526,21 +486,6 @@ This is the location address of the employer, see also below for work address/lo
 |municipal | String | Optional | Kommune |Municipal | Oslo |
 |county | String | Optional | Fylke | County | Oslo |
 |country | String | Optional | Land | Country, defaults to Norge | Norge |
-
-## Category
-Ads are classified by occupations, and these are divided in two levels. We support one type of classification, `JANZZ`.  
-`JANZZ` is a fine granulated classification for occupations, constantly updating with new professions. The list of updated supported JANZZ codes is found [here](https://arbeidsplassen-api.nav.no/stillingsimport/api/v1/categories/janzz/occupations).
-
-It is possible to have more than 1 and max 3 occupation categories for each ad.
-
-|Name | Type | Required | Description | Example              |
-|:----|:-----|:---------|:------------|:---------------------|
-|code | String | yes | the code of occupation | 38689                 |
-| categoryType | ENUM | yes | type of occupation standard | JANZZ                |
-| name | String | optional | name of category | Barnehagemedarbeider |
-
-If you don't or can not support any of our category standards, and you are using another occupations category standard, please
-let us know, we might support it later. You can also specify occupations using the "occupation" property (see below).
 
 ## Optional Properties
 An ad consists of many properties, they are all optional. However the more content the better the job ad will be. 
