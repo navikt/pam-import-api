@@ -58,7 +58,7 @@ dependencies {
     implementation ("io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}") {
         exclude group: 'org.apache.kafka:kafka-clients'
     }
-    implementation "org.apache.kafka:kafka-clients:3.6.1"
+    implementation "org.apache.kafka:kafka-clients:3.7.1"
 
     implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
     implementation "io.micronaut.sql:micronaut-jdbc-hikari:$micronautSQLVersion"
