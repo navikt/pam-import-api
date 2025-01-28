@@ -34,17 +34,19 @@ class ProviderAllowRule(rolesFinder: RolesFinder,
                 val values = routeMatch.getValue(ProviderAllowed::class.java, Array<String>::class.java).get().toMutableList()
                 val roles = getRoles(authentication)
                 if (values.contains(Roles.ROLE_ADMIN) && roles.contains(Roles.ROLE_ADMIN)) {
-                    LOG.debug("Admin request allow")
+                    LOG.info("Admin request allow")
                     return Flowable.just(SecurityRuleResult.ALLOWED)
                 }
                 val providerId = routeMatch.variableValues["providerId"].toString().toLong()
                 if (providerId != authentication.attributes["providerId"]) {
-                    LOG.debug("Rejected because provider id does not match with claims")
+                    LOG.info("Rejected because provider id $providerId does not match with claims {}",
+                        authentication.attributes["providerId"])
                     return Flowable.just(SecurityRuleResult.REJECTED)
                 }
                 val provider = providerService.findById(providerId)
                 if (provider.jwtid != authentication.attributes["jti"]) {
-                    LOG.debug("Rejected because jwt id does not match with claims")
+                    LOG.info("Rejected because jwt id does not match with claims {}",
+                        authentication.attributes["jti"])
                     return Flowable.just(SecurityRuleResult.REJECTED)
                 }
                 return compareRoles(values, roles)
