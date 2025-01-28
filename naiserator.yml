@@ -77,9 +77,6 @@ spec:
             envVarPrefix: DB
         cascadingDelete: false
   accessPolicy:
-    inbound:
-      rules:
-        - application: pam-ad
     outbound:
       rules:
         - application: pam-ontologi
