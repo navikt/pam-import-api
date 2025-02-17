@@ -154,5 +154,3 @@ Before deploying to production and if the API changes, remember to send informat
 # Inquiries
 
 Questions regarding the code or project can be asked as GitHub issues.
-
-

@@ -31,12 +31,9 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                        private val adStateRepository: AdStateRepository,
                        private val objectMapper: ObjectMapper,
                        private val meterRegistry: MeterRegistry,
-                       private val kafkaSender: AdstateKafkaSender,
-                       private val eventPublisher: ApplicationEventPublisher<AdStateEvent>,
                        private val styrkCodeConverter : StyrkCodeConverter,
                        private val lokalOntologiGateway : LokalOntologiGateway,
                        private val adOutboxService: AdOutboxService,
-                       @Value("\${transferlog.adstate.kafka.enabled}") private val adStateKafkaSend: Boolean,
                        @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
                        @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
 
@@ -66,7 +63,6 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             val savedList = adStateRepository.saveAll(adList)
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
             meterRegistry.counter("ads_received", "provider", it.providerId.toString()).increment(adList.size.toDouble())
-            eventPublisher.publishEvent(AdStateEvent(savedList, it.providerId))
             adOutboxService.lagreFlereTilOutbox(savedList)
         } catch (e: Exception) {
             LOG.error("Got exception while handling transfer log ${it.id}", e)
@@ -158,18 +154,4 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     private fun String.replaceAmpersand(): String {
         return this.replace("&amp;", "&")
     }
-
-    @TransactionalEventListener
-    fun onNewAdEvent(event: AdStateEvent) {
-        if (adStateKafkaSend) {
-            LOG.info("sending batch of ${event.adList.count()} adstates for provider ${event.providerId}")
-            kafkaSender.send(event.adList).subscribe(
-                    { LOG.info("Successfully sent to kafka adstates with uuid ${event.adList.map { it.uuid + " " }}") },
-                    { LOG.error("Got error while sending to kafka adstates with uuid: ${event.adList.map { it.uuid + " " }}", it) }
-            )
-        }
-    }
-
-    data class AdStateEvent(val adList: Iterable<AdState>, val providerId: Long)
 }
-
