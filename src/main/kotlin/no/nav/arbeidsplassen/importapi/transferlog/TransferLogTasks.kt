@@ -7,14 +7,12 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
-import io.micronaut.transaction.annotation.TransactionalEventListener
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
-import no.nav.arbeidsplassen.importapi.adstate.AdstateKafkaSender
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
