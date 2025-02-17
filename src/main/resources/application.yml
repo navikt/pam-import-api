@@ -92,9 +92,6 @@ transferlog:
     months: 6
   scheduler:
     enabled: true
-  adstate:
-    kafka:
-      enabled: false
 pulsevent:
   kafka:
     enabled: true
