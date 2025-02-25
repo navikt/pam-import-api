@@ -109,17 +109,12 @@ adminstatussync:
   kafka:
     enabled: true
 #    offsettimestamp: "2020-01-01T00:00:00Z"
-  feedurl: ${PAM_AD_FEED_URL:`http://localhost:9001/api/v1/ads?source=IMPORTAPI`}
-  pagesize: 200
 kafka:
   brokers: ${KAFKA_BROKERS:`http://localhost`}
   credstorepass: ${KAFKA_CREDSTORE_PASSWORD:}
   truststorepath: ${KAFKA_TRUSTSTORE_PATH:}
   keystorepath: ${KAFKA_KEYSTORE_PATH:}
 appname: ${NAIS_APP_NAME:}
-shedlock:
-  defaults:
-    lock-at-most-for: 1m
 ad:
   preview:
     url: ${AD_PREVIEW_URL:`http://localhost:8080/stillinger/intern`}

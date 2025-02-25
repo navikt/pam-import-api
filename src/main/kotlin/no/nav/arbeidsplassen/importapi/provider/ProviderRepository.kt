@@ -1,72 +1,109 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
-import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import jakarta.transaction.Transactional
-import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
+import java.sql.ResultSet
+import no.nav.arbeidsplassen.importapi.config.NavPageable
+import no.nav.arbeidsplassen.importapi.config.NavSlice
+import no.nav.arbeidsplassen.importapi.config.TxTemplate
 
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
+interface ProviderRepository {
+    fun save(entity: Provider): Provider
+    fun saveAll(entities: Iterable<Provider>): List<Provider>
+    fun findById(id: Long): Provider?
+    fun deleteById(id: Long)
+    fun list(page: NavPageable): NavSlice<Provider>
+}
+
+class JdbcProviderRepository(val txTemplate: TxTemplate): ProviderRepository {
 
     val insertSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
     val updateSQL = """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
     val migrateSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
+    val listSQL = """select * from "provider" where "id" > ? order by id asc limit ?"""
 
-    @Transactional
-    override fun <S : Provider> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong(1)) as S
-            }
-        }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check(executeUpdate() == 1 )
-                return entity
+    override fun save(entity: Provider): Provider {
+        return txTemplate.doInTransaction{ ctx ->
+            val connection = ctx.connection()
+            if (entity.isNew()) {
+                connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+                    prepareSQL(entity)
+                    execute()
+                    check(generatedKeys.next())
+                }.use { entity.copy(id = it.generatedKeys.getLong(1)) }
+            } else {
+                connection.prepareStatement(updateSQL).apply {
+                    prepareSQL(entity)
+                    check(executeUpdate() == 1)
+                }.use { entity }
             }
         }
     }
 
-    @Transactional
-    open fun saveOnMigrate(entities: Iterable<Provider>) {
-        entities.forEach {
-            connection.prepareStatement(migrateSQL).apply {
-                setString(1, it.jwtid)
-                setString(2, it.identifier)
-                setString(3, it.email)
-                setString(4, it.phone)
-                setTimestamp(5, it.created.toTimeStamp())
-                setTimestamp(6, it.updated.toTimeStamp())
-                setObject(7, it.id)
-                execute()
+    fun saveOnMigrate(entities: Iterable<Provider>) {
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            entities.forEach {
+                connection.prepareStatement(migrateSQL).apply {
+                    setString(1, it.jwtid)
+                    setString(2, it.identifier)
+                    setString(3, it.email)
+                    setString(4, it.phone)
+                    setTimestamp(5, it.created.toTimeStamp())
+                    setTimestamp(6, it.updated.toTimeStamp())
+                    setObject(7, it.id)
+                    execute()
+                }
             }
         }
-
     }
 
-    @Transactional
-    override fun <S : Provider> saveAll(entities: Iterable<S>): List<S> {
-
+    override fun saveAll(entities: Iterable<Provider>): List<Provider> {
         return entities.map { save(it) }.toList()
     }
 
-    @Transactional
-    abstract fun list(pageable: Pageable): Slice<Provider>
+    override fun findById(id: Long): Provider {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteById(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+    override fun list(page: NavPageable): NavSlice<Provider> {
+        return txTemplate.doInTransaction{ ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(listSQL).apply {
+                setObject(1, page.offset)
+                setInt(2, page.limit)
+            }.use {
+                val res: ResultSet = it.executeQuery()
+                val providers: MutableList<Provider> = mutableListOf<Provider>()
+                while( res.next() ) {
+                    providers.add(mapProvider(res))
+                }
+                return@doInTransaction NavSlice(providers, page)
+            }
+        }
+    }
+
+    fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: NavPageable): NavSlice<Provider> {
+        TODO()
+    }
+    
+    private fun mapProvider(res: ResultSet) = Provider(
+        id = res.getLong("id"),
+        identifier = res.getString("identifier"),
+        jwtid = res.getString("jwtid"),
+        email = res.getString("email"),
+        phone = res.getString("phone"),
+        created = res.getTimestamp("created").toLocalDateTime(),
+        updated = res.getTimestamp("updated").toLocalDateTime()
+    )
 
     private fun PreparedStatement.prepareSQL(entity: Provider) {
         setString(1, entity.jwtid)
@@ -80,12 +117,8 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
         else {
             setLong(6, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
-
         }
     }
-
-    @Transactional
-    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<Provider>
 }
 
 fun LocalDateTime.toTimeStamp(): Timestamp {
