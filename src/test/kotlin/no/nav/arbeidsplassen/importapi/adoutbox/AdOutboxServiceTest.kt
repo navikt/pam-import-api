@@ -65,8 +65,4 @@ class AdOutboxServiceTest(
 
         assertEquals(0, adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0).size)
     }
-
-    private fun AdOutboxRepository.hentAlle() = connection
-        .prepareStatement("SELECT * FROM ad_outbox").executeQuery()
-        .use { generateSequence { if (it.next()) it.toAdOutbox() else null }.toList() }
 }

@@ -1,30 +1,28 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.Statement
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import java.sql.ResultSet
-import no.nav.arbeidsplassen.importapi.config.NavPageable
-import no.nav.arbeidsplassen.importapi.config.NavSlice
 import no.nav.arbeidsplassen.importapi.config.TxTemplate
-
 
 interface ProviderRepository {
     fun save(entity: Provider): Provider
-    fun saveAll(entities: Iterable<Provider>): List<Provider>
     fun findById(id: Long): Provider?
     fun deleteById(id: Long)
-    fun list(page: NavPageable): NavSlice<Provider>
 }
 
-class JdbcProviderRepository(val txTemplate: TxTemplate): ProviderRepository {
+@Singleton
+class JdbcProviderRepository(private val txTemplate: TxTemplate): ProviderRepository {
 
     val insertSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
     val updateSQL = """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
     val migrateSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
-    val listSQL = """select * from "provider" where "id" > ? order by id asc limit ?"""
+    val findSQL = """select * from "provider" where id = ?"""
+    val deleteSQL = """delete from "provider" where id = ?"""
 
     override fun save(entity: Provider): Provider {
         return txTemplate.doInTransaction{ ctx ->
@@ -39,7 +37,8 @@ class JdbcProviderRepository(val txTemplate: TxTemplate): ProviderRepository {
                 connection.prepareStatement(updateSQL).apply {
                     prepareSQL(entity)
                     check(executeUpdate() == 1)
-                }.use { entity }
+                }
+                entity
             }
         }
     }
@@ -62,18 +61,35 @@ class JdbcProviderRepository(val txTemplate: TxTemplate): ProviderRepository {
         }
     }
 
-    override fun saveAll(entities: Iterable<Provider>): List<Provider> {
-        return entities.map { save(it) }.toList()
-    }
-
-    override fun findById(id: Long): Provider {
-        TODO("Not yet implemented")
+    override fun findById(id: Long): Provider? {
+        return txTemplate.doInTransactionNullable{ ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(findSQL)
+                .apply {
+                    setObject(1, id)
+                }.use {
+                    val rs: ResultSet = it.executeQuery()
+                    if( rs.next()) {
+                        return@doInTransactionNullable mapProvider(rs)
+                    }
+                    return@doInTransactionNullable null
+                }
+        }
     }
 
     override fun deleteById(id: Long) {
-        TODO("Not yet implemented")
+        txTemplate.doInTransaction{ ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteSQL).apply {
+                setObject(1, id)
+                check(executeUpdate() == 1)
+                // HPH: Skal vi feile hvis vi prøver å slette noe som ikke finnes? Jeg tror det, hvis jeg tolker dette riktig:
+                // https://micronaut-projects.github.io/micronaut-data/2.4.1/api/io/micronaut/data/repository/CrudRepository.html#deleteById-ID-
+            }
+        }
     }
 
+    /*
     override fun list(page: NavPageable): NavSlice<Provider> {
         return txTemplate.doInTransaction{ ctx ->
             val connection = ctx.connection()
@@ -90,10 +106,7 @@ class JdbcProviderRepository(val txTemplate: TxTemplate): ProviderRepository {
             }
         }
     }
-
-    fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: NavPageable): NavSlice<Provider> {
-        TODO()
-    }
+   */
     
     private fun mapProvider(res: ResultSet) = Provider(
         id = res.getLong("id"),

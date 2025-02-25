@@ -4,35 +4,45 @@ import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
 import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.Statement
 import java.util.*
 import jakarta.transaction.Transactional
+import java.sql.ResultSet
+import java.time.LocalDateTime
+import no.nav.arbeidsplassen.importapi.config.TxTemplate
+import no.nav.arbeidsplassen.importapi.provider.Provider
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
+abstract class AdminStatusRepository(private val txTemplate: TxTemplate) {
 
     val insertSQL = """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created", "publish_status") values(?,?,?,?,?,?,?,?)"""
     val updateSQL = """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "publish_status"=?, "updated"=current_timestamp where "id"=?"""
+    val findByUuidSQL = """jfdkjdk"""
+    val findByVersionIdAndProviderIdSQL = """jfdkjdk"""
+    val findByProviderIdAndReferenceSQL = """jfdkjdk"""
+    val findByVersionIdSQL = """jfdkjdk"""
 
-    @Transactional
-    override fun <S : AdminStatus> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id=generatedKeys.getLong(1)) as S
-            }
-        }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check (executeUpdate() == 1)
-                return entity
+    fun save(entity: AdminStatus): AdminStatus {
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            if (entity.isNew()) {
+                connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
+                    prepareSQL(entity)
+                    execute()
+                    check(generatedKeys.next())
+                }.use { entity.copy(id = it.generatedKeys.getLong(1)) }
+            } else {
+                connection.prepareStatement(updateSQL).apply {
+                    prepareSQL(entity)
+                    check(executeUpdate() == 1)
+                }
+                entity
             }
         }
     }
@@ -58,22 +68,61 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
         }
     }
 
-    @Transactional
-    override fun <S : AdminStatus> saveAll(entities: Iterable<S>): List<S> {
+    fun saveAll(entities: Iterable<AdminStatus>): List<AdminStatus> {
         return entities.map { save(it) }.toList()
     }
 
-    @Transactional
-    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdminStatus>
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus? {
+        return txTemplate.doInTransactionNullable{ ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(findByUuidSQL)
+                .apply {
+                    setLong(1, providerId)
+                    setString(2, reference)
+                }.use {
+                    val rs: ResultSet = it.executeQuery()
+                    if( rs.next()) {
+                        return@doInTransactionNullable rs.mapAdminStatus()
+                    }
+                    return@doInTransactionNullable null
+                }
+        }
+    }
 
-    @Transactional
-    abstract fun findByVersionId(versionId: Long): List<AdminStatus>
+    fun findByVersionId(versionId: Long): List<AdminStatus> {
 
-    @Transactional
-    abstract fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus>
+    }
 
-    @Transactional
-    abstract fun findByUuid(uuid:String): AdminStatus?
+    fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus> {
 
+    }
 
+    fun findByUuid(uuid:String): AdminStatus? {
+        return txTemplate.doInTransactionNullable{ ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(findByUuidSQL)
+                .apply {
+                    setObject(1, uuid)
+                }.use {
+                    val rs: ResultSet = it.executeQuery()
+                    if( rs.next()) {
+                        return@doInTransactionNullable rs.mapAdminStatus()
+                    }
+                    return@doInTransactionNullable null
+                }
+        }
+    }
+
+    private fun ResultSet.mapAdminStatus() = AdminStatus(
+        id = getLong("id"),
+        uuid = getString("uuid"),
+        status = Status.valueOf(getString("status")),
+        message = getString("message"),
+        reference = getString("reference"),
+        providerId = getLong("providerId"),
+        versionId = getLong("versionId"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime(),
+        publishStatus = PublishStatus.valueOf(getString("publishStatus")),
+    )
 }

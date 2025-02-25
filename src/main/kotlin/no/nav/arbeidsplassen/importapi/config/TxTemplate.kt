@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.config
 
 
+import jakarta.inject.Singleton
 import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -56,6 +57,7 @@ import javax.sql.DataSource
  *   TxTemplate bruker ScopedValue til dette, noe som fungerer bedre med virtuelle tråder og som er tryggere mtp lekkasje.
  *
  */
+@Singleton
 class TxTemplate(private val ds: DataSource) {
     companion object {
         private val LOG = LoggerFactory.getLogger(TxTemplate::class.java)

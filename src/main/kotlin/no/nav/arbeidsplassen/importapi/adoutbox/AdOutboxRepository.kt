@@ -3,15 +3,17 @@ package no.nav.arbeidsplassen.importapi.adoutbox
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
+import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.Connection
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import jakarta.transaction.Transactional
+import no.nav.arbeidsplassen.importapi.config.TxTemplate
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<AdOutbox, Long> {
-    open fun ResultSet.toAdOutbox() = AdOutbox(
+@Singleton
+class AdOutboxRepository(private val txTemplate: TxTemplate) {
+    fun ResultSet.toAdOutbox() = AdOutbox(
         id = this.getLong("id"),
         uuid = this.getString("uuid"),
         payload = this.getString("payload"),
@@ -22,26 +24,36 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
         prosessertDato = this.getObject("prosessert_dato", LocalDateTime::class.java)
     )
 
-    @Transactional
-    open fun lagre(entity: AdOutbox): Int {
+    fun hentAlle() : List<AdOutbox> {
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection
+                .prepareStatement("SELECT * FROM ad_outbox").executeQuery()
+                .use { generateSequence { if (it.next()) it.toAdOutbox() else null }.toList() }
+        }
+    }
+
+    fun lagre(entity: AdOutbox): Int {
         val sql = """
             INSERT INTO ad_outbox (uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
-        return connection.prepareStatement(sql).apply {
-            setString(1, entity.uuid)
-            setString(2, entity.payload)
-            setTimestamp(3, entity.opprettetDato.toTimeStamp())
-            setBoolean(4, entity.harFeilet)
-            setInt(5, entity.antallForsøk)
-            setTimestamp(6, entity.sisteForsøkDato?.toTimeStamp())
-            setTimestamp(7, entity.prosessertDato?.toTimeStamp())
-        }.executeUpdate()
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(sql).apply {
+                setString(1, entity.uuid)
+                setString(2, entity.payload)
+                setTimestamp(3, entity.opprettetDato.toTimeStamp())
+                setBoolean(4, entity.harFeilet)
+                setInt(5, entity.antallForsøk)
+                setTimestamp(6, entity.sisteForsøkDato?.toTimeStamp())
+                setTimestamp(7, entity.prosessertDato?.toTimeStamp())
+            }.executeUpdate()
+        }
     }
 
-    @Transactional
-    open fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> {
+    fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> {
         val sql = """
             SELECT id, uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato 
             FROM ad_outbox
@@ -50,38 +62,44 @@ abstract class AdOutboxRepository(val connection: Connection) : CrudRepository<A
             LIMIT ?
         """.trimIndent()
 
-        val resultSet = connection
-            .prepareStatement(sql)
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(sql)
             .apply {
                 setTimestamp(1, LocalDateTime.now().minusSeconds(outboxDelay).toTimeStamp())
                 setInt(2, batchSize)
-            }.executeQuery()
-
-        return resultSet.use { generateSequence { if (it.next()) it.toAdOutbox() else null }.toList() }
+            }
+            .use {
+                val rs = it.executeQuery()
+                return@doInTransaction generateSequence { if (rs.next()) rs.toAdOutbox() else null }.toList() }
+            }
     }
 
-    @Transactional
-    open fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
+    fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
 
-    @Transactional
-    open fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
+    fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
         val sql = """UPDATE ad_outbox SET prosessert_dato = ? WHERE id = ?"""
-
-        return connection.prepareStatement(sql).apply {
-            setTimestamp(1, adOutbox.prosessertDato?.toTimeStamp())
-            setLong(2, adOutbox.id!!)
-        }.executeUpdate() > 0
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(sql).apply {
+                setTimestamp(1, adOutbox.prosessertDato?.toTimeStamp())
+                setLong(2, adOutbox.id!!)
+            }.executeUpdate() > 0
+        }
     }
 
-    @Transactional
-    open fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
+
+    fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
         val sql = """UPDATE ad_outbox SET har_feilet = ?, antall_forsok = ?, siste_forsok_dato = ? WHERE id = ?"""
 
-        return connection.prepareStatement(sql).apply {
-            setBoolean(1, adOutbox.harFeilet)
-            setInt(2, adOutbox.antallForsøk)
-            setTimestamp(3, adOutbox.sisteForsøkDato?.toTimeStamp())
-            setLong(4, adOutbox.id!!)
-        }.executeUpdate() > 0
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(sql).apply {
+                setBoolean(1, adOutbox.harFeilet)
+                setInt(2, adOutbox.antallForsøk)
+                setTimestamp(3, adOutbox.sisteForsøkDato?.toTimeStamp())
+                setLong(4, adOutbox.id!!)
+            }.executeUpdate() > 0
+        }
     }
 }
