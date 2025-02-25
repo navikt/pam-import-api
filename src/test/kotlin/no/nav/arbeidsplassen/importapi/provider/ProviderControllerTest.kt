@@ -46,8 +46,11 @@ class ProviderControllerTest(private val tokenService: TokenService) {
         client.exchange(put, ProviderDTO::class.java).blockingFirst()
         val updated = client.exchange(read, ProviderDTO::class.java).blockingFirst().body()
         assertEquals("webcruiter2", updated?.identifier)
-
     }
+
+    /*
+    // HPH: Jeg beholder dette for å dokumentere hvordan man kan kalle en metode som tar pageable som input
+    // og returnerer slice som output.
 
     @Test
     fun `list providers`() {
@@ -68,7 +71,7 @@ class ProviderControllerTest(private val tokenService: TokenService) {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .bearerAuth(adminToken)
-        
+
         client.exchange(create1, ProviderDTO::class.java).blockingFirst().body()
         client.exchange(create2, ProviderDTO::class.java).blockingFirst().body()
         client.exchange(create3, ProviderDTO::class.java).blockingFirst().body()
@@ -82,4 +85,6 @@ class ProviderControllerTest(private val tokenService: TokenService) {
         val reddit : Slice<ProviderDTO> = client.exchange(read, bodyType).blockingFirst().body()
         assertEquals(3, reddit.content.size)
     }
+
+     */
 }
