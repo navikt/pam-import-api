@@ -1,6 +1,8 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.context.annotation.Property
+import io.micronaut.core.type.GenericArgument
+import io.micronaut.data.model.Slice
 import io.micronaut.http.HttpRequest.*
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.annotation.Client
@@ -45,5 +47,39 @@ class ProviderControllerTest(private val tokenService: TokenService) {
         val updated = client.exchange(read, ProviderDTO::class.java).blockingFirst().body()
         assertEquals("webcruiter2", updated?.identifier)
 
+    }
+
+    @Test
+    fun `list providers`() {
+        // create provider
+        val adminToken = tokenService.adminToken()
+        val create1 = POST("/internal/providers",
+            ProviderDTO(identifier = "webcruiter1", email = "test1@test.no", phone = "12345678"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val create2 = POST("/internal/providers",
+            ProviderDTO(identifier = "webcruiter2", email = "test2@test.no", phone = "12345678"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val create3 = POST("/internal/providers",
+            ProviderDTO(identifier = "webcruiter3", email = "test3@test.no", phone = "12345678"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        
+        client.exchange(create1, ProviderDTO::class.java).blockingFirst().body()
+        client.exchange(create2, ProviderDTO::class.java).blockingFirst().body()
+        client.exchange(create3, ProviderDTO::class.java).blockingFirst().body()
+
+        val bodyType = object: GenericArgument<Slice<ProviderDTO>>() {}
+        // Man kan iterere gjennom pageable ved en URL ala /internal/providers?size=200&page=2
+        val read = GET<String>("/internal/providers")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val reddit : Slice<ProviderDTO> = client.exchange(read, bodyType).blockingFirst().body()
+        assertEquals(3, reddit.content.size)
     }
 }

@@ -27,7 +27,10 @@ class ProviderController(private val providerService: ProviderService,
 
     @Get("/")
     fun getProviders(pageable: Pageable): Slice<ProviderDTO> {
-        return providerService.list(pageable)
+        LOG.info("pageable: $pageable")
+        val providers: Slice<ProviderDTO> = providerService.list(pageable)
+        LOG.info("Antall providers: ${providers.content.size}")
+        return providers
     }
 
     @Post("/")
