@@ -25,11 +25,6 @@ class ProviderController(private val providerService: ProviderService,
         return HttpResponse.ok(providerService.findById(id))
     }
 
-    @Get("/")
-    fun getProviders(pageable: Pageable): Slice<ProviderDTO> {
-        return providerService.list(pageable)
-    }
-
     @Post("/")
     fun createProvider(@Body provider: ProviderDTO): HttpResponse<ProviderDTO> {
         LOG.info("Creating provider ${provider.identifier}")

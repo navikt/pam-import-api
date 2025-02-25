@@ -23,8 +23,12 @@ class AdStateController(private val adStateService: AdStateService) {
     fun getAdStateByUuid(@PathVariable providerId: Long, @PathVariable uuid: String): AdStatePublicDTO
             = adStateService.getAdStateByUuidAndProviderId(uuid, providerId)
 
+    /*
+    // HPH: Kommenterer ut denne da jeg ikke finner at den er i bruk i accessloggene
     @Get("/{providerId}/versions/{versionId}")
     fun getAdStatesByProvider(@PathVariable providerId: Long, @PathVariable versionId: Long, pageable: Pageable): Slice<AdStatePublicDTO> {
         return adStateService.getAdStatesByVersionIdAndProviderId(versionId, providerId, pageable)
     }
+    */
+
 }
