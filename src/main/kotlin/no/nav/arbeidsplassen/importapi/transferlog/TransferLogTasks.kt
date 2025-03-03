@@ -76,11 +76,10 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
 
     private fun mapAdToAdState(ad: AdDTO, transferLog: TransferLog): AdState {
         LOG.info("Mapping ad {} for providerId {} transferlog {}", ad.reference, transferLog.providerId, transferLog.id)
-        val inDb = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
-        return inDb.map {
-            it.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad))) }
-                .orElseGet{ AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)),
-                        providerId = transferLog.providerId, reference = ad.reference)}
+        val inDb: AdState? = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
+        return inDb?.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)))
+            ?: AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)),
+                        providerId = transferLog.providerId, reference = ad.reference)
     }
 
     fun sanitizeAd(ad: AdDTO): AdDTO {

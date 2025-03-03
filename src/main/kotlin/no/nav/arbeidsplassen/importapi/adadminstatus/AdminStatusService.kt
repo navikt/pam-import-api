@@ -11,17 +11,8 @@ class AdminStatusService(private val adminStatusRepository: AdminStatusRepositor
                          @Value("\${ad.preview.url}") private val previewUrl: String) {
 
     fun findByProviderReference(providerId: Long, reference: String): AdAdminStatusDTO {
-        return adminStatusRepository.findByProviderIdAndReference(providerId, reference)
-                .orElseThrow{
-                    ImportApiError(message = "AdAdminStatus for $providerId, $reference not found", type = ErrorType.NOT_FOUND)
-                }
-                .toDTO()
-    }
-
-    fun findByVersion(versionId: Long): List<AdAdminStatusDTO> {
-        return adminStatusRepository.findByVersionId(versionId).map {
-            it.toDTO()
-        }
+        return adminStatusRepository.findByProviderIdAndReference(providerId, reference)?.toDTO()
+            ?: throw ImportApiError(message = "AdAdminStatus for $providerId, $reference not found", type = ErrorType.NOT_FOUND)
     }
 
     fun findByVersionAndProviderId(versionId: Long, providerId: Long): List<AdAdminStatusDTO> {

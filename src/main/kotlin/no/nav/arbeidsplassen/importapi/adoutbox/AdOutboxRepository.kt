@@ -1,28 +1,13 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
-import java.sql.Connection
 import java.sql.ResultSet
 import java.time.LocalDateTime
-import jakarta.transaction.Transactional
 import no.nav.arbeidsplassen.importapi.config.TxTemplate
 
 @Singleton
 class AdOutboxRepository(private val txTemplate: TxTemplate) {
-    fun ResultSet.toAdOutbox() = AdOutbox(
-        id = this.getLong("id"),
-        uuid = this.getString("uuid"),
-        payload = this.getString("payload"),
-        opprettetDato = this.getObject("opprettet_dato", LocalDateTime::class.java),
-        harFeilet = this.getBoolean("har_feilet"),
-        antallForsøk = this.getInt("antall_forsok"),
-        sisteForsøkDato = this.getObject("siste_forsok_dato", LocalDateTime::class.java),
-        prosessertDato = this.getObject("prosessert_dato", LocalDateTime::class.java)
-    )
 
     fun hentAlle() : List<AdOutbox> {
         return txTemplate.doInTransaction { ctx ->
@@ -102,4 +87,15 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
             }.executeUpdate() > 0
         }
     }
+
+    private fun ResultSet.toAdOutbox() = AdOutbox(
+        id = this.getLong("id"),
+        uuid = this.getString("uuid"),
+        payload = this.getString("payload"),
+        opprettetDato = this.getObject("opprettet_dato", LocalDateTime::class.java),
+        harFeilet = this.getBoolean("har_feilet"),
+        antallForsøk = this.getInt("antall_forsok"),
+        sisteForsøkDato = this.getObject("siste_forsok_dato", LocalDateTime::class.java),
+        prosessertDato = this.getObject("prosessert_dato", LocalDateTime::class.java)
+    )
 }

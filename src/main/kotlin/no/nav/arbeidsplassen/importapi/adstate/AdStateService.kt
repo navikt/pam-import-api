@@ -18,12 +18,6 @@ class AdStateService(private val adStateRepository: AdStateRepository,
                      private val objectMapper: ObjectMapper,
                      private val providerService: ProviderService) {
 
-    fun getAdStates(pageable: Pageable): Slice<AdStatePublicDTO> {
-        return adStateRepository.list(pageable).map {
-            it.toDTO()
-        }
-    }
-
     @Throws(ImportApiError::class)
     fun getAdStateByUuid(uuid: String): AdStatePublicDTO {
         return adStateRepository.findByUuid(uuid)?.toDTO()
@@ -34,31 +28,13 @@ class AdStateService(private val adStateRepository: AdStateRepository,
             .orElseThrow{ ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND) }.toDTO()
 
     fun getAdStatesByProviderReference(providerId:Long, reference:String): AdStatePublicDTO =
-        adStateRepository.findByProviderIdAndReference(providerId, reference)
-                .orElseThrow { ImportApiError("AdState with $providerId $reference not found", ErrorType.NOT_FOUND) }
-                .toDTO()
+        adStateRepository.findByProviderIdAndReference(providerId, reference)?.toDTO()
+            ?: throw ImportApiError("AdState with $providerId $reference not found", ErrorType.NOT_FOUND)
 
-    fun getAdStatesByUpdatedForInternalUse(updated:LocalDateTime, pageable: Pageable): Slice<AdStateDTO> {
-        return adStateRepository.findByUpdatedGreaterThanEquals(updated, pageable).map {
-            it.toInternalDTO()
-        }
-    }
-
-    fun getAdStatesByVersionId(versionId: Long, pageable: Pageable): Slice<AdStatePublicDTO> {
-        return adStateRepository.list(versionId, pageable).map{
-            it.toDTO()
-        }
-    }
-
-    fun getAdStatesByVersionIdAndProviderId(versionId: Long, providerId: Long, pageable: Pageable): Slice<AdStatePublicDTO> {
-        return adStateRepository.list(versionId, providerId, pageable).map{
-            it.toDTO()
-        }
-    }
 
     fun resendAdState(uuid: String): AdStatePublicDTO {
-        val resend = adStateRepository.findByUuid(uuid)?.copy(updated = LocalDateTime.now()) ?: throw
-           ImportApiError("Adstate with $uuid not found", ErrorType.NOT_FOUND)
+        val resend = adStateRepository.findByUuid(uuid)?.copy(updated = LocalDateTime.now())
+            ?: throw ImportApiError("Adstate with $uuid not found", ErrorType.NOT_FOUND)
         return adStateRepository.save(resend).toDTO()
     }
 
