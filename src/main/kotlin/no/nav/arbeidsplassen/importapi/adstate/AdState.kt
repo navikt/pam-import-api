@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.adstate
 
 import java.time.LocalDateTime
 import java.util.*
+import no.nav.arbeidsplassen.importapi.repository.Entity
 
 data class AdState(
         override var id: Long? = null,

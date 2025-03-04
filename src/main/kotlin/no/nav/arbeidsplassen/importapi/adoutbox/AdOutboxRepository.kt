@@ -1,20 +1,20 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
 import jakarta.inject.Singleton
-import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
 import java.sql.ResultSet
+import java.sql.Timestamp
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.config.TxTemplate
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
 class AdOutboxRepository(private val txTemplate: TxTemplate) {
 
-    fun hentAlle() : List<AdOutbox> {
+    fun hentAlle(): List<AdOutbox> {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection
                 .prepareStatement("SELECT * FROM ad_outbox").executeQuery()
-                .use { generateSequence { if (it.next()) it.toAdOutbox() else null }.toList() }
+                .use { generateSequence { if (it.next()) it.mapToEntity() else null }.toList() }
         }
     }
 
@@ -50,14 +50,15 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(sql)
-            .apply {
-                setTimestamp(1, LocalDateTime.now().minusSeconds(outboxDelay).toTimeStamp())
-                setInt(2, batchSize)
-            }
-            .use {
-                val rs = it.executeQuery()
-                return@doInTransaction generateSequence { if (rs.next()) rs.toAdOutbox() else null }.toList() }
-            }
+                .apply {
+                    setTimestamp(1, LocalDateTime.now().minusSeconds(outboxDelay).toTimeStamp())
+                    setInt(2, batchSize)
+                }
+                .use {
+                    val rs = it.executeQuery()
+                    return@doInTransaction generateSequence { if (rs.next()) rs.mapToEntity() else null }.toList()
+                }
+        }
     }
 
     fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
@@ -88,7 +89,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         }
     }
 
-    private fun ResultSet.toAdOutbox() = AdOutbox(
+    private fun ResultSet.mapToEntity() = AdOutbox(
         id = this.getLong("id"),
         uuid = this.getString("uuid"),
         payload = this.getString("payload"),
@@ -98,4 +99,8 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         sisteForsøkDato = this.getObject("siste_forsok_dato", LocalDateTime::class.java),
         prosessertDato = this.getObject("prosessert_dato", LocalDateTime::class.java)
     )
+
+    private fun LocalDateTime.toTimeStamp(): Timestamp {
+        return Timestamp.valueOf(this)
+    }
 }

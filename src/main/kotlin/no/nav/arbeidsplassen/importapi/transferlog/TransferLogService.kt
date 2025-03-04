@@ -1,6 +1,10 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import jakarta.inject.Singleton
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.DateTimeParseException
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
@@ -11,10 +15,6 @@ import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.format.DateTimeParseException
 
 
 @Singleton
@@ -37,15 +37,14 @@ class TransferLogService(
     }
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
-        return transferLogRepository.findByIdAndProviderId(versionId, providerId)
-            .orElseThrow { ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND) }
-            .toDTO()
+        return transferLogRepository.findByIdAndProviderId(versionId, providerId)?.toDTO()
+            ?: throw ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
+
     }
 
     fun findByVersionId(versionId: Long): TransferLogDTO {
-        return transferLogRepository.findById(versionId).orElseThrow {
-            ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
-        }.toDTO()
+        return transferLogRepository.findById(versionId)?.toDTO()
+            ?: throw ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
     }
 
     private fun TransferLogDTO.toEntity(): TransferLog {
@@ -60,9 +59,8 @@ class TransferLogService(
     }
 
     fun resend(versionId: Long): TransferLogDTO {
-        val received = transferLogRepository.findById(versionId).orElseThrow {
-            ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
-        }.copy(status = TransferLogStatus.RECEIVED)
+        val received = transferLogRepository.findById(versionId)?.copy(status = TransferLogStatus.RECEIVED)
+            ?: throw ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
         return transferLogRepository.save(received).toDTO()
     }
 
@@ -74,7 +72,7 @@ class TransferLogService(
             return ad.copy(expires = newExpiryDate)
         }
 
-        val dueDate = ad.properties[PropertyNames.applicationdue]?.let {parseApplicationDueDate(it)?.atStartOfDay() }
+        val dueDate = ad.properties[PropertyNames.applicationdue]?.let { parseApplicationDueDate(it)?.atStartOfDay() }
         if (dueDate != null && ad.expires != null && dueDate.isBefore(ad.expires)) {
             return ad.copy(expires = dueDate)
         }
@@ -103,7 +101,8 @@ class TransferLogService(
     /** Vi ønsker å få inn annonsen selv om kategorien er feil / ugyldig, da vi uansett gjør en automatisk klassifisering mot Janzz */
     fun handleInvalidCategories(ad: AdDTO, providerId: Long, reference: String): AdDTO {
         val invalidCategories: List<CategoryDTO> = findInvalidCategories(ad, providerId, reference)
-        return ad.copy(properties = addInvalidCategoriesToProperties(invalidCategories, ad.properties.toMutableMap()),
+        return ad.copy(
+            properties = addInvalidCategoriesToProperties(invalidCategories, ad.properties.toMutableMap()),
             categoryList = ad.categoryList.filter { cat -> !invalidCategories.contains(cat) })
     }
 

@@ -1,11 +1,11 @@
-package no.nav.arbeidsplassen.importapi.config
+package no.nav.arbeidsplassen.importapi.repository
 
 
 import jakarta.inject.Singleton
-import org.slf4j.LoggerFactory
 import java.sql.Connection
 import java.sql.PreparedStatement
 import javax.sql.DataSource
+import org.slf4j.LoggerFactory
 
 /**
  * TxTemplate er løst basert på ideen bak spring TransactionTemplate – bare mye enklere.
@@ -129,6 +129,7 @@ enum class TxPropagation {
      */
     REQUIRES_NEW
 }
+
 class TxContext(private val conn: Connection) {
     private var rollbackOnly = false
 

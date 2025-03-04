@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
-import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Sort
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
+import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
@@ -21,27 +21,30 @@ import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
 
 @Singleton
 @Open
-class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
-                       private val adStateRepository: AdStateRepository,
-                       private val objectMapper: ObjectMapper,
-                       private val meterRegistry: MeterRegistry,
-                       private val styrkCodeConverter : StyrkCodeConverter,
-                       private val lokalOntologiGateway : LokalOntologiGateway,
-                       private val adOutboxService: AdOutboxService,
-                       @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
-                       @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long) {
+class TransferLogTasks(
+    private val transferLogRepository: TransferLogRepository,
+    private val adStateRepository: AdStateRepository,
+    private val objectMapper: ObjectMapper,
+    private val meterRegistry: MeterRegistry,
+    private val styrkCodeConverter: StyrkCodeConverter,
+    private val lokalOntologiGateway: LokalOntologiGateway,
+    private val adOutboxService: AdOutboxService,
+    @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
+    @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogTasks::class.java)
     }
 
-
-    fun processTransferLogTask():Int {
-        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED, Pageable.from(0,logSize, Sort.of(Sort.Order.asc("updated"))))
+    fun processTransferLogTask(): Int {
+        val transferlogs = transferLogRepository.findByStatus(
+            TransferLogStatus.RECEIVED,
+            Pageable.from(0, logSize, Sort.of(Sort.Order.asc("updated")))
+        )
         transferlogs.stream().forEach {
             mapTransferLog(it)
         }
@@ -60,7 +63,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
             LOG.info("mapping transfer ${it.id} for provider ${it.providerId} found ${adList.size} ads ")
             val savedList = adStateRepository.saveAll(adList)
             transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
-            meterRegistry.counter("ads_received", "provider", it.providerId.toString()).increment(adList.size.toDouble())
+            meterRegistry.counter("ads_received", "provider", it.providerId.toString())
+                .increment(adList.size.toDouble())
             adOutboxService.lagreFlereTilOutbox(savedList)
         } catch (e: Exception) {
             LOG.error("Got exception while handling transfer log ${it.id}", e)
@@ -69,8 +73,8 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     }
 
     private fun mapTransferLogs(transferLog: TransferLog): List<AdState> {
-        val ads = objectMapper.readValue(transferLog.payload, object: TypeReference<List<AdDTO>>(){})
-        return ads.stream().map { mapAdToAdState(it, transferLog)}.toList()
+        val ads = objectMapper.readValue(transferLog.payload, object : TypeReference<List<AdDTO>>() {})
+        return ads.stream().map { mapAdToAdState(it, transferLog) }.toList()
 
     }
 
@@ -78,8 +82,10 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
         LOG.info("Mapping ad {} for providerId {} transferlog {}", ad.reference, transferLog.providerId, transferLog.id)
         val inDb: AdState? = adStateRepository.findByProviderIdAndReference(transferLog.providerId, ad.reference)
         return inDb?.copy(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)))
-            ?: AdState(versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)),
-                        providerId = transferLog.providerId, reference = ad.reference)
+            ?: AdState(
+                versionId = transferLog.id!!, jsonPayload = objectMapper.writeValueAsString(sanitizeAd(ad)),
+                providerId = transferLog.providerId, reference = ad.reference
+            )
     }
 
     fun sanitizeAd(ad: AdDTO): AdDTO {
@@ -121,7 +127,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
     private fun addEscoToCategoriesIfExists(
         categoryList: MutableList<CategoryDTO>,
         konseptGruppering: KonseptGrupperingDTO
-    ){
+    ) {
         konseptGruppering.esco?.let { escoCategory ->
             CategoryDTO(
                 code = escoCategory.uri,
@@ -129,14 +135,14 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                 name = escoCategory.label,
                 janzzParentId = konseptGruppering.konseptId.toString()
             )
-        }?.let { categoryList.add(it)}
+        }?.let { categoryList.add(it) }
     }
 
     private fun addStyrkToCategoriesIfExists(
         categoryList: MutableList<CategoryDTO>,
         konseptGruppering: KonseptGrupperingDTO
-    ){
-        konseptGruppering.styrk08SSB.first()?.let { styrkCode ->
+    ) {
+        konseptGruppering.styrk08SSB.firstOrNull()?.let { styrkCode ->
             styrkCodeConverter.lookup(styrkCode).get().let {
                 CategoryDTO(
                     code = it.styrkCode,
@@ -145,7 +151,7 @@ class TransferLogTasks(private val transferLogRepository: TransferLogRepository,
                     janzzParentId = konseptGruppering.konseptId.toString()
                 )
             }
-        }?.let { categoryList.add(it)}
+        }?.let { categoryList.add(it) }
     }
 
     private fun String.replaceAmpersand(): String {

@@ -4,44 +4,22 @@ import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Statement
-import java.sql.Timestamp
-import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.config.TxTemplate
-
-interface ProviderRepository {
-    fun save(entity: Provider): Provider
-    fun findById(id: Long): Provider?
-    fun deleteById(id: Long)
-}
+import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
-class JdbcProviderRepository(private val txTemplate: TxTemplate): ProviderRepository {
+class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<Provider>(txTemplate) {
 
-    val insertSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
-    val updateSQL = """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
-    val migrateSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
-    val findSQL = """select * from "provider" where id = ?"""
-    val deleteSQL = """delete from "provider" where id = ?"""
+    override val insertSQL =
+        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
+    override val updateSQL =
+        """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val findSQL = """select * from "provider" where id = ?"""
+    override val findAllSQL = """select * from "provider""""
+    override val deleteSQL = """delete from "provider" where id = ?"""
 
-    override fun save(entity: Provider): Provider {
-        return txTemplate.doInTransaction{ ctx ->
-            val connection = ctx.connection()
-            if (entity.isNew()) {
-                connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                    prepareSQL(entity)
-                    execute()
-                    check(generatedKeys.next())
-                }.use { entity.copy(id = it.generatedKeys.getLong(1)) }
-            } else {
-                connection.prepareStatement(updateSQL).apply {
-                    prepareSQL(entity)
-                    check(executeUpdate() == 1)
-                }
-                entity
-            }
-        }
-    }
+    val migrateSQL =
+        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
 
     fun saveOnMigrate(entities: Iterable<Provider>) {
         return txTemplate.doInTransaction { ctx ->
@@ -57,34 +35,6 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate): ProviderReposi
                     setObject(7, it.id)
                     execute()
                 }
-            }
-        }
-    }
-
-    override fun findById(id: Long): Provider? {
-        return txTemplate.doInTransactionNullable{ ctx ->
-            val connection = ctx.connection()
-            connection.prepareStatement(findSQL)
-                .apply {
-                    setObject(1, id)
-                }.use {
-                    val rs: ResultSet = it.executeQuery()
-                    if( rs.next()) {
-                        return@doInTransactionNullable mapProvider(rs)
-                    }
-                    return@doInTransactionNullable null
-                }
-        }
-    }
-
-    override fun deleteById(id: Long) {
-        txTemplate.doInTransaction{ ctx ->
-            val connection = ctx.connection()
-            connection.prepareStatement(deleteSQL).apply {
-                setObject(1, id)
-                check(executeUpdate() == 1)
-                // HPH: Skal vi feile hvis vi prøver å slette noe som ikke finnes? Jeg tror det, hvis jeg tolker dette riktig:
-                // https://micronaut-projects.github.io/micronaut-data/2.4.1/api/io/micronaut/data/repository/CrudRepository.html#deleteById-ID-
             }
         }
     }
@@ -107,18 +57,21 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate): ProviderReposi
         }
     }
    */
-    
-    private fun mapProvider(res: ResultSet) = Provider(
-        id = res.getLong("id"),
-        identifier = res.getString("identifier"),
-        jwtid = res.getString("jwtid"),
-        email = res.getString("email"),
-        phone = res.getString("phone"),
-        created = res.getTimestamp("created").toLocalDateTime(),
-        updated = res.getTimestamp("updated").toLocalDateTime()
+
+    override fun ResultSet.mapToEntity() = Provider(
+        id = this.getLong("id"),
+        identifier = this.getString("identifier"),
+        jwtid = this.getString("jwtid"),
+        email = this.getString("email"),
+        phone = this.getString("phone"),
+        created = this.getTimestamp("created").toLocalDateTime(),
+        updated = this.getTimestamp("updated").toLocalDateTime()
     )
 
-    private fun PreparedStatement.prepareSQL(entity: Provider) {
+    override fun Provider.kopiMedNyId(nyId: Long): Provider =
+        this.copy(id = nyId)
+
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: Provider) {
         setString(1, entity.jwtid)
         setString(2, entity.identifier)
         setString(3, entity.email)
@@ -126,14 +79,9 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate): ProviderReposi
         setTimestamp(5, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        }
-        else {
+        } else {
             setLong(6, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }
-}
-
-fun LocalDateTime.toTimeStamp(): Timestamp {
-    return Timestamp.valueOf(this)
 }

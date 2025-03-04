@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi.config
+package no.nav.arbeidsplassen.importapi.repository
 
 data class NavSlice<T>(
     val content: List<T>,

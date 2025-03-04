@@ -1,65 +1,58 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
+
 import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
 import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
-import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
-import java.sql.Connection
 import java.sql.PreparedStatement
-import java.sql.Statement
+import java.sql.ResultSet
 import java.time.LocalDateTime
-import java.util.*
-import jakarta.transaction.Transactional
+import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class TransferLogRepository(private val connection: Connection): CrudRepository<TransferLog, Long> {
+class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<TransferLog>(txTemplate) {
 
-    val insertSQL = """insert into "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") values (?,?,?,?,?,?,?)"""
-    val updateSQL = """update "transfer_log" set "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val insertSQL =
+        """insert into "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") values (?,?,?,?,?,?,?)"""
+    override val updateSQL =
+        """update "transfer_log" set "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val findSQL: String = """select * from "transfer_log" where id = ?"""
+    override val findAllSQL: String = """select * from "transfer_log""""
+    override val deleteSQL: String = """delete from "transfer_log" where id = ?"""
 
-    @Transactional
-    override fun <S : TransferLog> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong(1)) as S
+    val findByProviderIdSQL = """select * from "transfer_log" where provider_id = ?""""
+    val findByStatusPageable = """select * from "transfer_log" where status = ? limit ?"""
+    val findByProviderIdAndMd5SQL = """select * from "transfer_log" where provider_id = ? and md5 = ?"""
+    val deleteByUpdatedBeforeSQL = """delete from "transfer_log" where updated < ?"""
+
+    fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean =
+        singleFind(findByProviderIdAndMd5SQL) {
+            it.setLong(1, providerId)
+            it.setString(2, md5)
+        } != null
+
+    fun findByIdAndProviderId(id: Long, providerId: Long): TransferLog? =
+        singleFind(findByProviderIdSQL) {
+            it.setLong(1, id)
+            it.setLong(2, providerId)
+        }
+
+    // TODO: Bruke pageable skikkelig
+    fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> =
+        listFind(findByStatusPageable) {
+            it.setString(1, status.name)
+            it.setInt(2, pageable.size)
+        }
+
+    fun deleteByUpdatedBefore(updated: LocalDateTime) =
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByUpdatedBeforeSQL).apply {
+                setTimestamp(1, updated.toTimeStamp())
+                executeUpdate()
             }
         }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check(executeUpdate() == 1 )
-                return entity
-            }
-        }
-    }
 
-    @Transactional
-    abstract fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
-
-    @Transactional
-    abstract fun findByIdAndProviderId(id: Long, providerId: Long): Optional<TransferLog>
-
-    @Transactional
-    abstract fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog>
-
-    @Transactional
-    abstract fun deleteByUpdatedBefore(updated: LocalDateTime)
-
-    @Transactional
-    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<TransferLog>
-
-    override fun <S : TransferLog> saveAll(entities: Iterable<S>): List<S> {
-        return entities.map { save(it) }.toList()
-    }
-
-    private fun PreparedStatement.prepareSQL(entity: TransferLog) {
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: TransferLog) {
         setObject(1, entity.providerId)
         setInt(2, entity.items)
         setString(3, entity.md5)
@@ -69,10 +62,25 @@ abstract class TransferLogRepository(private val connection: Connection): CrudRe
         setTimestamp(7, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        }
-        else {
+        } else {
             setLong(8, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }
+
+    override fun ResultSet.mapToEntity(): TransferLog = TransferLog(
+        id = getLong("id"),
+        providerId = getLong("provider_id"),
+        md5 = getString("md5"),
+        items = getInt("items"),
+        payload = getString("payload"),
+        status = TransferLogStatus.valueOf(getString("status")),
+        message = getString("message"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime()
+    )
+
+    override fun TransferLog.kopiMedNyId(nyId: Long): TransferLog =
+        this.copy(id = nyId)
+
 }

@@ -1,17 +1,37 @@
-package no.nav.arbeidsplassen.importapi.adstate
+package no.nav.arbeidsplassen.importapi.repository
 
-import io.micronaut.data.repository.CrudRepository
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Statement
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.config.TxTemplate
 
-abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTemplate) : CRUDRepository<T> {
+interface Entity {
+    var id: Long?
+    fun isNew(): Boolean = id == null
+}
 
-    fun saveOrUpdate(entity: T): T {
+interface CrudRepository<T : Entity> {
+    fun save(entity: T): T
+    fun saveAll(entities: Iterable<T>): List<T>
+    fun deleteById(id: Long)
+    fun findById(id: Long): T?
+    fun findAll(): List<T>
+}
+
+abstract class BaseCrudRepository<T : Entity>(private val txTemplate: TxTemplate) : CrudRepository<T> {
+
+    abstract val insertSQL: String
+    abstract val updateSQL: String
+    abstract val findSQL: String
+    abstract val findAllSQL: String
+    abstract val deleteSQL: String
+
+    abstract fun PreparedStatement.prepareSQLSaveOrUpdate(entity: T)
+    abstract fun ResultSet.mapToEntity(): T
+    abstract fun T.kopiMedNyId(nyId: Long): T
+
+    override fun save(entity: T): T {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             if (entity.isNew()) {
@@ -20,7 +40,6 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
                     execute()
                     check(generatedKeys.next())
                 }.use {
-                    @Suppress("UNCHECKED_CAST")
                     entity.kopiMedNyId(it.generatedKeys.getLong(1))
                 }
             } else {
@@ -33,12 +52,12 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
         }
     }
 
-    fun saveAll(entities: Iterable<T>): List<T> {
-        return entities.map { saveOrUpdate(it) }.toList()
+    override fun saveAll(entities: Iterable<T>): List<T> {
+        return entities.map { save(it) }.toList()
     }
 
-    fun deleteById(id: Long) {
-        txTemplate.doInTransaction{ ctx ->
+    override fun deleteById(id: Long) {
+        txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(deleteSQL).apply {
                 setObject(1, id)
@@ -49,22 +68,23 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
         }
     }
 
-    fun findById(id: Long): T? {
-        return txTemplate.doInTransactionNullable{ ctx ->
+    override fun findById(id: Long): T? {
+        return txTemplate.doInTransactionNullable { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(findSQL)
                 .apply {
                     setObject(1, id)
                 }.use {
                     val rs: ResultSet = it.executeQuery()
-                    if( rs.next()) {
+                    if (rs.next()) {
                         return@doInTransactionNullable rs.mapToEntity()
                     }
                     return@doInTransactionNullable null
                 }
         }
     }
-    fun findAll(): List<T> {
+
+    override fun findAll(): List<T> {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection
@@ -73,15 +93,15 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
         }
     }
 
-    protected fun singleFind(sql : String, applyFunctions : (PreparedStatement) -> PreparedStatement): T? {
-        return txTemplate.doInTransactionNullable{ ctx ->
+    protected fun singleFind(sql: String, applyFunctions: (PreparedStatement) -> Unit): T? {
+        return txTemplate.doInTransactionNullable { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(sql)
                 .apply {
                     applyFunctions.invoke(this)
                 }.use {
                     val rs: ResultSet = it.executeQuery()
-                    if( rs.next()) {
+                    if (rs.next()) {
                         return@doInTransactionNullable rs.mapToEntity()
                     }
                     return@doInTransactionNullable null
@@ -89,8 +109,8 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
         }
     }
 
-    protected fun listFind(sql: String, applyFunctions : (PreparedStatement) -> PreparedStatement): List<T> {
-        return txTemplate.doInTransaction{ ctx ->
+    protected fun listFind(sql: String, applyFunctions: (PreparedStatement) -> Unit): List<T> {
+        return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(sql)
                 .apply {
@@ -101,7 +121,7 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
         }
     }
 
-    private fun ResultSet.mapToList() : List<T> =
+    private fun ResultSet.mapToList(): List<T> =
         use {
             generateSequence { if (it.next()) it.mapToEntity() else null }.toList()
         }
@@ -109,20 +129,4 @@ abstract class CRUDRepositoryHelper<T : Entity>(private val txTemplate: TxTempla
     fun LocalDateTime.toTimeStamp(): Timestamp {
         return Timestamp.valueOf(this)
     }
-}
-
-interface Entity {
-    var id: Long?
-    fun isNew() : Boolean = id == null
-}
-
-interface CRUDRepository<T: Entity> {
-    fun PreparedStatement.prepareSQLSaveOrUpdate(entity: T)
-    fun ResultSet.mapToEntity(): T
-    fun T.kopiMedNyId(id: Long): T
-    val insertSQL : String
-    val updateSQL: String
-    val deleteSQL: String
-    val findSQL: String
-    val findAllSQL: String
 }
