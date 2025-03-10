@@ -1,10 +1,10 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
 import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton

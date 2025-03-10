@@ -10,7 +10,7 @@ data class PamImportSlice<T>(
     }
 
     fun hasNextPage(): Boolean {
-        return !isEmpty
+        return !empty
     }
 
     fun previousPageable(): PamImportPageable {
@@ -21,11 +21,20 @@ data class PamImportSlice<T>(
         return pageable.number > 0
     }
 
-    val isEmpty: Boolean
+    val empty: Boolean
         get() = content.isEmpty()
 
     val numberOfElements: Int
         get() = content.size
+
+    val pageNumber: Long
+        get() = pageable.number
+
+    val size: Int
+        get() = pageable.size
+
+    val offset: Long
+        get() = (pageable.number * pageable.size)
 
     override fun iterator(): Iterator<T> {
         return content.iterator()

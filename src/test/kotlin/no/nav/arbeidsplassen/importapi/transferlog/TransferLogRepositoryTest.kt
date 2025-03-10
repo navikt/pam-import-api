@@ -2,8 +2,6 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Sort
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.dao.AdStateRepositoryTest
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
@@ -11,6 +9,7 @@ import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -55,7 +54,7 @@ class TransferLogRepositoryTest(
         )
         val findByStatus = transferLogRepository.findByStatus(
             TransferLogStatus.RECEIVED,
-            Pageable.from(0, 100, Sort.of(Sort.Order.asc("updated")))
+            PamImportPageable(size = 1000, number = 0)
         )
         assertNotNull(findByStatus)
     }

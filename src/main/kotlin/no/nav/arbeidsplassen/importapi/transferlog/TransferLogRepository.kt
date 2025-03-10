@@ -1,14 +1,16 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
+@Singleton
 class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<TransferLog>(txTemplate) {
 
     override val insertSQL =
@@ -19,7 +21,7 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
     override val findAllSQL: String = """select * from "transfer_log""""
     override val deleteSQL: String = """delete from "transfer_log" where id = ?"""
 
-    val findByProviderIdSQL = """select * from "transfer_log" where provider_id = ?""""
+    val findByProviderIdSQL = """select * from "transfer_log" where provider_id = ?"""
     val findByStatusPageable = """select * from "transfer_log" where status = ? limit ?"""
     val findByProviderIdAndMd5SQL = """select * from "transfer_log" where provider_id = ? and md5 = ?"""
     val deleteByUpdatedBeforeSQL = """delete from "transfer_log" where updated < ?"""
@@ -32,12 +34,11 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
 
     fun findByIdAndProviderId(id: Long, providerId: Long): TransferLog? =
         singleFind(findByProviderIdSQL) {
-            it.setLong(1, id)
-            it.setLong(2, providerId)
+            it.setLong(1, providerId)
         }
 
     // TODO: Bruke pageable skikkelig
-    fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> =
+    fun findByStatus(status: TransferLogStatus, pageable: PamImportPageable): List<TransferLog> =
         listFind(findByStatusPageable) {
             it.setString(1, status.name)
             it.setInt(2, pageable.size)

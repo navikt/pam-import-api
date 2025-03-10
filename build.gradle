@@ -60,9 +60,7 @@ dependencies {
     }
     implementation "org.apache.kafka:kafka-clients:3.6.1"
 
-    implementation "io.micronaut.data:micronaut-data-jdbc:$micronautDataVersion"
     implementation "io.micronaut.sql:micronaut-jdbc-hikari:$micronautSQLVersion"
-    implementation "jakarta.persistence:jakarta.persistence-api:$jakartaPersistence"
     implementation "io.micronaut.flyway:micronaut-flyway"
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
 

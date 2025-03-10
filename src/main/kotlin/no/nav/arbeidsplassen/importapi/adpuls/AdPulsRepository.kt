@@ -1,7 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.data.runtime.config.DataSettings
 import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -9,11 +8,13 @@ import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
 import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
 import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
+import no.nav.arbeidsplassen.importapi.repository.QueryLog
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
 class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMapper: ObjectMapper) :
     BaseCrudRepository<AdPuls>(txTemplate) {
+
 
     override val insertSQL =
         """insert into "ad_puls" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
@@ -78,10 +79,10 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
         setLong(++index, entity.total)
         setTimestamp(++index, entity.created.toTimeStamp())
         if (entity.isNew()) {
-            DataSettings.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+            QueryLog.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
         } else {
             setLong(++index, entity.id!!)
-            DataSettings.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+            QueryLog.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
         }
     }
 

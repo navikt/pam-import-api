@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Sort
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import java.time.LocalDateTime
@@ -19,6 +17,7 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
@@ -43,7 +42,7 @@ class TransferLogTasks(
     fun processTransferLogTask(): Int {
         val transferlogs = transferLogRepository.findByStatus(
             TransferLogStatus.RECEIVED,
-            Pageable.from(0, logSize, Sort.of(Sort.Order.asc("updated")))
+            PamImportPageable(size = logSize, number = 0)
         )
         transferlogs.stream().forEach {
             mapTransferLog(it)
