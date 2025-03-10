@@ -18,8 +18,8 @@ repositories {
     maven {
         url = uri("https://packages.confluent.io/maven/")
     }
-    maven { url ("https://jitpack.io") }
-    maven { url "https://github-package-registry-mirror.gc.nav.no/cached/maven-release"}
+    maven { url("https://jitpack.io") }
+    maven { url "https://github-package-registry-mirror.gc.nav.no/cached/maven-release" }
 }
 
 configurations {
@@ -55,7 +55,7 @@ dependencies {
     implementation "io.micronaut.micrometer:micronaut-micrometer-core"
     implementation "io.micronaut.micrometer:micronaut-micrometer-registry-prometheus"
     implementation "io.micronaut:micronaut-management"
-    implementation ("io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}") {
+    implementation("io.micronaut.kafka:micronaut-kafka:${micronautKafkaVersion}") {
         exclude group: 'org.apache.kafka:kafka-clients'
     }
     implementation "org.apache.kafka:kafka-clients:3.6.1"
@@ -82,6 +82,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion"
     testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpserverVersion")
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
+    testImplementation("net.javacrumbs.json-unit:json-unit:4.1.0")
 }
 
 test.classpath += configurations.developmentOnly
