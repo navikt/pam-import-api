@@ -1,10 +1,10 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
 import jakarta.inject.Singleton
-import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
+import org.slf4j.LoggerFactory
 
 @Singleton
 class AdPulsService(private val repository: AdPulsRepository) {
@@ -14,7 +14,7 @@ class AdPulsService(private val repository: AdPulsRepository) {
     }
 
     fun findByUuid(uuid: String): List<AdPulsDTO> {
-        return repository.findByUuid(uuid).map{it.toDTO()}
+        return repository.findByUuid(uuid).map { it.toDTO() }
     }
 
     fun findByUuidAndType(uuid: String, type: PulsEventType): AdPulsDTO? {
@@ -26,8 +26,10 @@ class AdPulsService(private val repository: AdPulsRepository) {
     }
 
     fun save(adPulsDTO: AdPulsDTO): AdPulsDTO {
-        return repository.save(repository.findByUuidAndType(adPulsDTO.uuid, adPulsDTO.type)?.copy(total = adPulsDTO.total)
-            ?: adPulsDTO.toEntity()).toDTO()
+        return repository.save(
+            repository.findByUuidAndType(adPulsDTO.uuid, adPulsDTO.type)?.copy(total = adPulsDTO.total)
+                ?: adPulsDTO.toEntity()
+        ).toDTO()
     }
 
 
@@ -38,14 +40,36 @@ class AdPulsService(private val repository: AdPulsRepository) {
     }
 
     private fun AdPuls.toDTO(): AdPulsDTO {
-        return AdPulsDTO(id=id, providerId=providerId, reference=reference, uuid = uuid, type = type, total = total, created=created, updated=updated)
+        return AdPulsDTO(
+            id = id,
+            providerId = providerId,
+            reference = reference,
+            uuid = uuid,
+            type = type,
+            total = total,
+            created = created,
+            updated = updated
+        )
     }
 
     private fun AdPulsDTO.toEntity(): AdPuls {
-        return AdPuls(id=id, providerId=providerId, reference=reference, uuid=uuid, type = type, total = total, created=created, updated=updated)
+        return AdPuls(
+            id = id,
+            providerId = providerId,
+            reference = reference,
+            uuid = uuid,
+            type = type,
+            total = total,
+            created = created,
+            updated = updated
+        )
     }
 
-    fun findByProviderIdAndUpdatedAfter(providerId: Long, updatedAfter: LocalDateTime, pageable: Pageable): Slice<AdPulsDTO> {
+    fun findByProviderIdAndUpdatedAfter(
+        providerId: Long,
+        updatedAfter: LocalDateTime,
+        pageable: PamImportPageable
+    ): PamImportSlice<AdPulsDTO> {
         return repository.findByProviderIdAndUpdatedAfter(providerId, updatedAfter, pageable).map { it.toDTO() }
     }
 

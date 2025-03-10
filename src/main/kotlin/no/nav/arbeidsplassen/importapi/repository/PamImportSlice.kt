@@ -1,16 +1,24 @@
 package no.nav.arbeidsplassen.importapi.repository
 
-data class NavSlice<T>(
+data class PamImportSlice<T>(
     val content: List<T>,
-    val pageable: NavPageable
+    val pageable: PamImportPageable
 ) : Iterable<T> {
 
-    fun nextPageable(): NavPageable {
+    fun nextPageable(): PamImportPageable {
         return pageable.next()
     }
 
-    fun previousPageable(): NavPageable {
+    fun hasNextPage(): Boolean {
+        return !isEmpty
+    }
+
+    fun previousPageable(): PamImportPageable {
         return pageable.previous()
+    }
+
+    fun hasPreviousPage(): Boolean {
+        return pageable.number > 0
     }
 
     val isEmpty: Boolean
@@ -23,8 +31,8 @@ data class NavSlice<T>(
         return content.iterator()
     }
 
-    fun <T2> map(function: (T) -> T2): NavSlice<T2> {
-        return NavSlice(
+    fun <T2> map(function: (T) -> T2): PamImportSlice<T2> {
+        return PamImportSlice(
             this.content.map(function),
             this.pageable
         )

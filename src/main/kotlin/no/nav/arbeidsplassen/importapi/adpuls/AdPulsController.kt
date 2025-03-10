@@ -2,17 +2,20 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.micronaut.data.model.Pageable
 import io.micronaut.data.model.Slice
-import io.micronaut.data.model.Sort.Order.Direction
+import io.micronaut.data.model.Sort
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.QueryValue
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
+import no.nav.arbeidsplassen.importapi.repository.PamImportSortable
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/stats/")
@@ -24,12 +27,133 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     }
 
     @Get("/{providerId}")
-    fun getAllTodayStatsForProvider(@PathVariable providerId: Long, @QueryValue from: String, pageable: Pageable):Slice<AdPulsDTO> {
+    fun getAllTodayStatsForProvider(
+        @PathVariable providerId: Long,
+        @QueryValue from: String,
+        pageable: Pageable
+        // @Nullable @QueryValue page: Long?,
+        // @Nullable @QueryValue number: Long?,
+        // @Nullable @QueryValue size: Int?,
+        // @Nullable @QueryValue sort: List<String>,
+    ): Slice<AdPulsDTO> {
+        LOG.info("111111111111111")
         val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
         LOG.info("Getting stats for provider $providerId from $fromDate")
-        require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now"}
-        require(pageable.size<=1000) {"size can not be more than 1000"}
-        return adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pageable)
+        require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
+
+        val pamImportPageable = mapPageable(pageable)
+        return mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
     }
 
+    private fun mapPageable(
+        pageFromUrl: Long?,
+        numberFromUrl: Long?,
+        sizeFromUrl: Int?,
+        sortFromUrl: List<String>
+    ): PamImportPageable {
+        val lowercaseSort = sortFromUrl.map { it.lowercase() }
+        val page = pageFromUrl ?: numberFromUrl ?: 0
+        val size = sizeFromUrl ?: 100
+
+        validatePageable(page, size, lowercaseSort)
+        val sortProperty = extractSortableProperty(lowercaseSort) ?: PamImportSortable.Property.UPDATED
+        val sortDirection = extractSortableDirection(lowercaseSort) ?: PamImportSortable.Direction.ASC
+        return PamImportPageable(
+            size = size,
+            number = page,
+            sort = PamImportSortable(property = sortProperty, direction = sortDirection)
+        )
+    }
+
+    private fun validatePageable(page: Long, size: Int, sort: List<String>) {
+        require(page >= 0) { "size can not be less than 0" }
+        require(size <= 1000) { "size can not be more than 1000" }
+        require(
+            sort.filterNot { it == "updated" || it == "created" || it == "asc" || it == "desc" }.isEmpty()
+        ) { "only legal values for sort are updated, created, asc and desc" }
+        require(
+            sort.filter { it == "updated" || it == "created" }.size <= 1
+        ) { "We do not support ordering by more than one property" }
+        require(
+            sort.filter { it == "asc" || it == "desc" }.size <= 1
+        ) { "We do not support ordering in both directions" }
+    }
+
+    private fun extractSortableProperty(sortFromUrl: List<String>): PamImportSortable.Property? {
+        if (sortFromUrl.contains("updated")) {
+            return PamImportSortable.Property.UPDATED
+        }
+        if (sortFromUrl.contains("created")) {
+            return PamImportSortable.Property.CREATED
+        }
+        return null
+    }
+
+    private fun extractSortableDirection(sortFromUrl: List<String>): PamImportSortable.Direction? {
+        if (sortFromUrl.contains("asc")) {
+            return PamImportSortable.Direction.ASC
+        }
+        if (sortFromUrl.contains("desc")) {
+            return PamImportSortable.Direction.DESC
+        }
+        return null
+    }
+
+    /*
+    // Denne mapper fra Micronaut sin Pageable til vår egen Pageable
+     */
+    private fun mapPageable(pageable: Pageable): PamImportPageable {
+        require(pageable.size <= 1000) { "size can not be more than 1000" }
+        if (pageable.isUnpaged) {
+            return PamImportPageable(
+                size = 100,
+                number = 0,
+                sort = PamImportSortable(
+                    property = PamImportSortable.Property.UPDATED,
+                    direction = PamImportSortable.Direction.ASC
+                )
+            )
+        }
+        if (!pageable.isSorted) {
+            return PamImportPageable(
+                size = pageable.size,
+                number = pageable.offset,
+                sort = PamImportSortable(
+                    property = PamImportSortable.Property.UPDATED,
+                    direction = PamImportSortable.Direction.ASC
+                )
+            )
+        }
+        require(pageable.sort.orderBy.size > 1) { "We do not support ordering by more than one property" }
+        val property = pageable.sort.orderBy.firstOrNull()?.property?.uppercase() ?: "UPDATED"
+        val direction = pageable.sort.orderBy.firstOrNull()?.direction ?: Sort.Order.Direction.ASC
+        require(property in PamImportSortable.Property.entries.map { it.name }) { "We only support ordering by UPDATED or CREATED" }
+
+        return PamImportPageable(
+            size = pageable.size,
+            number = pageable.offset,
+            sort = PamImportSortable(
+                property = mapProperty(property),
+                direction = mapDirection(direction)
+            )
+        )
+    }
+
+    private fun mapDirection(direction: Sort.Order.Direction?): PamImportSortable.Direction {
+        if (direction == Sort.Order.Direction.ASC) {
+            return PamImportSortable.Direction.ASC
+        }
+        return PamImportSortable.Direction.DESC
+    }
+
+    private fun mapProperty(property: String): PamImportSortable.Property {
+        if (property == PamImportSortable.Property.UPDATED.name) {
+            return PamImportSortable.Property.UPDATED
+        }
+        return PamImportSortable.Property.CREATED
+    }
+
+    private fun mapSlice(slice: PamImportSlice<AdPulsDTO>): Slice<AdPulsDTO> {
+        return TODO() // Slice.of()
+    }
 }

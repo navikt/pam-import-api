@@ -1,15 +1,17 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
 import io.micronaut.data.runtime.config.DataSettings
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
+@Singleton
 class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMapper: ObjectMapper) :
     BaseCrudRepository<AdPuls>(txTemplate) {
 
@@ -23,14 +25,16 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
 
     val findByUuidAndTypeSQL = """select * from "ad_puls" where uuid = ? and type = ?"""
     val findByUuid = """select * from "ad_puls" where uuid = ?"""
-    val findByProviderIdAndReferenceSQL = """select * from "ad_puls" where provider_id = ? and reference = ?"""
-    val val deleteByUpdatedBeforeSQL = """delete from "ad_puls" where updated < ?"""
+    val findByProviderIdAndReferenceSQL = """select * from "ad_puls" where provider_id = ? and reference = ? and """
+    val deleteByUpdatedBeforeSQL = """delete from "ad_puls" where updated < ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableSQL =
+        """select * from "ad_puls" where provider_id = ? and updated > ? order by ? offset ? LIMIT ?"""
 
-    fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls =
+    fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls? =
         singleFind(findByUuidAndTypeSQL) {
             it.setString(1, uuid)
             it.setString(2, type.name)
-        }!! // TODO Hvilken exception bør hives?
+        }
 
     fun findByUuid(uuid: String): List<AdPuls> =
         listFind(findByUuid) {
@@ -38,7 +42,7 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
         }
 
     fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls> =
-        listFind((findByProviderIdAndReferenceSQL)) {
+        listFind(findByProviderIdAndReferenceSQL) {
             it.setLong(1, providerId)
             it.setString(2, reference)
         }
@@ -46,9 +50,15 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
     fun findByProviderIdAndUpdatedAfter(
         providerId: Long,
         updated: LocalDateTime,
-        pageable: Pageable
-    ): Slice<AdPuls> {
-        TODO()
+        pageable: PamImportPageable
+    ): PamImportSlice<AdPuls> {
+        return listFind(findByProviderIdAndUpdatedAfterAndPageableSQL) {
+            it.setLong(1, providerId)
+            it.setTimestamp(2, updated.toTimeStamp())
+            it.setString(3, pageable.sort.property.name) // order by
+            it.setLong(4, (pageable.number * pageable.size)) // offset
+            it.setInt(5, pageable.size) // limit
+        }.let { PamImportSlice(it, pageable) }
     }
 
     fun deleteByUpdatedBefore(before: LocalDateTime): Long =
