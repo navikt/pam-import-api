@@ -1,9 +1,9 @@
-package no.nav.arbeidsplassen.importapi.dao
+package no.nav.arbeidsplassen.importapi.adstate
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.adstate.AdState
-import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
+import no.nav.arbeidsplassen.importapi.dao.newTestProvider
+import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
@@ -48,5 +48,9 @@ class AdStateRepositoryTest(
         val adstates = listOf(adState, adstate2)
         adStateRepository.saveAll(adstates)
         assertEquals(2, adStateRepository.findAll().count())
+
+        val adstate2Lastet = adStateRepository.findByUuidAndProviderId(adstate2.uuid, adstate2.providerId)
+        assertNotNull(adstate2Lastet)
+        assertEquals(adstate2.reference, adstate2Lastet!!.reference)
     }
 }

@@ -3,7 +3,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import no.nav.arbeidsplassen.importapi.dao.AdStateRepositoryTest
+import no.nav.arbeidsplassen.importapi.adstate.AdStateRepositoryTest
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
