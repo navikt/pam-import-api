@@ -13,33 +13,30 @@ class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository
     override val insertSQL =
         """insert into "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") values (?,?,?,?,?,?)"""
     override val updateSQL =
-        """update "ad_state" set "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
-    override val deleteSQL = """delete from "ad_state" where id = ?"""
-    override val findSQL: String = """select * from "ad_state" where "id"=?"""
-    override val findAllSQL: String = """select * from "ad_state""""
+        """update "ad_state" set "uuid"=?, "reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val deleteSQL = """delete from "ad_state" where "id" = ?"""
+    override val findSQL: String =
+        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "id"=?"""
+    override val findAllSQL: String =
+        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state""""
 
-    val findByProviderIdAndReferenceSQL = """select * from "ad_state" where "provider_id"=? and "reference"=?"""
-    val findByUuidSQL = """select * from "ad_state" where "uuid"=?"""
-    val findByUuidAndProviderIdSQL = """select * from "ad_state" where "uuid"=? and "provider_id"=?"""
+    val findByProviderIdAndReferenceSQL =
+        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "provider_id"=? and "reference"=?"""
+    val findByUuidSQL =
+        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "uuid"=?"""
+    val findByUuidAndProviderIdSQL =
+        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "uuid"=? and "provider_id"=?"""
 
-    fun findByProviderIdAndReference(providerId: Long, reference: String): AdState? =
-        singleFind(findByProviderIdAndReferenceSQL) { p ->
-            p.setLong(1, providerId)
-            p.setString(2, reference)
-        }
-
-    // fun list(pageable: Pageable): Slice<AdState>
-
-    fun findByUuid(uuid: String): AdState? =
-        singleFind(findByUuidSQL) { p ->
-            p.setObject(1, uuid)
-        }
-
-    fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState? =
-        singleFind(findByUuidAndProviderIdSQL) { p ->
-            p.setObject(1, uuid)
-            p.setLong(2, providerId)
-        }
+    override fun ResultSet.mapToEntity(): AdState = AdState(
+        id = getLong("id"),
+        uuid = getString("uuid"),
+        providerId = getLong("provider_id"),
+        reference = getString("reference"),
+        versionId = getLong("version_id"),
+        jsonPayload = getString("json_payload"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime()
+    )
 
     override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: AdState) {
         setString(1, entity.uuid)
@@ -56,17 +53,23 @@ class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository
         }
     }
 
-    override fun ResultSet.mapToEntity(): AdState = AdState(
-        id = getLong("id"),
-        uuid = getString("uuid"),
-        providerId = getLong("provider_id"),
-        reference = getString("reference"),
-        versionId = getLong("version_id"),
-        jsonPayload = getString("json_payload"),
-        created = getTimestamp("created").toLocalDateTime(),
-        updated = getTimestamp("updated").toLocalDateTime()
-    )
-
     override fun AdState.kopiMedNyId(nyId: Long): AdState =
         this.copy(id = nyId)
+
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdState? =
+        singleFind(findByProviderIdAndReferenceSQL) { p ->
+            p.setLong(1, providerId)
+            p.setString(2, reference)
+        }
+
+    fun findByUuid(uuid: String): AdState? =
+        singleFind(findByUuidSQL) { p ->
+            p.setObject(1, uuid)
+        }
+
+    fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState? =
+        singleFind(findByUuidAndProviderIdSQL) { p ->
+            p.setObject(1, uuid)
+            p.setLong(2, providerId)
+        }
 }

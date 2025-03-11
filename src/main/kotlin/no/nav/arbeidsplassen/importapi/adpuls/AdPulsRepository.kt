@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -12,24 +11,58 @@ import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
-class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMapper: ObjectMapper) :
+class AdPulsRepository(private val txTemplate: TxTemplate) :
     BaseCrudRepository<AdPuls>(txTemplate) {
-
-
+        
     override val insertSQL =
         """insert into "ad_puls" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
     override val updateSQL =
         """update "ad_puls" set "provider_id"=?, "uuid"=?,"reference"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
-    override val findSQL = """select * from "ad_puls" where id = ?"""
-    override val findAllSQL = """select * from "ad_puls""""
-    override val deleteSQL: String = """delete from "ad_puls" where id = ?"""
+    override val findSQL =
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "id" = ?"""
+    override val findAllSQL =
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls""""
+    override val deleteSQL: String = """delete from "ad_puls" where "id" = ?"""
 
-    val findByUuidAndTypeSQL = """select * from "ad_puls" where uuid = ? and type = ?"""
-    val findByUuid = """select * from "ad_puls" where uuid = ?"""
-    val findByProviderIdAndReferenceSQL = """select * from "ad_puls" where provider_id = ? and reference = ? and """
-    val deleteByUpdatedBeforeSQL = """delete from "ad_puls" where updated < ?"""
+    val findByUuidAndTypeSQL =
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "uuid" = ? and "type" = ?"""
+    val findByUuid =
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "uuid" = ?"""
+    val findByProviderIdAndReferenceSQL =
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "provider_id" = ? and "reference" = ?"""
+    val deleteByUpdatedBeforeSQL = """delete from "ad_puls" where "updated" < ?"""
     val findByProviderIdAndUpdatedAfterAndPageableSQL =
-        """select * from "ad_puls" where provider_id = ? and updated > ? order by ? offset ? LIMIT ?"""
+        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "provider_id" = ? and "updated" > ? order by ? offset ? LIMIT ?"""
+
+    override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
+        id = getLong("id"),
+        providerId = getLong("provider_id"),
+        uuid = getString("uuid"),
+        reference = getString("reference"),
+        type = PulsEventType.valueOf(getString("type")),
+        total = getLong("total"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime()
+    )
+
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: AdPuls) {
+        var index = 0
+        setLong(++index, entity.providerId)
+        setString(++index, entity.uuid)
+        setString(++index, entity.reference)
+        setString(++index, entity.type.name)
+        setLong(++index, entity.total)
+        setTimestamp(++index, entity.created.toTimeStamp())
+        if (entity.isNew()) {
+            QueryLog.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
+        } else {
+            setLong(++index, entity.id!!)
+            QueryLog.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
+        }
+    }
+
+    override fun AdPuls.kopiMedNyId(nyId: Long): AdPuls =
+        this.copy(id = nyId)
 
     fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls? =
         singleFind(findByUuidAndTypeSQL) {
@@ -69,34 +102,4 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
                 setTimestamp(1, before.toTimeStamp())
             }.executeUpdate().toLong()
         }
-
-    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: AdPuls) {
-        var index = 0
-        setLong(++index, entity.providerId)
-        setString(++index, entity.uuid)
-        setString(++index, entity.reference)
-        setString(++index, entity.type.name)
-        setLong(++index, entity.total)
-        setTimestamp(++index, entity.created.toTimeStamp())
-        if (entity.isNew()) {
-            QueryLog.QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        } else {
-            setLong(++index, entity.id!!)
-            QueryLog.QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
-        }
-    }
-
-    override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
-        id = getLong("id"),
-        providerId = getLong("provider_id"),
-        uuid = getString("uuid"),
-        reference = getString("reference"),
-        type = PulsEventType.valueOf(getString("type")),
-        total = getLong("total"),
-        created = getTimestamp("created").toLocalDateTime(),
-        updated = getTimestamp("updated").toLocalDateTime()
-    )
-
-    override fun AdPuls.kopiMedNyId(nyId: Long): AdPuls =
-        this.copy(id = nyId)
 }
