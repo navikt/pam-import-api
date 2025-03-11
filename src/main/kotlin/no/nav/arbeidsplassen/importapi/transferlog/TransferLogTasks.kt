@@ -46,7 +46,6 @@ class TransferLogTasks(
             Pageable(size = logSize)
         )
         transferlogs.stream().forEach {
-            println("ID:" + it.id)
             mapTransferLog(it)
         }
         return transferlogs.count()

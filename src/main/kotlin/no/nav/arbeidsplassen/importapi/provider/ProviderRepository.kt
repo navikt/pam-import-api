@@ -11,16 +11,16 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<Provider>(txTemplate) {
 
     override val insertSQL =
-        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
+        """insert into provider (jwtid, identifier, email, phone, created) values (?,?,?,?,?)"""
     override val updateSQL =
-        """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+        """update provider set jwtid=?, identifier=?, email=?, phone=?, created=?, updated=current_timestamp where id=?"""
     override val findSQL =
-        """select "id", "identifier", "jwtid", "email", "phone", "created", "updated" from "provider" where "id" = ?"""
+        """select id, identifier, jwtid, email, phone, created, updated from provider where id = ?"""
     override val findAllSQL =
-        """select "id", "identifier", "jwtid", "email", "phone", "created", "updated" from "provider""""
-    override val deleteSQL = """delete from "provider" where "id" = ?"""
+        """select id, identifier, jwtid, email, phone, created, updated from provider"""
+    override val deleteSQL = """delete from provider where id = ?"""
     val migrateSQL =
-        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
+        """insert into provider (jwtid, identifier, email, phone, created, updated, id) values (?,?,?,?,?,?,?)"""
 
     override fun ResultSet.mapToEntity() = Provider(
         id = this.getLong("id"),

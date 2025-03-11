@@ -48,8 +48,5 @@ class AdStateRepositoryTest(
         val adstates = listOf(adState, adstate2)
         adStateRepository.saveAll(adstates)
         assertEquals(2, adStateRepository.findAll().count())
-        // val content = adStateRepository.list(provider.id!!, Pageable.from(0).order("updated", Sort.Order.Direction.DESC)).content
-        // assertNotNull(content)
-        // assertEquals(2,adStateRepository.findByUpdatedGreaterThanEquals(updated= LocalDateTime.now().minusDays(1), pageable = Pageable.from(0)).count())
     }
 }

@@ -11,21 +11,21 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdState>(txTemplate) {
 
     override val insertSQL =
-        """insert into "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") values (?,?,?,?,?,?)"""
+        """insert into ad_state (uuid, reference, provider_id, json_payload, version_id, created) values (?,?,?,?,?,?)"""
     override val updateSQL =
-        """update "ad_state" set "uuid"=?, "reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
-    override val deleteSQL = """delete from "ad_state" where "id" = ?"""
+        """update ad_state set uuid=?, reference=?, provider_id=?, json_payload=?, version_id=?, created=?, updated=current_timestamp where id=?"""
+    override val deleteSQL = """delete from ad_state where id = ?"""
     override val findSQL: String =
-        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "id"=?"""
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where id=?"""
     override val findAllSQL: String =
-        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state""""
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state"""
 
     val findByProviderIdAndReferenceSQL =
-        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "provider_id"=? and "reference"=?"""
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where provider_id=? and reference=?"""
     val findByUuidSQL =
-        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "uuid"=?"""
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=?"""
     val findByUuidAndProviderIdSQL =
-        """select "id", "uuid", "provider_id", "reference", "version_id", "json_payload", "created", "updated" from "ad_state" where "uuid"=? and "provider_id"=?"""
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=? and provider_id=?"""
 
     override fun ResultSet.mapToEntity(): AdState = AdState(
         id = getLong("id"),

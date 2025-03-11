@@ -10,22 +10,22 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 class AdminStatusRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdminStatus>(txTemplate) {
 
     override val insertSQL =
-        """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created", "publish_status") values(?,?,?,?,?,?,?,?)"""
+        """insert into admin_status (uuid, status, message, reference, provider_id, version_id, created, publish_status) values(?,?,?,?,?,?,?,?)"""
     override val updateSQL =
-        """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "publish_status"=?, "updated"=current_timestamp where "id"=?"""
+        """update admin_status set uuid=?, status=?, message=?, reference=?, provider_id=?, version_id=?, created=?, publish_status=?, updated=current_timestamp where id=?"""
     override val findSQL =
-        """select "id", "uuid", "status", "message", "reference", "provider_id", "version_id", "created", "updated", "publish_status" from "admin_status" where "id" = ?"""
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where id = ?"""
     override val findAllSQL =
-        """select "id", "uuid", "status", "message", "reference", "provider_id", "version_id", "created", "updated", "publish_status" from "admin_status""""
-    override val deleteSQL = """delete from "admin_status" where "id" = ?"""
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status"""
+    override val deleteSQL = """delete from admin_status where id = ?"""
 
     val findByUuidSQL =
-        """select "id", "uuid", "status", "message", "reference", "provider_id", "version_id", "created", "updated", "publish_status" from "admin_status" where "uuid" = ?"""
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where uuid = ?"""
     val findByVersionIdAndProviderIdSQL =
-        """select "id", "uuid", "status", "message", "reference", "provider_id", "version_id", "created", "updated", "publish_status" from "admin_status" where "version_id" = ? and "provider_id" = ?"""
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where version_id = ? and provider_id = ?"""
     val findByProviderIdAndReferenceSQL =
-        """select "id", "uuid", "status", "message", "reference", "provider_id", "version_id", "created", "updated", "publish_status" from "admin_status" where "provider_id" = ? and "reference" = ?"""
-
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where provider_id = ? and reference = ?"""
+    
     override fun ResultSet.mapToEntity() = AdminStatus(
         id = getLong("id"),
         uuid = getString("uuid"),

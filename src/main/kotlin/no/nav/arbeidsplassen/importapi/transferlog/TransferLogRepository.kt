@@ -14,22 +14,22 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<TransferLog>(txTemplate) {
 
     override val insertSQL =
-        """insert into "transfer_log" ("provider_id", "items", "md5", "payload", "status", "message", "created") values (?,?,?,?,?,?,?)"""
+        """insert into transfer_log (provider_id, items, md5, payload, status, message, created) values (?,?,?,?,?,?,?)"""
     override val updateSQL =
-        """update "transfer_log" set "provider_id"=?, "items"=?, "md5"=?, "payload"=?, "status"=?, "message"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+        """update transfer_log set provider_id=?, items=?, md5=?, payload=?, status=?, message=?, created=?, updated=current_timestamp where id=?"""
     override val findSQL: String =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "id" = ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where id = ?"""
     override val findAllSQL: String =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log""""
-    override val deleteSQL: String = """delete from "transfer_log" where "id" = ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log"""
+    override val deleteSQL: String = """delete from transfer_log where id = ?"""
 
     val findByIdAndProviderIdSQL =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "id" = ? and "provider_id" = ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where id = ? and provider_id = ?"""
     val findByStatusPageable =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "status" = ? order by ? offset ? LIMIT ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where status = ? order by ? offset ? LIMIT ?"""
     val findByProviderIdAndMd5SQL =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "provider_id" = ? and md5 = ?"""
-    val deleteByUpdatedBeforeSQL = """delete from "transfer_log" where "updated" < ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where provider_id = ? and md5 = ?"""
+    val deleteByUpdatedBeforeSQL = """delete from transfer_log where updated < ?"""
 
     override fun ResultSet.mapToEntity(): TransferLog = TransferLog(
         id = getLong("id"),

@@ -13,16 +13,8 @@ class AdPulsService(private val repository: AdPulsRepository) {
         private val LOG = LoggerFactory.getLogger(AdPulsService::class.java)
     }
 
-    fun findByUuid(uuid: String): List<AdPulsDTO> {
-        return repository.findByUuid(uuid).map { it.toDTO() }
-    }
-
     fun findByUuidAndType(uuid: String, type: PulsEventType): AdPulsDTO? {
         return repository.findByUuidAndType(uuid, type)?.toDTO()
-    }
-
-    fun findByProviderReference(providerId: Long, reference: String): List<AdPulsDTO> {
-        return repository.findByProviderIdAndReference(providerId, reference).map { it.toDTO() }
     }
 
     fun save(adPulsDTO: AdPulsDTO): AdPulsDTO {

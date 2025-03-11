@@ -13,26 +13,22 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 @Singleton
 class AdPulsRepository(private val txTemplate: TxTemplate) :
     BaseCrudRepository<AdPuls>(txTemplate) {
-        
+
     override val insertSQL =
-        """insert into "ad_puls" ("provider_id", "uuid", "reference", "type", "total", "created", "updated" ) values (?,?,?,?,?,?, current_timestamp)"""
+        """insert into ad_puls (provider_id, uuid, reference, type, total, created, updated ) values (?,?,?,?,?,?, current_timestamp)"""
     override val updateSQL =
-        """update "ad_puls" set "provider_id"=?, "uuid"=?,"reference"=?, "type"=?, "total"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+        """update ad_puls set provider_id=?, uuid=?,reference=?, type=?, total=?, created=?, updated=current_timestamp where id=?"""
     override val findSQL =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "id" = ?"""
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where id = ?"""
     override val findAllSQL =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls""""
-    override val deleteSQL: String = """delete from "ad_puls" where "id" = ?"""
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls"""
+    override val deleteSQL: String = """delete from ad_puls where id = ?"""
 
     val findByUuidAndTypeSQL =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "uuid" = ? and "type" = ?"""
-    val findByUuid =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "uuid" = ?"""
-    val findByProviderIdAndReferenceSQL =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "provider_id" = ? and "reference" = ?"""
-    val deleteByUpdatedBeforeSQL = """delete from "ad_puls" where "updated" < ?"""
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where uuid = ? and type = ?"""
+    val deleteByUpdatedBeforeSQL = """delete from ad_puls where updated < ?"""
     val findByProviderIdAndUpdatedAfterAndPageableSQL =
-        """select "id", "provider_id", "uuid", "reference", "type", "total", "created", "updated" from "ad_puls" where "provider_id" = ? and "updated" > ? order by ? offset ? LIMIT ?"""
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? offset ? LIMIT ?"""
 
     override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
         id = getLong("id"),
@@ -68,17 +64,6 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
         singleFind(findByUuidAndTypeSQL) {
             it.setString(1, uuid)
             it.setString(2, type.name)
-        }
-
-    fun findByUuid(uuid: String): List<AdPuls> =
-        listFind(findByUuid) {
-            it.setString(1, uuid)
-        }
-
-    fun findByProviderIdAndReference(providerId: Long, reference: String): List<AdPuls> =
-        listFind(findByProviderIdAndReferenceSQL) {
-            it.setLong(1, providerId)
-            it.setString(2, reference)
         }
 
     fun findByProviderIdAndUpdatedAfter(
