@@ -23,8 +23,8 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
         """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log""""
     override val deleteSQL: String = """delete from "transfer_log" where "id" = ?"""
 
-    val findByProviderIdSQL =
-        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "provider_id" = ?"""
+    val findByIdAndProviderIdSQL =
+        """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "id" = ? and "provider_id" = ?"""
     val findByStatusPageable =
         """select "id", "provider_id", "md5", "items", "payload", "status", "message", "created", "updated" from "transfer_log" where "status" = ? order by ? offset ? LIMIT ?"""
     val findByProviderIdAndMd5SQL =
@@ -68,9 +68,11 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
             it.setString(2, md5)
         } != null
 
+    // TODO: Gir denne mening? Id er pk, så hvorfor har vi med providerId? For å sikre at en provider ikke får tilgang til andres data?
     fun findByIdAndProviderId(id: Long, providerId: Long): TransferLog? =
-        singleFind(findByProviderIdSQL) {
-            it.setLong(1, providerId)
+        singleFind(findByIdAndProviderIdSQL) {
+            it.setLong(1, id)
+            it.setLong(2, providerId)
         }
 
     fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> =
