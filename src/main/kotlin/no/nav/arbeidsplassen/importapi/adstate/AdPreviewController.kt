@@ -24,6 +24,7 @@ class AdPreviewController(private val adStateService: AdStateService, private va
         private val LOG = LoggerFactory.getLogger(AdPreviewController::class.java)
     }
 
+    // Fixme: HPH Denne ser ikke ut til å være i bruk basert på accessloggene
     @Get("/api/v1/preview/{uuid}")
     fun previewAd(@PathVariable uuid: String): AdDTO {
         LOG.info("Previewing ad as json. Uuid:  {}", uuid)

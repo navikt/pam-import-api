@@ -7,7 +7,8 @@ val _PROVIDERID = "_providerid"
 val _VERSIONID = "_versionid"
 
 fun AdTransport.toAdminStatus(adminStatusRepository: AdminStatusRepository): AdminStatus {
-    return adminStatusRepository.findByUuid(uuid)?.copy(status = mapStatus(), versionId = properties[_VERSIONID]?.toLong()!!,
+    return adminStatusRepository.findByUuid(uuid)
+        ?.copy(status = mapStatus(), versionId = properties[_VERSIONID]?.toLong()!!,
                     message = mapMessage(), publishStatus = mapPublishingStatus())
         ?: run { AdminStatus(uuid = uuid, status = mapStatus(), versionId =
             properties[_VERSIONID]?.toLong()!!, providerId = properties[_PROVIDERID]?.toLong()!!,

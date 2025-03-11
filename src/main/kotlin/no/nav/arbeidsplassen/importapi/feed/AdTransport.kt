@@ -3,7 +3,7 @@ package no.nav.arbeidsplassen.importapi.feed
 import java.time.LocalDateTime
 import java.util.*
 
-
+// Feeden er død og begravet, men denne klassen brukes av InternalAdTopicListener som lytter på en Kafka topic
 data class AdTransport(val id: Long, val uuid: String, val createdBy: String, val updatedBy: String, val created: LocalDateTime,
                        val updated: LocalDateTime, val contactList: List<Contact> = listOf(), val mediaList: List<Media> = listOf(),
                        val locationList: List<Location> = listOf(), val properties: Map<String, String> = hashMapOf(),

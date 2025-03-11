@@ -50,7 +50,7 @@ class AdPulsControllerTest(
                     total = 10
                 )
             )
-            val inDb = adPulsControllerTest.repository.findById(first.id!!).get()
+            val inDb = adPulsControllerTest.repository.findById(first.id!!)!!
             val new = inDb.copy(total = 20)
             adPulsControllerTest.repository.save(new)
 

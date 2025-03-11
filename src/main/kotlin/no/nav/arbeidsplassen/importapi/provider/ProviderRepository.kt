@@ -1,74 +1,38 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
-import java.sql.Connection
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
-import java.sql.Statement
-import java.sql.Timestamp
-import java.time.LocalDateTime
-import jakarta.transaction.Transactional
-import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
+import java.sql.ResultSet
+import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
+@Singleton
+class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<Provider>(txTemplate) {
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class ProviderRepository(val connection:Connection): CrudRepository<Provider, Long> {
+    override val insertSQL =
+        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
+    override val updateSQL =
+        """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val findSQL =
+        """select "id", "identifier", "jwtid", "email", "phone", "created", "updated" from "provider" where "id" = ?"""
+    override val findAllSQL =
+        """select "id", "identifier", "jwtid", "email", "phone", "created", "updated" from "provider""""
+    override val deleteSQL = """delete from "provider" where "id" = ?"""
+    val migrateSQL =
+        """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
 
-    val insertSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created") values (?,?,?,?,?)"""
-    val updateSQL = """update "provider" set "jwtid"=?, "identifier"=?, "email"=?, "phone"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
-    val migrateSQL = """insert into "provider" ("jwtid", "identifier", "email", "phone", "created", "updated", "id") values (?,?,?,?,?,?,?)"""
+    override fun ResultSet.mapToEntity() = Provider(
+        id = this.getLong("id"),
+        identifier = this.getString("identifier"),
+        jwtid = this.getString("jwtid"),
+        email = this.getString("email"),
+        phone = this.getString("phone"),
+        created = this.getTimestamp("created").toLocalDateTime(),
+        updated = this.getTimestamp("updated").toLocalDateTime()
+    )
 
-    @Transactional
-    override fun <S : Provider> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong(1)) as S
-            }
-        }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check(executeUpdate() == 1 )
-                return entity
-            }
-        }
-    }
-
-    @Transactional
-    open fun saveOnMigrate(entities: Iterable<Provider>) {
-        entities.forEach {
-            connection.prepareStatement(migrateSQL).apply {
-                setString(1, it.jwtid)
-                setString(2, it.identifier)
-                setString(3, it.email)
-                setString(4, it.phone)
-                setTimestamp(5, it.created.toTimeStamp())
-                setTimestamp(6, it.updated.toTimeStamp())
-                setObject(7, it.id)
-                execute()
-            }
-        }
-
-    }
-
-    @Transactional
-    override fun <S : Provider> saveAll(entities: Iterable<S>): List<S> {
-
-        return entities.map { save(it) }.toList()
-    }
-
-    @Transactional
-    abstract fun list(pageable: Pageable): Slice<Provider>
-
-    private fun PreparedStatement.prepareSQL(entity: Provider) {
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: Provider) {
         setString(1, entity.jwtid)
         setString(2, entity.identifier)
         setString(3, entity.email)
@@ -76,18 +40,30 @@ abstract class ProviderRepository(val connection:Connection): CrudRepository<Pro
         setTimestamp(5, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        }
-        else {
+        } else {
             setLong(6, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
-
         }
     }
 
-    @Transactional
-    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<Provider>
-}
+    override fun Provider.kopiMedNyId(nyId: Long): Provider =
+        this.copy(id = nyId)
 
-fun LocalDateTime.toTimeStamp(): Timestamp {
-    return Timestamp.valueOf(this)
+    fun saveOnMigrate(entities: Iterable<Provider>) {
+        return txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            entities.forEach {
+                connection.prepareStatement(migrateSQL).apply {
+                    setString(1, it.jwtid)
+                    setString(2, it.identifier)
+                    setString(3, it.email)
+                    setString(4, it.phone)
+                    setTimestamp(5, it.created.toTimeStamp())
+                    setTimestamp(6, it.updated.toTimeStamp())
+                    setObject(7, it.id)
+                    execute()
+                }
+            }
+        }
+    }
 }
