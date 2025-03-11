@@ -6,9 +6,9 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
-import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
+import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog
+import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
@@ -51,15 +51,15 @@ class AdPulsRepository(private val txTemplate: TxTemplate, private val objectMap
     fun findByProviderIdAndUpdatedAfter(
         providerId: Long,
         updated: LocalDateTime,
-        pageable: PamImportPageable
-    ): PamImportSlice<AdPuls> {
+        pageable: Pageable
+    ): Slice<AdPuls> {
         return listFind(findByProviderIdAndUpdatedAfterAndPageableSQL) {
             it.setLong(1, providerId)
             it.setTimestamp(2, updated.toTimeStamp())
             it.setString(3, pageable.sort.property.name) // order by
-            it.setLong(4, (pageable.number * pageable.size)) // offset
+            it.setLong(4, (pageable.offset)) // offset
             it.setInt(5, pageable.size) // limit
-        }.let { PamImportSlice(it, pageable) }
+        }.let { Slice(it, pageable) }
     }
 
     fun deleteByUpdatedBefore(before: LocalDateTime): Long =

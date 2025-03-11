@@ -8,13 +8,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import javax.annotation.Nullable
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
-import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
-import no.nav.arbeidsplassen.importapi.repository.PamImportSortable
+import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.RestOrderBy
 import no.nav.arbeidsplassen.importapi.repository.RestPageable
 import no.nav.arbeidsplassen.importapi.repository.RestSlice
 import no.nav.arbeidsplassen.importapi.repository.RestSortable
+import no.nav.arbeidsplassen.importapi.repository.Slice
+import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
@@ -46,7 +46,7 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         return mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
     }
 
-    private fun <T> mapSlice(slice: PamImportSlice<T>): RestSlice<T> {
+    private fun <T> mapSlice(slice: Slice<T>): RestSlice<T> {
         return RestSlice(
             content = slice.content,
             pageable = RestPageable(
@@ -58,7 +58,7 @@ class AdPulsController(private val adPulsService: AdPulsService) {
                             property = slice.pageable.sort.property.name.lowercase(),
                             direction = slice.pageable.sort.direction.name,
                             ignoreCase = false,
-                            ascending = (slice.pageable.sort.direction == PamImportSortable.Direction.ASC)
+                            ascending = (slice.pageable.sort.direction == Sortable.Direction.ASC)
                         )
                     )
                 )
@@ -71,18 +71,18 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         numberFromUrl: Long?,
         sizeFromUrl: Int?,
         sortFromUrl: List<String>?
-    ): PamImportPageable {
+    ): Pageable {
         val lowercaseSort = sortFromUrl?.map { it.lowercase() } ?: emptyList()
         val page = pageFromUrl ?: numberFromUrl ?: 0
         val size = sizeFromUrl ?: 1000
 
         validatePageable(page, size, lowercaseSort)
-        val sortProperty = extractSortableProperty(lowercaseSort) ?: PamImportSortable.Property.UPDATED
-        val sortDirection = extractSortableDirection(lowercaseSort) ?: PamImportSortable.Direction.ASC
-        return PamImportPageable(
+        val sortProperty = extractSortableProperty(lowercaseSort) ?: Sortable.Property.UPDATED
+        val sortDirection = extractSortableDirection(lowercaseSort) ?: Sortable.Direction.ASC
+        return Pageable(
             size = size,
             number = page,
-            sort = PamImportSortable(property = sortProperty, direction = sortDirection)
+            sort = Sortable(property = sortProperty, direction = sortDirection)
         )
     }
 
@@ -100,22 +100,22 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         ) { "We do not support ordering in both directions" }
     }
 
-    private fun extractSortableProperty(sortFromUrl: List<String>): PamImportSortable.Property? {
+    private fun extractSortableProperty(sortFromUrl: List<String>): Sortable.Property? {
         if (sortFromUrl.contains("updated")) {
-            return PamImportSortable.Property.UPDATED
+            return Sortable.Property.UPDATED
         }
         if (sortFromUrl.contains("created")) {
-            return PamImportSortable.Property.CREATED
+            return Sortable.Property.CREATED
         }
         return null
     }
 
-    private fun extractSortableDirection(sortFromUrl: List<String>): PamImportSortable.Direction? {
+    private fun extractSortableDirection(sortFromUrl: List<String>): Sortable.Direction? {
         if (sortFromUrl.contains("asc")) {
-            return PamImportSortable.Direction.ASC
+            return Sortable.Direction.ASC
         }
         if (sortFromUrl.contains("desc")) {
-            return PamImportSortable.Direction.DESC
+            return Sortable.Direction.DESC
         }
         return null
     }

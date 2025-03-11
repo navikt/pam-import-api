@@ -9,7 +9,7 @@ import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -54,7 +54,7 @@ class TransferLogRepositoryTest(
         )
         val findByStatus = transferLogRepository.findByStatus(
             TransferLogStatus.RECEIVED,
-            PamImportPageable(size = 1000, number = 0)
+            Pageable(size = 1000, number = 0)
         )
         assertNotNull(findByStatus)
     }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
 import io.micronaut.context.annotation.Value
 import jakarta.inject.Singleton
-import jakarta.transaction.Transactional
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
@@ -17,7 +16,8 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.Pageable
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
@@ -31,6 +31,7 @@ class TransferLogTasks(
     private val styrkCodeConverter: StyrkCodeConverter,
     private val lokalOntologiGateway: LokalOntologiGateway,
     private val adOutboxService: AdOutboxService,
+    private val txTemplate: TxTemplate,
     @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
     @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long
 ) {
@@ -42,9 +43,10 @@ class TransferLogTasks(
     fun processTransferLogTask(): Int {
         val transferlogs = transferLogRepository.findByStatus(
             TransferLogStatus.RECEIVED,
-            PamImportPageable(size = logSize, number = 0)
+            Pageable(size = logSize)
         )
         transferlogs.stream().forEach {
+            println("ID:" + it.id)
             mapTransferLog(it)
         }
         return transferlogs.count()
@@ -55,19 +57,20 @@ class TransferLogTasks(
         transferLogRepository.deleteByUpdatedBefore(date)
     }
 
-    @Transactional
-    fun mapTransferLog(it: TransferLog) {
+    fun mapTransferLog(transferLog: TransferLog) {
         try {
-            val adList = mapTransferLogs(it)
-            LOG.info("mapping transfer ${it.id} for provider ${it.providerId} found ${adList.size} ads ")
-            val savedList = adStateRepository.saveAll(adList)
-            transferLogRepository.save(it.copy(status = TransferLogStatus.DONE))
-            meterRegistry.counter("ads_received", "provider", it.providerId.toString())
-                .increment(adList.size.toDouble())
-            adOutboxService.lagreFlereTilOutbox(savedList)
+            txTemplate.doInTransaction {
+                val adList = mapTransferLogs(transferLog)
+                LOG.info("mapping transfer ${transferLog.id} for provider ${transferLog.providerId} found ${adList.size} ads ")
+                val savedList = adStateRepository.saveAll(adList)
+                transferLogRepository.save(transferLog.copy(status = TransferLogStatus.DONE))
+                meterRegistry.counter("ads_received", "provider", transferLog.providerId.toString())
+                    .increment(adList.size.toDouble())
+                adOutboxService.lagreFlereTilOutbox(savedList)
+            }
         } catch (e: Exception) {
-            LOG.error("Got exception while handling transfer log ${it.id}", e)
-            transferLogRepository.save(it.copy(status = TransferLogStatus.ERROR))
+            LOG.error("Got exception while handling transfer log ${transferLog.id}", e)
+            transferLogRepository.save(transferLog.copy(status = TransferLogStatus.ERROR))
         }
     }
 

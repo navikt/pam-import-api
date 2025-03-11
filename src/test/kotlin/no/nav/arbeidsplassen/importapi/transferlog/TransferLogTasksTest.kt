@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
@@ -13,7 +14,8 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.Pageable
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -28,10 +30,13 @@ class TransferLogTasksTest(
     private val adStateRepository: AdStateRepository,
     private val adOutboxRepository: AdOutboxRepository
 ) {
+
+    @Inject
+    lateinit var txTemplate: TxTemplate
+
     @Test
     fun doTransferLogTaskTest() {
         val payload = objectMapper.transferJsonString()
-        // TODO: Gjør jeg noe annerledes her? Skal den egentlig føre til en update?
         val provider = providerRepository.newTestProvider()
         transferLogRepository.save(
             TransferLog(
@@ -46,7 +51,7 @@ class TransferLogTasksTest(
         adstates.forEach { println(it.jsonPayload) }
         assertEquals(2, adstates.count())
         val transferLog =
-            transferLogRepository.findByStatus(TransferLogStatus.DONE, PamImportPageable(size = 1000, number = 0))
+            transferLogRepository.findByStatus(TransferLogStatus.DONE, Pageable(size = 1000, number = 0))
         assertEquals(1, transferLog.count())
         val adOutbox = adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0)
         assertEquals(2, adOutbox.size)
@@ -54,18 +59,24 @@ class TransferLogTasksTest(
 
     @Test
     fun deleteTransferLogTaskTest() {
-        val provider = providerRepository.newTestProvider()
-        transferLogRepository.save(
-            TransferLog(
-                providerId = provider.id!!,
-                md5 = "1a2b3c4d5e",
-                payload = "payload",
-                items = 1
+        // Jeg måtte innføre dette for å kompensere for at transaksjonshåndteringen ikke lenger er helt Micronaut-kompatibel..
+        // (By default, when using @MicronautTest, each @Test method will be wrapped in a transaction that will be rolled back when the test finishes.)
+        txTemplate.doInTransaction { tx ->
+            tx.setRollbackOnly()
+
+            val provider = providerRepository.newTestProvider()
+            transferLogRepository.save(
+                TransferLog(
+                    providerId = provider.id!!,
+                    md5 = "1a2b3c4d5e",
+                    payload = "payload",
+                    items = 1
+                )
             )
-        )
-        val date = LocalDateTime.now().plusMonths(7)
-        transferLogTasks.deleteTransferLogTask(date)
-        assertEquals(0, transferLogRepository.findAll().count())
+            val date = LocalDateTime.now().plusMonths(7)
+            transferLogTasks.deleteTransferLogTask(date)
+            assertEquals(0, transferLogRepository.findAll().count())
+        }
     }
 
     @Test

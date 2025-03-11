@@ -2,8 +2,8 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import jakarta.inject.Singleton
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
-import no.nav.arbeidsplassen.importapi.repository.PamImportSlice
+import no.nav.arbeidsplassen.importapi.repository.Pageable
+import no.nav.arbeidsplassen.importapi.repository.Slice
 import org.slf4j.LoggerFactory
 
 @Singleton
@@ -68,8 +68,8 @@ class AdPulsService(private val repository: AdPulsRepository) {
     fun findByProviderIdAndUpdatedAfter(
         providerId: Long,
         updatedAfter: LocalDateTime,
-        pageable: PamImportPageable
-    ): PamImportSlice<AdPulsDTO> {
+        pageable: Pageable
+    ): Slice<AdPulsDTO> {
         return repository.findByProviderIdAndUpdatedAfter(providerId, updatedAfter, pageable).map { it.toDTO() }
     }
 

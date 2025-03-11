@@ -6,7 +6,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
-import no.nav.arbeidsplassen.importapi.repository.PamImportPageable
+import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
@@ -22,7 +22,7 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
     override val deleteSQL: String = """delete from "transfer_log" where id = ?"""
 
     val findByProviderIdSQL = """select * from "transfer_log" where provider_id = ?"""
-    val findByStatusPageable = """select * from "transfer_log" where status = ? limit ?"""
+    val findByStatusPageable = """select * from "transfer_log" where status = ? order by ? offset ? LIMIT ?"""
     val findByProviderIdAndMd5SQL = """select * from "transfer_log" where provider_id = ? and md5 = ?"""
     val deleteByUpdatedBeforeSQL = """delete from "transfer_log" where updated < ?"""
 
@@ -37,11 +37,12 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
             it.setLong(1, providerId)
         }
 
-    // TODO: Bruke pageable skikkelig
-    fun findByStatus(status: TransferLogStatus, pageable: PamImportPageable): List<TransferLog> =
+    fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> =
         listFind(findByStatusPageable) {
             it.setString(1, status.name)
-            it.setInt(2, pageable.size)
+            it.setString(2, pageable.sort.property.name) // order by
+            it.setLong(3, (pageable.offset)) // offset
+            it.setInt(4, pageable.size) // limit
         }
 
     fun deleteByUpdatedBefore(updated: LocalDateTime) =
