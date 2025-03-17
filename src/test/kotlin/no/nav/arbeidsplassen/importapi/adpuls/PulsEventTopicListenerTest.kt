@@ -1,5 +1,11 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
+/*
+// Jeg kommenterer ut denne i stedet for å fjerne den,
+// da vi må opprette en lignende integrasjon snart for å hente inn data fra Umami
+
+
+
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
@@ -29,3 +35,4 @@ class PulsEventTopicListenerTest(private val pulsEventTopicListener: PulsEventTo
         assertEquals(25, dtos[1].total)
     }
 }
+ */

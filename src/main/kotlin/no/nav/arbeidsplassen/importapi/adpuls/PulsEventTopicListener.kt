@@ -1,5 +1,10 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
+/*
+
+// Jeg kommenterer ut denne i stedet for å fjerne den,
+// da vi må opprette en lignende integrasjon snart for å hente inn data fra Umami
+
 import io.micronaut.configuration.kafka.annotation.KafkaListener
 import io.micronaut.configuration.kafka.annotation.OffsetReset
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy
@@ -51,3 +56,4 @@ class PulsEventTopicListener(
     }
 }
 
+ */

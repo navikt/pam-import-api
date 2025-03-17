@@ -53,10 +53,6 @@ spec:
       value: {{ ad_preview_url }}
     - name: ADMINSTATUS_KAFKA_TOPIC
       value: "{{ adminstatus_kafka_topic }}"
-    - name: PULSEVENT_KAFKA_TOPIC
-      value: "{{ pulsevent_kafka_topic }}"
-    - name: PULSEVENT_KAFKA_ENABLED
-      value: "{{ pulsevent_kafka_enabled }}"
     - name: ANNONSEMOTTAK_TOPIC
       value: "{{ annonsemottak_topic }}"
     - name: AD_OUTBOX_KAFKA_ENABLED
