@@ -1,45 +1,46 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
-import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
-import java.sql.Connection
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
-import java.sql.Statement
-import java.util.*
-import jakarta.transaction.Transactional
+import java.sql.ResultSet
+import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class AdminStatusRepository(private val connection: Connection): CrudRepository<AdminStatus, Long> {
+@Singleton
+class AdminStatusRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdminStatus>(txTemplate) {
 
-    val insertSQL = """insert into "admin_status" ("uuid", "status", "message", "reference", "provider_id", "version_id", "created", "publish_status") values(?,?,?,?,?,?,?,?)"""
-    val updateSQL = """update "admin_status" set "uuid"=?, "status"=?, "message"=?, "reference"=?, "provider_id"=?, "version_id"=?, "created"=?, "publish_status"=?, "updated"=current_timestamp where "id"=?"""
+    override val insertSQL =
+        """insert into admin_status (uuid, status, message, reference, provider_id, version_id, created, publish_status) values(?,?,?,?,?,?,?,?)"""
+    override val updateSQL =
+        """update admin_status set uuid=?, status=?, message=?, reference=?, provider_id=?, version_id=?, created=?, publish_status=?, updated=current_timestamp where id=?"""
+    override val findSQL =
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where id = ?"""
+    override val findAllSQL =
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status"""
+    override val deleteSQL = """delete from admin_status where id = ?"""
 
-    @Transactional
-    override fun <S : AdminStatus> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id=generatedKeys.getLong(1)) as S
-            }
-        }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check (executeUpdate() == 1)
-                return entity
-            }
-        }
-    }
+    val findByUuidSQL =
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where uuid = ?"""
+    val findByVersionIdAndProviderIdSQL =
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where version_id = ? and provider_id = ?"""
+    val findByProviderIdAndReferenceSQL =
+        """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where provider_id = ? and reference = ?"""
+    
+    override fun ResultSet.mapToEntity() = AdminStatus(
+        id = getLong("id"),
+        uuid = getString("uuid"),
+        status = Status.valueOf(getString("status")),
+        message = getString("message"),
+        reference = getString("reference"),
+        providerId = getLong("provider_id"),
+        versionId = getLong("version_id"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime(),
+        publishStatus = PublishStatus.valueOf(getString("publish_status")),
+    )
 
-
-    private fun PreparedStatement.prepareSQL(entity: AdminStatus) {
-        var parIndex=0
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: AdminStatus) {
+        var parIndex = 0
         setString(++parIndex, entity.uuid)
         setString(++parIndex, entity.status.name)
         setString(++parIndex, entity.message)
@@ -48,32 +49,28 @@ abstract class AdminStatusRepository(private val connection: Connection): CrudRe
         setLong(++parIndex, entity.versionId)
         setTimestamp(++parIndex, entity.created.toTimeStamp())
         setString(++parIndex, entity.publishStatus.name)
-        if (entity.isNew()) {
-            QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        }
-        else {
+        if (!entity.isNew()) {
             setLong(++parIndex, entity.id!!)
-            QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
-
         }
     }
 
-    @Transactional
-    override fun <S : AdminStatus> saveAll(entities: Iterable<S>): List<S> {
-        return entities.map { save(it) }.toList()
-    }
+    override fun AdminStatus.kopiMedNyId(nyId: Long): AdminStatus =
+        this.copy(id = nyId)
 
-    @Transactional
-    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdminStatus>
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus? =
+        singleFind(findByProviderIdAndReferenceSQL) {
+            it.setLong(1, providerId)
+            it.setString(2, reference)
+        }
 
-    @Transactional
-    abstract fun findByVersionId(versionId: Long): List<AdminStatus>
+    fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus> =
+        listFind(findByVersionIdAndProviderIdSQL) {
+            it.setLong(1, versionId)
+            it.setLong(2, providerId)
+        }
 
-    @Transactional
-    abstract fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus>
-
-    @Transactional
-    abstract fun findByUuid(uuid:String): AdminStatus?
-
-
+    fun findByUuid(uuid: String): AdminStatus? =
+        singleFind(findByUuidSQL) {
+            it.setObject(1, uuid)
+        }
 }

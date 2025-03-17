@@ -1,46 +1,44 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
-import io.micronaut.data.runtime.config.DataSettings.QUERY_LOG
-import no.nav.arbeidsplassen.importapi.provider.toTimeStamp
-import java.sql.Connection
+import jakarta.inject.Singleton
 import java.sql.PreparedStatement
-import java.sql.Statement
-import java.time.LocalDateTime
-import java.util.*
-import jakarta.transaction.Transactional
+import java.sql.ResultSet
+import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@JdbcRepository(dialect = Dialect.POSTGRES)
-abstract class AdStateRepository(val connection: Connection): CrudRepository<AdState, Long> {
+@Singleton
+class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdState>(txTemplate) {
 
-    val insertSQL = """insert into "ad_state" ("uuid", "reference", "provider_id", "json_payload", "version_id", "created") values (?,?,?,?,?,?)"""
-    val updateSQL = """update "ad_state" set "uuid"=?,"reference"=?, "provider_id"=?, "json_payload"=?, "version_id"=?, "created"=?, "updated"=current_timestamp where "id"=?"""
+    override val insertSQL =
+        """insert into ad_state (uuid, reference, provider_id, json_payload, version_id, created) values (?,?,?,?,?,?)"""
+    override val updateSQL =
+        """update ad_state set uuid=?, reference=?, provider_id=?, json_payload=?, version_id=?, created=?, updated=current_timestamp where id=?"""
+    override val deleteSQL = """delete from ad_state where id = ?"""
+    override val findSQL: String =
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where id=?"""
+    override val findAllSQL: String =
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state"""
 
-    @Transactional
-    override fun <S : AdState> save(entity: S): S {
-        if (entity.isNew()) {
-            connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS).apply {
-                prepareSQL(entity)
-                execute()
-                check(generatedKeys.next())
-                @Suppress("UNCHECKED_CAST")
-                return entity.copy(id = generatedKeys.getLong(1)) as S
-            }
-        }
-        else {
-            connection.prepareStatement(updateSQL).apply {
-                prepareSQL(entity)
-                check(executeUpdate() == 1 )
-                return entity
-            }
-        }
-    }
+    val findByProviderIdAndReferenceSQL =
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where provider_id=? and reference=?"""
+    val findByUuidSQL =
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=?"""
+    val findByUuidAndProviderIdSQL =
+        """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=? and provider_id=?"""
 
-    private fun PreparedStatement.prepareSQL(entity: AdState) {
+    override fun ResultSet.mapToEntity(): AdState = AdState(
+        id = getLong("id"),
+        uuid = getString("uuid"),
+        providerId = getLong("provider_id"),
+        reference = getString("reference"),
+        versionId = getLong("version_id"),
+        jsonPayload = getString("json_payload"),
+        created = getTimestamp("created").toLocalDateTime(),
+        updated = getTimestamp("updated").toLocalDateTime()
+    )
+
+    override fun PreparedStatement.prepareSQLSaveOrUpdate(entity: AdState) {
         setString(1, entity.uuid)
         setString(2, entity.reference)
         setLong(3, entity.providerId)
@@ -49,39 +47,29 @@ abstract class AdStateRepository(val connection: Connection): CrudRepository<AdS
         setTimestamp(6, entity.created.toTimeStamp())
         if (entity.isNew()) {
             QUERY_LOG.debug("Executing SQL INSERT: $insertSQL")
-        }
-        else {
+        } else {
             setLong(7, entity.id!!)
             QUERY_LOG.debug("Executing SQL UPDATE: $updateSQL")
-
         }
     }
 
-    @Transactional
-    override fun <S : AdState> saveAll(entities: Iterable<S>): List<S> {
-        return entities.map { save(it) }.toList()
-    }
+    override fun AdState.kopiMedNyId(nyId: Long): AdState =
+        this.copy(id = nyId)
 
-    @Transactional
-    abstract fun findByProviderIdAndReference(providerId: Long, reference: String): Optional<AdState>
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdState? =
+        singleFind(findByProviderIdAndReferenceSQL) { p ->
+            p.setLong(1, providerId)
+            p.setString(2, reference)
+        }
 
-    @Transactional
-    abstract fun list(pageable: Pageable): Slice<AdState>
+    fun findByUuid(uuid: String): AdState? =
+        singleFind(findByUuidSQL) { p ->
+            p.setObject(1, uuid)
+        }
 
-    @Transactional
-    abstract fun findByUpdatedGreaterThanEquals(updated: LocalDateTime, pageable: Pageable): Slice<AdState>
-
-    @Transactional
-    abstract fun findByUuid(uuid: String): AdState?
-
-
-    @Transactional
-    abstract fun findByUuidAndProviderId(uuid: String, providerId: Long): Optional<AdState>
-
-    @Transactional
-    abstract fun list(versionId: Long, pageable: Pageable): Slice<AdState>
-
-    @Transactional
-    abstract fun list(versionId: Long, providerId: Long, pageable: Pageable): Slice<AdState>
-
+    fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState? =
+        singleFind(findByUuidAndProviderIdSQL) { p ->
+            p.setObject(1, uuid)
+            p.setLong(2, providerId)
+        }
 }

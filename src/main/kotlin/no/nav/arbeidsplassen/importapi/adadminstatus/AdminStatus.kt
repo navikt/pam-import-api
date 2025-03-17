@@ -1,32 +1,25 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
 import java.time.LocalDateTime
-import jakarta.persistence.*
+import no.nav.arbeidsplassen.importapi.repository.Entity
 
-@Entity
 data class AdminStatus(
-        @Id
-        @GeneratedValue
-        var id: Long? = null,
-        val uuid: String,
-        @Enumerated(EnumType.STRING)
-        val status: Status = Status.RECEIVED,
-        val message: String? = null,
-        val reference: String,
-        val providerId: Long,
-        val versionId: Long,
-        val created: LocalDateTime = LocalDateTime.now(),
-        val updated: LocalDateTime = LocalDateTime.now(),
-        @Enumerated(EnumType.STRING)
-        val publishStatus: PublishStatus = PublishStatus.INACTIVE
-)
+    override var id: Long? = null,
+    val uuid: String,
+    val status: Status = Status.RECEIVED,
+    val message: String? = null,
+    val reference: String,
+    val providerId: Long,
+    val versionId: Long,
+    val created: LocalDateTime = LocalDateTime.now(),
+    val updated: LocalDateTime = LocalDateTime.now(),
+    val publishStatus: PublishStatus = PublishStatus.INACTIVE
+) : Entity
 
 enum class PublishStatus {
-        INACTIVE, ACTIVE, REJECTED, STOPPED, DELETED, UNKNOWN
+    INACTIVE, ACTIVE, REJECTED, STOPPED, DELETED, UNKNOWN
 }
 
 enum class Status {
     RECEIVED, PENDING, DONE, UNKNOWN
 }
-
-fun AdminStatus.isNew(): Boolean = id==null

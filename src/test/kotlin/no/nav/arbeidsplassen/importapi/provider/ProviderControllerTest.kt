@@ -1,9 +1,9 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 import io.micronaut.context.annotation.Property
-import io.micronaut.core.type.GenericArgument
-import io.micronaut.data.model.Slice
-import io.micronaut.http.HttpRequest.*
+import io.micronaut.http.HttpRequest.GET
+import io.micronaut.http.HttpRequest.POST
+import io.micronaut.http.HttpRequest.PUT
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.rxjava3.http.client.Rx3HttpClient
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 
 @MicronautTest
-@Property(name="JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
+@Property(name = "JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
 class ProviderControllerTest(private val tokenService: TokenService) {
 
     @Inject
@@ -26,23 +26,27 @@ class ProviderControllerTest(private val tokenService: TokenService) {
     fun `create read update provider`() {
         // create provider
         val adminToken = tokenService.adminToken()
-        val create = POST("/internal/providers",
-                ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
+        val create = POST(
+            "/internal/providers",
+            ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
         val created = client.exchange(create, ProviderDTO::class.java).blockingFirst().body()
         val read = GET<Long>("/internal/providers/${created?.id}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
         val reddit = client.exchange(read, ProviderDTO::class.java).blockingFirst().body()
         assertEquals(created, reddit)
-        val put = PUT("/internal/providers/${created?.id}",
-                ProviderDTO(identifier = "webcruiter2", email = "test@test.no", phone = "12345678"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
+        val put = PUT(
+            "/internal/providers/${created?.id}",
+            ProviderDTO(identifier = "webcruiter2", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
         client.exchange(put, ProviderDTO::class.java).blockingFirst()
         val updated = client.exchange(read, ProviderDTO::class.java).blockingFirst().body()
         assertEquals("webcruiter2", updated?.identifier)

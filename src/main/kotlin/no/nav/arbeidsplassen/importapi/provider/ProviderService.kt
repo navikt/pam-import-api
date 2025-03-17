@@ -3,8 +3,6 @@ package no.nav.arbeidsplassen.importapi.provider
 import io.micronaut.cache.annotation.CacheConfig
 import io.micronaut.cache.annotation.CacheInvalidate
 import io.micronaut.cache.annotation.Cacheable
-import io.micronaut.data.model.Pageable
-import io.micronaut.data.model.Slice
 import no.nav.arbeidsplassen.importapi.Open
 import jakarta.inject.Singleton
 
@@ -22,13 +20,7 @@ class ProviderService(private val providerRepository: ProviderRepository) {
 
     @Cacheable
     fun findById(id:Long): ProviderDTO {
-        return providerRepository.findById(id).orElseThrow().toDTO()
-    }
-
-    fun list(page: Pageable): Slice<ProviderDTO> {
-        return providerRepository.list(page).map {
-            it.toDTO()
-        }
+        return providerRepository.findById(id)!!.toDTO()
     }
 
     private fun ProviderDTO.toEntity(): Provider {
@@ -39,4 +31,3 @@ class ProviderService(private val providerRepository: ProviderRepository) {
         return ProviderDTO(id=id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
     }
 }
-
