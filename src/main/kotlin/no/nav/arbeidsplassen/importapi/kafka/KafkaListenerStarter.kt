@@ -34,12 +34,14 @@ class KafkaListenerStarter(
                 val listener = KafkaRapidJsonListener(consumerConfig, adTransportProsessor, healthService)
                 listener.startListener()
             } catch (e: Exception) {
-                LOG.error("Greide ikke å starte kafka consumer: ${e.message}", e)
+                LOG.error("Greide ikke å starte Kafka listener: ${e.message}", e)
+                healthService.addUnhealthyVote()
             }
         }
     }
 
     override fun onApplicationEvent(event: StartupEvent?) {
+        LOG.info("onApplicationEvent StartupEvent")
         start()
     }
 }

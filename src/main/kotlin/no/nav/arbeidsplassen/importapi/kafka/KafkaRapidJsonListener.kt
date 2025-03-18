@@ -16,13 +16,13 @@ class KafkaRapidJsonListener(
 
     override fun handleRecord(record: ConsumerRecord<String?, ByteArray?>) = record.key()?.let { key ->
         try {
-            MDC.put("U", key)
-            val eventId = record.headers().headers("@eventId").firstOrNull()?.let { String(it.value()) }
-            eventId?.let { MDC.put("TraceId", it) }
-            val kilde = record.headers().headers("@kilde").firstOrNull()?.let { String(it.value()) }
+            MDC.put("AD", key)
+            record.headers().headers("kafka_correlationId").firstOrNull()
+                ?.let { MDC.put("C", String(it.value())) }
+            
             val message = JsonMessage(
-                key, eventId, record.value()?.let { String(it) }, record.timestamp(),
-                record.partition(), record.offset(), kilde
+                key, record.value()?.let { String(it) }, record.timestamp(),
+                record.partition(), record.offset()
             )
             messageListener.onMessage(message)
         } finally {
@@ -34,13 +34,11 @@ class KafkaRapidJsonListener(
         fun onMessage(message: JsonMessage)
     }
 
-    class JsonMessage(
+    data class JsonMessage(
         val key: String,
-        val eventId: String?,
         val payload: String?,
         val timestamp: Long? = null,
         val partition: Int? = null,
         val offset: Long? = null,
-        val kilde: String? = null
     )
 }

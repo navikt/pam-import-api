@@ -29,10 +29,7 @@ class InternalAdTopicListener(
                     LOG.info("{} was saved as import-api ad", adminStatus.uuid)
                 }
             } catch (e: Exception) {
-                LOG.error(
-                    "Greide ikke å konsumere/mappe AdTransport med key ${message.key} og payload ${message.payload}: ${e.message}",
-                    e
-                )
+                LOG.error("Greide ikke å konsumere/mappe AdTransport med key ${message.key}: ${e.message}", e)
                 throw (e)
             }
         }
