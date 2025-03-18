@@ -1,11 +1,12 @@
 {
-  "ingress": ["https://arbeidsplassen-api.nav.no/stillingsimport", "https://pam-import-api.intern.nav.no/stillingsimport"],
+  "ingress": [
+    "https://arbeidsplassen-api.nav.no/stillingsimport",
+    "https://pam-import-api.intern.nav.no/stillingsimport"
+  ],
   "ad_preview_url": "https://arbeidsplassen.nav.no/stillinger/stilling",
   "kafka_pool": "nav-prod",
   "adminstatus_kafka_topic": "teampam.stilling-intern-1",
   "cloudsql_tier": "db-custom-2-7680",
-  "pulsevent_kafka_topic": "teampam.pam-puls-intern-2",
-  "pulsevent_kafka_enabled": "true",
   "annonsemottak_topic": "teampam.annonsemottak-v1",
   "ad_outbox_scheduler_enabled": "true",
   "ad_outbox_kafka_enabled": "true"
