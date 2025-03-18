@@ -92,10 +92,6 @@ transferlog:
     months: 6
   scheduler:
     enabled: true
-pulsevent:
-  kafka:
-    enabled: true
-    topic: teampam.puls-intern-2
 adoutbox:
   kafka:
     enabled: ${AD_OUTBOX_KAFKA_ENABLED:false}
