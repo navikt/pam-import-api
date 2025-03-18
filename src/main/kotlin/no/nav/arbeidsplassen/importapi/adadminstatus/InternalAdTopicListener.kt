@@ -34,25 +34,4 @@ class InternalAdTopicListener(
             }
         }
     }
-
-    /*
-    @Topic("\${adminstatus.kafka.topic:teampam.stilling-intern-1}")
-    fun kakfkaAdminStatusSyncWithAd(adList: List<AdTransport>, offsets: List<Long>) {
-        LOG.info("received from kafka with batch size of {} ads", adList.size)
-        val adminList = adList.stream()
-            .filter { "IMPORTAPI" == it.source }
-            .map {
-                LOG.info("Mapping import api ad ${it.uuid}")
-                it.toAdminStatus(adminStatusRepository)
-            }
-            .toList()
-
-        if (adminList.isNotEmpty()) {
-            val distinctList = adminList.sortedByDescending(AdminStatus::updated).distinctBy(AdminStatus::uuid)
-            adminStatusRepository.saveAll(distinctList)
-            LOG.info("{} was saved as import-api ads ", distinctList.size)
-        }
-        LOG.info("committing latest offset {} with ad {}", offsets.last(), adList.last().uuid)
-    }
-     */
 }

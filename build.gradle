@@ -78,7 +78,6 @@ dependencies {
     testImplementation("com.squareup.okhttp3:mockwebserver:$okhttpserverVersion")
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
     testImplementation("net.javacrumbs.json-unit:json-unit:4.1.0")
-    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
 }
 
 test.classpath += configurations.developmentOnly
