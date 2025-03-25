@@ -18,10 +18,15 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
-@Singleton
-open class KafkaConfig(private val env: Map<String, String> = System.getenv()) {
+open class KafkaConfig(envInput: Map<String, String> = emptyMap()) {
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaConfig::class.java)
+    }
+
+    private val env: Map<String, String> = if (envInput == null || envInput.eisEmpty()) {
+        System.getenv()
+    } else {
+        envInput
     }
 
     open fun kafkaJsonConsumer(topic: String, groupId: String): KafkaConsumer<String?, ByteArray?> {

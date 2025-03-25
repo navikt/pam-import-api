@@ -21,11 +21,12 @@ class MicronautConfig {
     fun adOutboxProducer(
         @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}") topic: String,
         healthService: HealthService,
-        kafkaConfig: KafkaConfig
-    ): AdOutboxKafkaProducer =
-        AdOutboxKafkaProducer(
+    ): AdOutboxKafkaProducer {
+        val kafkaConfig = KafkaConfig()
+        return AdOutboxKafkaProducer(
             kafkaProducer = kafkaConfig.kafkaProducer(),
             topic = topic,
             healthService = healthService,
         )
+    }
 }
