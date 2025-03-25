@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.feed.AdTransport
-import no.nav.arbeidsplassen.importapi.kafka.KafkaRapidJsonListener
+import no.nav.arbeidsplassen.importapi.kafka.KafkaTopicJsonListener
 import org.slf4j.LoggerFactory
 
 
@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory
 class InternalAdTopicListener(
     private val adminStatusRepository: AdminStatusRepository,
     private val jacksonMapper: ObjectMapper
-) : KafkaRapidJsonListener.RapidMessageListener {
+) : KafkaTopicJsonListener.TopicMessageListener {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(InternalAdTopicListener::class.java)
     }
 
-    override fun onMessage(message: KafkaRapidJsonListener.JsonMessage) {
+    override fun onMessage(message: KafkaTopicJsonListener.JsonMessage) {
         if (message.payload != null) {
             try {
                 val adTransport = jacksonMapper.readValue<AdTransport>(message.payload)

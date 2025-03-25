@@ -12,9 +12,9 @@ import org.apache.kafka.common.errors.AuthorizationException
 import org.intellij.lang.annotations.Language
 import org.slf4j.LoggerFactory
 
-abstract class KafkaRapidListener<T> {
+abstract class KafkaTopicListener<T> {
     companion object {
-        private val LOG = LoggerFactory.getLogger(KafkaRapidListener::class.java)
+        private val LOG = LoggerFactory.getLogger(KafkaTopicListener::class.java)
     }
 
     abstract val healthService: HealthService
@@ -24,17 +24,18 @@ abstract class KafkaRapidListener<T> {
     abstract fun handleRecord(record: ConsumerRecord<String?, T?>): Unit?
 
     fun startListenerInternal() {
-        LOG.info("Starter Kafka AdTransport listener")
+        LOG.info("Starter Kafka listener")
         var records: ConsumerRecords<String?, T?>?
 
         while (healthService.isHealthy()) {
             var currentPositions = mutableMapOf<TopicPartition, Long>()
             try {
+                LOG.info("Poller i Kafka listener")
                 records = kafkaConsumer.poll(Duration.ofSeconds(1))
                 if (records.count() > 0) {
                     currentPositions = records
                         .groupBy { TopicPartition(it.topic(), it.partition()) }
-                        .mapValues { it.value.minOf { it.offset() } }
+                        .mapValues { entry -> entry.value.minOf { it.offset() } }
                         .toMutableMap()
 
                     LOG.info("Leste ${records.count()} rader. Keys: {}", records.mapNotNull { it.key() }.joinToString())

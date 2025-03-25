@@ -31,7 +31,7 @@ class KafkaListenerStarter(
             LOG.info("Starter kafka rapid listener")
             try {
                 val consumerConfig = kafkaConfig.kafkaJsonConsumer(topic, groupId)
-                val listener = KafkaRapidJsonListener(consumerConfig, adTransportProsessor, healthService)
+                val listener = KafkaTopicJsonListener(consumerConfig, healthService, adTransportProsessor)
                 listener.startListener()
             } catch (e: Exception) {
                 LOG.error("Greide ikke å starte Kafka listener: ${e.message}", e)
