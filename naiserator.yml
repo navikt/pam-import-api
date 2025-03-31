@@ -41,9 +41,8 @@ spec:
   {{#each ingress as |url|}}
      - {{url}}
   {{/each}}
-  filesFrom:
+  envFrom:
     - secret: pam-import-api-env-secret
-      mountPath: /var/run/secrets/nais.io/vault
   kafka:
     pool: {{ kafka_pool }}
   env:

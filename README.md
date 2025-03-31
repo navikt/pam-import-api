@@ -2,7 +2,9 @@
 ![deploy-prod](https://github.com/navikt/pam-import-api/workflows/deploy-prod/badge.svg)
 
 ## Beskrivelse
-pam-import-api er en applikasjon som lar stillingsleverandærer laste opp og publisere stillingsannonser på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
+
+pam-import-api er en applikasjon som lar stillingsleverandærer laste opp og publisere stillingsannonser
+på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
 
 # Technical documentation
 
@@ -46,18 +48,16 @@ information to the Kafka topic `puls` that pam-import-api listens to.
 # Secrets
 
 All secrets are now available in the Nais console. There are three of them:
-* pam-import-api-script-secret is not used by the application, but should be used by developers when they need to use the provider-scripts
+
+* pam-import-api-script-secret is not used by the application, but should be used by developers when they need to use
+  the provider-scripts
 * import-api-dev-key contains information about a provider in dev that developers can use to test the API.
-* pam-import-api-env-secret contains the JWT secret needed to verify tokens sent in. This is the only secret used by the application.
+* pam-import-api-env-secret contains the JWT secret needed to verify tokens sent in. This is the only secret used by the
+  application.
 
 ## pam-import-api-env-env-secret
 
-This secret is handled in a quite strange way. It is written to the file /var/run/secrets/nais.io/vault, 
-which again is read by init-scripts included in the NAV baseimage and made available as environment variables.
-(Ref https://github.com/navikt/baseimages/blob/master/java-common/init-scripts/02-import-env-files.sh)
-At least this is what I think is happening.
-But this is not necessary, we could use envFrom instead of filesFrom in naiserator.yml. But this is a TODO for later.
-
+This secret is read using envFrom in naiserator.yml
 The secret contains both the JWT_SECRET and a username and password for a service user. I think the latter is not used.
 
 # Getting started
@@ -96,11 +96,16 @@ curl -k -XPOST -H "Accept: application/json" -H "Cache-Control: no-cache" -H "Co
 
 # Register new providers
 
-Providers must authenticate requests to the API with a `providerId` and `token`. These credentials are generated manually with scripts in this app ([register-new-provider.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/register-new-provider.sh) and [generate-provider-tokens.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/generate-provider-tokens.sh)).
+Providers must authenticate requests to the API with a `providerId` and `token`. These credentials are generated
+manually with scripts in this
+app ([register-new-provider.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/register-new-provider.sh)
+and [generate-provider-tokens.sh](https://github.com/navikt/pam-import-api/blob/master/scripts/generate-provider-tokens.sh)).
 
 ## Prerequisites
 
-Providers must register themselves as a job provider/partner and be approved by sending an email to us with the following information:
+Providers must register themselves as a job provider/partner and be approved by sending an email to us with the
+following information:
+
 * Company name
 * Contact email (technical support or personell)
 * Contact phone number
@@ -156,11 +161,12 @@ Are you sure (Y/y to approve)? Y
 # note token for dev and prod
 ```
 
-## Provider og token til testing av api'et 
-Det er laget et eget token for testing av api'et i dev for utviklere. 
+## Provider og token til testing av api'et
+
+Det er laget et eget token for testing av api'et i dev for utviklere.
 ProviderId og token kan hentes i secreten import-api-dev-key som ligger i nais consollet.
 (Tidligere lå det i Vault, men det skal ikke trengs å brukes lenger
-https://vault.adeo.no/ui/vault/secrets/secret/show/teampam/import-api/import-api-dev-key ) 
+https://vault.adeo.no/ui/vault/secrets/secret/show/teampam/import-api/import-api-dev-key )
 
 # Deploy to prod
 
