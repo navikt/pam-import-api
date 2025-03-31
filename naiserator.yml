@@ -42,7 +42,7 @@ spec:
      - {{url}}
   {{/each}}
   envFrom:
-    - secret: pam-import-api-env-secret
+    - secret: pam-import-api-env-secrets
   kafka:
     pool: {{ kafka_pool }}
   env:
