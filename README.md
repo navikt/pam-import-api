@@ -52,13 +52,9 @@ All secrets are now available in the Nais console. There are three of them:
 * pam-import-api-script-secret is not used by the application, but should be used by developers when they need to use
   the provider-scripts
 * import-api-dev-key contains information about a provider in dev that developers can use to test the API.
-* pam-import-api-env-secret contains the JWT secret needed to verify tokens sent in. This is the only secret used by the
+* pam-import-api-env-secrets contains the JWT secret needed to verify tokens sent in. This is the only secret used by
+  the
   application.
-
-## pam-import-api-env-env-secret
-
-This secret is read using envFrom in naiserator.yml
-The secret contains both the JWT_SECRET and a username and password for a service user. I think the latter is not used.
 
 # Getting started
 
