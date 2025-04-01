@@ -23,4 +23,4 @@ ENV TZ="Europe/Oslo"
 ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Duser.language=no -Duser.country=NO -Duser.timezone=Europe/Oslo"
 EXPOSE 8080
 
-CMD ["java", "-jar", "/app.jar"]
+CMD ["/app.jar"]
