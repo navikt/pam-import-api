@@ -8,15 +8,21 @@ val _VERSIONID = "_versionid"
 
 fun AdTransport.toAdminStatus(adminStatusRepository: AdminStatusRepository): AdminStatus {
     return adminStatusRepository.findByUuid(uuid)
-        ?.copy(status = mapStatus(), versionId = properties[_VERSIONID]?.toLong()!!,
-                    message = mapMessage(), publishStatus = mapPublishingStatus())
-        ?: run { AdminStatus(uuid = uuid, status = mapStatus(), versionId =
-            properties[_VERSIONID]?.toLong()!!, providerId = properties[_PROVIDERID]?.toLong()!!,
-                    reference = reference, message = mapMessage(), publishStatus = mapPublishingStatus()) }
+        ?.copy(
+            status = mapStatus(), versionId = properties[_VERSIONID]?.toLong()!!,
+            message = mapMessage(), publishStatus = mapPublishingStatus()
+        )
+        ?: run {
+            AdminStatus(
+                uuid = uuid, status = mapStatus(), versionId =
+                    properties[_VERSIONID]?.toLong()!!, providerId = properties[_PROVIDERID]?.toLong()!!,
+                reference = reference, message = mapMessage(), publishStatus = mapPublishingStatus()
+            )
+        }
 }
 
 private fun AdTransport.mapMessage(): String? {
-    if ("REJECTED".equals(status)) {
+    if ("REJECTED" == status) {
         return administration.message ?: administration.remarks.toString()
     }
     return null
