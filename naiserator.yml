@@ -75,3 +75,7 @@ spec:
     outbound:
       rules:
         - application: pam-ontologi
+    inbound:
+      rules:
+        - application: toi-publisering-til-arbeidsplassen
+          namespace: toi
