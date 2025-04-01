@@ -20,6 +20,7 @@ ENV LANG='nb_NO.UTF-8'
 ENV LANGUAGE='nb_NO:nb'
 ENV LC_ALL='nb_NO.UTF-8'
 ENV TZ="Europe/Oslo"
+ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Duser.language=no -Duser.country=NO -Duser.timezone=Europe/Oslo"
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]
