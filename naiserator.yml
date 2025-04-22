@@ -41,9 +41,8 @@ spec:
   {{#each ingress as |url|}}
      - {{url}}
   {{/each}}
-  filesFrom:
-    - secret: pam-import-api-env-secret
-      mountPath: /var/run/secrets/nais.io/vault
+  envFrom:
+    - secret: pam-import-api-env-secrets
   kafka:
     pool: {{ kafka_pool }}
   env:
@@ -76,3 +75,7 @@ spec:
     outbound:
       rules:
         - application: pam-ontologi
+    inbound:
+      rules:
+        - application: toi-publisering-til-arbeidsplassen
+          namespace: toi
