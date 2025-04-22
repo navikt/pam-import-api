@@ -11,6 +11,7 @@ import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.testcontainers.containers.KafkaContainer
@@ -51,7 +52,7 @@ class InternalAdTopicListenerTest {
             )
 
             // Testen er bare at den skal kunne starte opp uten feil
-            kafkaListenerStarter.start()
+            assertDoesNotThrow { kafkaListenerStarter.start() }
         }
     }
 }
