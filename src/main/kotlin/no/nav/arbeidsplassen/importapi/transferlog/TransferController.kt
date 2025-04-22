@@ -11,12 +11,19 @@ import com.fasterxml.jackson.module.kotlin.treeToValue
 import io.micronaut.context.annotation.Value
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.*
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.QueryValue
 import io.netty.handler.codec.CodecException
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.exceptions.CompositeException
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus
@@ -30,7 +37,6 @@ import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.slf4j.LoggerFactory
-import java.time.LocalDateTime
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
 @Controller("/api/v1/transfers")
@@ -92,23 +98,29 @@ class TransferController(
         LOG.info("Streaming for provider $providerId")
 
         val o = json.subscribeOn(Schedulers.io())
-                .onErrorReturn {
-                    LOG.warn("Feil ved streaming av ads fra provider $providerId: ${it.message}")
-                    objectMapper.valueToTree(listOf(TransferLogDTO(
+            .onErrorReturn { it: Throwable ->
+                LOG.warn("Feil ved streaming av ads fra provider $providerId: ${it.message}")
+                objectMapper.valueToTree(
+                    listOf(
+                        TransferLogDTO(
                             message = "JSON Parse error: ${it.localizedMessage}",
                             status = TransferLogStatus.ERROR,
                             providerId = provider.id!!
-                    )))
-                }
-                .map {
-                    receiveAd(it, provider)
-                }
+                        )
+                    )
+                )
+            }
+            .map {
+                receiveAd(it, provider)
+            }
 
         return o;
     }
 
-    private fun receiveAd(jsonNode: JsonNode, provider: ProviderDTO) : TransferLogDTO {
+    private fun receiveAd(jsonNode: JsonNode, provider: ProviderDTO): TransferLogDTO {
         return runCatching {
+            // Denne if'en er her for å håndtere det man lager i onErrorReturn på linje 101.
+            // Det var litt overraskende, må jeg innrømme..
             if (jsonNode.isArray) {
                 val errorDto = objectMapper.treeToValue<List<TransferLogDTO>>(jsonNode)
                 return@runCatching errorDto[0]
@@ -121,21 +133,21 @@ class TransferController(
             val md5 = content.toMD5Hex()
             if (transferLogService.existsByProviderIdAndMd5(provider.id!!, md5)) {
                 TransferLogDTO(
-                        message = "Content already exist, skipping",
-                        status = TransferLogStatus.SKIPPED,
-                        items = 1,
-                        md5 = md5,
-                        providerId = provider.id!!
+                    message = "Content already exist, skipping",
+                    status = TransferLogStatus.SKIPPED,
+                    items = 1,
+                    md5 = md5,
+                    providerId = provider.id!!
                 )
             } else {
                 transferLogService.validate(ad)
                 transferLogService.save(
-                        TransferLogDTO(
-                                payload = content,
-                                md5 = md5,
-                                items = 1,
-                                providerId = provider.id!!
-                        )
+                    TransferLogDTO(
+                        payload = content,
+                        md5 = md5,
+                        items = 1,
+                        providerId = provider.id!!
+                    )
                 ).apply {
                     payload = null
                 }
@@ -147,23 +159,23 @@ class TransferController(
         val transferLogDTO = when (error) {
             is CompositeException -> {
                 val codecException = error.exceptions.find { it is CodecException }
-                codecException?.let { c->
+                codecException?.let { c ->
                     TransferLogDTO(
-                            message = "JSON Parse error: ${c.localizedMessage}",
-                            status = TransferLogStatus.ERROR,
-                            providerId = provider.id!!
-                    )
-                } ?:
-                TransferLogDTO(
-                        message = "Parse error: ${error.exceptions.firstOrNull()?.localizedMessage}",
+                        message = "JSON Parse error: ${c.localizedMessage}",
                         status = TransferLogStatus.ERROR,
                         providerId = provider.id!!
-                )
-            }
-            is CodecException -> TransferLogDTO(
-                    message = "JSON Parse error: at ${error.localizedMessage}",
+                    )
+                } ?: TransferLogDTO(
+                    message = "Parse error: ${error.exceptions.firstOrNull()?.localizedMessage}",
                     status = TransferLogStatus.ERROR,
                     providerId = provider.id!!
+                )
+            }
+
+            is CodecException -> TransferLogDTO(
+                message = "JSON Parse error: at ${error.localizedMessage}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
             )
 
             is JsonParseException -> TransferLogDTO(
@@ -179,15 +191,15 @@ class TransferController(
             )
 
             is InvalidNullException -> TransferLogDTO(
-                    message = "Missing parameter: ${error.propertyName.simpleName}",
-                    status = TransferLogStatus.ERROR,
-                    providerId = provider.id!!
+                message = "Missing parameter: ${error.propertyName.simpleName}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
             )
 
             is MismatchedInputException -> TransferLogDTO(
-                    message = "Missing parameter: ${feltFraPathReference(error.pathReference)}",
-                    status = TransferLogStatus.ERROR,
-                    providerId = provider.id!!
+                message = "Missing parameter: ${feltFraPathReference(error.pathReference)}",
+                status = TransferLogStatus.ERROR,
+                providerId = provider.id!!
             )
 
             else -> TransferLogDTO(
@@ -220,7 +232,8 @@ class TransferController(
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
         val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
-        val adWithoutInvalidCategories = transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
+        val adWithoutInvalidCategories =
+            transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
         val ad = adWithoutInvalidCategories.copy(expires = LocalDateTime.now().minusMinutes(1), status = adStatus)
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()

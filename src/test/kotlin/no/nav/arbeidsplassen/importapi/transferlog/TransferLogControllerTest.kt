@@ -626,6 +626,8 @@ class TransferLogControllerTest(
         val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
         assertNull(errorFromServer)
         assertEquals(TransferLogStatus.ERROR, transferLog?.status)
+        println("Transferlog is $transferLog")
+        println("Transferlog.message is ${transferLog.message}")
         assertTrue(transferLog!!.message!!.contains("JSON Parse error"))
     }
 
