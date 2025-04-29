@@ -127,8 +127,8 @@ abstract class BaseCrudRepository<T : Entity>(private val txTemplate: TxTemplate
     }
 
     private fun ResultSet.mapToList(): List<T> =
-        use {
-            generateSequence { if (it.next()) it.mapToEntity() else null }.toList()
+        use { rs: ResultSet ->
+            generateSequence { if (rs.next()) rs.mapToEntity() else null }.toList()
         }
 
     fun LocalDateTime.toTimeStamp(): Timestamp {

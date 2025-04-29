@@ -60,7 +60,7 @@ class TransferLogTasks(
         try {
             txTemplate.doInTransaction {
                 val adList = mapTransferLogs(transferLog)
-                LOG.info("mapping transfer ${transferLog.id} for provider ${transferLog.providerId} found ${adList.size} ads ")
+                LOG.info("mapping transfer ${transferLog.id} for provider ${transferLog.providerId} with updated ${transferLog.updated} found ${adList.size} ads ")
                 val savedList = adStateRepository.saveAll(adList)
                 transferLogRepository.save(transferLog.copy(status = TransferLogStatus.DONE))
                 meterRegistry.counter("ads_received", "provider", transferLog.providerId.toString())

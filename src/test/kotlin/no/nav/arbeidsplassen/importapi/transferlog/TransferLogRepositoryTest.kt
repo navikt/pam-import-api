@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.provider.Provider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.toMD5Hex
@@ -57,6 +58,35 @@ class TransferLogRepositoryTest(
             Pageable(size = 1000, number = 0)
         )
         assertNotNull(findByStatus)
+    }
+
+    @Test
+    fun transferLogOrderTest() {
+        val provider =
+            providerRepository.save(Provider(identifier = "tester2", email = "tester2@tester.test", phone = "12345678"))
+        val payload = objectMapper.transferJsonString()
+        val md5hash = payload.toMD5Hex()
+        val transferLog1 = TransferLog(providerId = provider.id!!, md5 = "1", payload = payload, items = 1)
+        val transferLog2 = TransferLog(providerId = provider.id!!, md5 = "2", payload = payload, items = 1)
+        val create1 = transferLogRepository.save(transferLog1)
+        val read1 = transferLogRepository.findById(create1.id!!)!!
+        val create2 = transferLogRepository.save(transferLog2)
+        val read2 = transferLogRepository.findById(create2.id!!)!!
+        assertNotNull(read1)
+        assertNotNull(read2)
+
+        val findByStatus = transferLogRepository.findByStatus(
+            TransferLogStatus.RECEIVED,
+            Pageable(size = 1000, number = 0)
+        )
+        assertNotNull(findByStatus)
+        assertEquals(2, findByStatus.size)
+        assertTrue(findByStatus[0].updated.isBefore(findByStatus[1].updated))
+
+        //Rydde opp:
+        findByStatus.map { it.id!! }.forEach {
+            transferLogRepository.deleteById(it)
+        }
     }
 
     @Test
