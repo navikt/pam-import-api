@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog
 import no.nav.arbeidsplassen.importapi.repository.Slice
+import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 @Singleton
@@ -27,8 +28,10 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
     val findByUuidAndTypeSQL =
         """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where uuid = ? and type = ?"""
     val deleteByUpdatedBeforeSQL = """delete from ad_puls where updated < ?"""
-    val findByProviderIdAndUpdatedAfterAndPageableSQL =
-        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableAscSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? asc offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableDescSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? desc offset ? LIMIT ?"""
 
     override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
         id = getLong("id"),
@@ -71,7 +74,12 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
         updated: LocalDateTime,
         pageable: Pageable
     ): Slice<AdPuls> {
-        return listFind(findByProviderIdAndUpdatedAfterAndPageableSQL) {
+        val sql = if (pageable.sort.direction == Sortable.Direction.ASC) {
+            findByProviderIdAndUpdatedAfterAndPageableAscSQL
+        } else {
+            findByProviderIdAndUpdatedAfterAndPageableDescSQL
+        }
+        return listFind(sql) {
             it.setLong(1, providerId)
             it.setTimestamp(2, updated.toTimeStamp())
             it.setString(3, pageable.sort.property.name) // order by
