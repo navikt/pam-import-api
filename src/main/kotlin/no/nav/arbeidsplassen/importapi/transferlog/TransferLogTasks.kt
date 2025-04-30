@@ -45,7 +45,7 @@ class TransferLogTasks(
             TransferLogStatus.RECEIVED,
             Pageable(size = logSize)
         )
-        transferlogs.stream().forEach {
+        transferlogs.forEach {
             mapTransferLog(it)
         }
         return transferlogs.count()

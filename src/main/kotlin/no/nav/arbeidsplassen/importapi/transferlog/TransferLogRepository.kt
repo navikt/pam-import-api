@@ -10,9 +10,14 @@ import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
+import org.slf4j.LoggerFactory
 
 @Singleton
 class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<TransferLog>(txTemplate) {
+
+    companion object {
+        private val LOG = LoggerFactory.getLogger(TransferLogRepository::class.java)
+    }
 
     override val insertSQL =
         """insert into transfer_log (provider_id, items, md5, payload, status, message, created) values (?,?,?,?,?,?,?)"""
@@ -79,6 +84,7 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
         }
 
     fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> {
+        LOG.info("Searching for $status with page $pageable")
         val sql = if (pageable.sort.direction == Sortable.Direction.ASC) {
             findByStatusPageableAsc
         } else {

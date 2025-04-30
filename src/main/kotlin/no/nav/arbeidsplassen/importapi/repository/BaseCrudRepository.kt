@@ -93,8 +93,9 @@ abstract class BaseCrudRepository<T : Entity>(private val txTemplate: TxTemplate
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection
-                .prepareStatement(findAllSQL).executeQuery()
-                .use { generateSequence { if (it.next()) it.mapToEntity() else null }.toList() }
+                .prepareStatement(findAllSQL)
+                .executeQuery()
+                .mapToList()
         }
     }
 
@@ -118,18 +119,19 @@ abstract class BaseCrudRepository<T : Entity>(private val txTemplate: TxTemplate
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(sql)
-                .apply {
-                    applyFunctions(this)
-                }
+                .apply { applyFunctions(this) }
                 .executeQuery()
                 .mapToList()
         }
     }
 
-    private fun ResultSet.mapToList(): List<T> =
-        use { rs: ResultSet ->
-            generateSequence { if (rs.next()) rs.mapToEntity() else null }.toList()
+    private fun ResultSet.mapToList(): List<T> {
+        val list: MutableList<T> = mutableListOf()
+        while (next()) {
+            list.add(mapToEntity())
         }
+        return list
+    }
 
     fun LocalDateTime.toTimeStamp(): Timestamp {
         return Timestamp.valueOf(this)
