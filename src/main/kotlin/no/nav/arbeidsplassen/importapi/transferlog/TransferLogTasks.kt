@@ -45,10 +45,21 @@ class TransferLogTasks(
             TransferLogStatus.RECEIVED,
             Pageable(size = logSize)
         )
-        transferlogs.stream().forEach {
+        logOrder(transferlogs)
+        val sortedTransferlogs = transferlogs.sortedBy { it.updated }
+        logOrder(sortedTransferlogs)
+        sortedTransferlogs.forEach {
             mapTransferLog(it)
         }
         return transferlogs.count()
+    }
+
+    private fun logOrder(transferlogs: List<TransferLog>) {
+        LOG.info("Transferlog rekkefølge start")
+        transferlogs.forEach {
+            LOG.info("Transferlog rekkefølge ${it.id}")
+        }
+        LOG.info("Transferlog rekkefølge slutt")
     }
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {
