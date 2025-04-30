@@ -14,7 +14,6 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -51,7 +50,7 @@ class TransferLogTasksTest(
         adstates.forEach { println(it.jsonPayload) }
         assertEquals(2, adstates.count())
         val transferLog =
-            transferLogRepository.findByStatus(TransferLogStatus.DONE, Pageable(size = 1000, number = 0))
+            transferLogRepository.findByStatus(TransferLogStatus.DONE)
         assertEquals(1, transferLog.count())
         val adOutbox = adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0)
         assertEquals(2, adOutbox.size)

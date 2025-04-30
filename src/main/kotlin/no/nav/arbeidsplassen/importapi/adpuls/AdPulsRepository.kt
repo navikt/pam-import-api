@@ -28,10 +28,14 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
     val findByUuidAndTypeSQL =
         """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where uuid = ? and type = ?"""
     val deleteByUpdatedBeforeSQL = """delete from ad_puls where updated < ?"""
-    val findByProviderIdAndUpdatedAfterAndPageableAscSQL =
-        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? asc offset ? LIMIT ?"""
-    val findByProviderIdAndUpdatedAfterAndPageableDescSQL =
-        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by ? desc offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableCreatedAscSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by created asc offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableCreatedDescSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by created desc offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableUpdatedAscSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by updated asc offset ? LIMIT ?"""
+    val findByProviderIdAndUpdatedAfterAndPageableUpdatedDescSQL =
+        """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by updated desc offset ? LIMIT ?"""
 
     override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
         id = getLong("id"),
@@ -74,17 +78,22 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
         updated: LocalDateTime,
         pageable: Pageable
     ): Slice<AdPuls> {
-        val sql = if (pageable.sort.direction == Sortable.Direction.ASC) {
-            findByProviderIdAndUpdatedAfterAndPageableAscSQL
-        } else {
-            findByProviderIdAndUpdatedAfterAndPageableDescSQL
+        val sql = when (pageable.sort.property) {
+            Sortable.Property.UPDATED -> when (pageable.sort.direction) {
+                Sortable.Direction.ASC -> findByProviderIdAndUpdatedAfterAndPageableUpdatedAscSQL
+                Sortable.Direction.DESC -> findByProviderIdAndUpdatedAfterAndPageableUpdatedDescSQL
+            }
+
+            Sortable.Property.CREATED -> when (pageable.sort.direction) {
+                Sortable.Direction.ASC -> findByProviderIdAndUpdatedAfterAndPageableCreatedAscSQL
+                Sortable.Direction.DESC -> findByProviderIdAndUpdatedAfterAndPageableCreatedDescSQL
+            }
         }
         return listFind(sql) {
             it.setLong(1, providerId)
             it.setTimestamp(2, updated.toTimeStamp())
-            it.setString(3, pageable.sort.property.name) // order by
-            it.setLong(4, (pageable.offset)) // offset
-            it.setInt(5, pageable.size) // limit
+            it.setLong(3, (pageable.offset)) // offset
+            it.setInt(4, pageable.size) // limit
         }.let { Slice(it, pageable) }
     }
 

@@ -6,9 +6,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
-import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
-import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import org.slf4j.LoggerFactory
 
@@ -32,9 +30,7 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
     val findByIdAndProviderIdSQL =
         """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where id = ? and provider_id = ?"""
     val findByStatusPageableAsc =
-        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where status = ? order by ? asc offset ? LIMIT ?"""
-    val findByStatusPageableDesc =
-        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where status = ? order by ? desc offset ? LIMIT ?"""
+        """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where status = ? order by updated asc offset 0 LIMIT 100"""
     val findByProviderIdAndMd5SQL =
         """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where provider_id = ? and md5 = ?"""
     val deleteByUpdatedBeforeSQL = """delete from transfer_log where updated < ?"""
@@ -83,18 +79,9 @@ class TransferLogRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
             it.setLong(2, providerId)
         }
 
-    fun findByStatus(status: TransferLogStatus, pageable: Pageable): List<TransferLog> {
-        LOG.info("Searching for $status with page $pageable")
-        val sql = if (pageable.sort.direction == Sortable.Direction.ASC) {
-            findByStatusPageableAsc
-        } else {
-            findByStatusPageableDesc
-        }
-        return listFind(sql) {
+    fun findByStatus(status: TransferLogStatus): List<TransferLog> {
+        return listFind(findByStatusPageableAsc) {
             it.setString(1, status.name)
-            it.setString(2, pageable.sort.property.name) // order by
-            it.setLong(3, (pageable.offset)) // offset
-            it.setInt(4, pageable.size) // limit
         }
     }
 
