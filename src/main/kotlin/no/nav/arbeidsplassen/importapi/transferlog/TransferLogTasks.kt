@@ -16,7 +16,6 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
-import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
@@ -41,25 +40,11 @@ class TransferLogTasks(
     }
 
     fun processTransferLogTask(): Int {
-        val transferlogs = transferLogRepository.findByStatus(
-            TransferLogStatus.RECEIVED,
-            Pageable(size = logSize)
-        )
-        logOrder(transferlogs)
-        val sortedTransferlogs = transferlogs.sortedBy { it.updated }
-        logOrder(sortedTransferlogs)
-        sortedTransferlogs.forEach {
+        val transferlogs = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED)
+        transferlogs.forEach {
             mapTransferLog(it)
         }
         return transferlogs.count()
-    }
-
-    private fun logOrder(transferlogs: List<TransferLog>) {
-        LOG.info("Transferlog rekkefølge start")
-        transferlogs.forEach {
-            LOG.info("Transferlog rekkefølge ${it.id}")
-        }
-        LOG.info("Transferlog rekkefølge slutt")
     }
 
     fun deleteTransferLogTask(date: LocalDateTime = LocalDateTime.now().minusMonths(deleteMonths)) {

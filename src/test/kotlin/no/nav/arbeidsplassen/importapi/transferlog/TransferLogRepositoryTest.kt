@@ -10,7 +10,6 @@ import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.provider.Provider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -53,10 +52,7 @@ class TransferLogRepositoryTest(
                 items = 100
             )
         )
-        val findByStatus = transferLogRepository.findByStatus(
-            TransferLogStatus.RECEIVED,
-            Pageable(size = 1000, number = 0)
-        )
+        val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED)
         assertNotNull(findByStatus)
     }
 
@@ -75,10 +71,7 @@ class TransferLogRepositoryTest(
         assertNotNull(read1)
         assertNotNull(read2)
 
-        val findByStatus = transferLogRepository.findByStatus(
-            TransferLogStatus.RECEIVED,
-            Pageable(size = 1000, number = 0)
-        )
+        val findByStatus = transferLogRepository.findByStatus(TransferLogStatus.RECEIVED)
         assertNotNull(findByStatus)
         assertEquals(2, findByStatus.size)
         assertTrue(findByStatus[0].updated.isBefore(findByStatus[1].updated))
