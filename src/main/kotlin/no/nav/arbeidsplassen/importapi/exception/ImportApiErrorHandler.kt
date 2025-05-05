@@ -17,24 +17,45 @@ import io.micronaut.http.server.exceptions.ConversionErrorHandler
 import io.micronaut.http.server.exceptions.ExceptionHandler
 import io.micronaut.http.server.exceptions.JsonExceptionHandler
 import jakarta.inject.Singleton
-import no.nav.arbeidsplassen.importapi.exception.ErrorType.*
+import java.util.UUID
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.CONFLICT
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.INVALID_VALUE
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.MISSING_PARAMETER
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.NOT_FOUND
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.PARSE_ERROR
+import no.nav.arbeidsplassen.importapi.exception.ErrorType.UNKNOWN
 import org.slf4j.LoggerFactory
-import java.util.*
 
 @Produces
 @Singleton
 class ImportApiErrorHandler : ExceptionHandler<ImportApiError, HttpResponse<ErrorMessage>> {
 
     override fun handle(request: HttpRequest<*>, error: ImportApiError): HttpResponse<ErrorMessage> {
-        val response =  when (error.type) {
+        val response = when (error.type) {
             NOT_FOUND -> HttpResponse.notFound(createMessage(error))
+                .also {
+                    LOG.warn(it.body().toString())
+                }
+
             MISSING_PARAMETER, INVALID_VALUE, PARSE_ERROR -> HttpResponse.badRequest(createMessage(error))
-            CONFLICT -> HttpResponseFactory.INSTANCE.status<ErrorMessage>(HttpStatus.CONFLICT).body(createMessage(error))
+                .also {
+                    LOG.warn(it.body().toString())
+                }
+
+            CONFLICT -> HttpResponseFactory.INSTANCE.status<ErrorMessage>(HttpStatus.CONFLICT)
+                .body(createMessage(error))
+                .also {
+                    LOG.error(it.body().toString())
+                }
+
             UNKNOWN -> HttpResponse.serverError(createMessage(error))
+                .also {
+                    LOG.error(it.body().toString())
+                }
         }
-        if (error.type != NOT_FOUND) { LOG.error(response.body().toString()) }
         return response
     }
+
     private fun createMessage(error: ImportApiError) = ErrorMessage(message = error.message!!, errorType = error.type)
 }
 
@@ -45,9 +66,11 @@ class ConversionExceptionHandler : ExceptionHandler<ConversionErrorException, Ht
     override fun handle(request: HttpRequest<*>?, error: ConversionErrorException): HttpResponse<ErrorMessage> {
         val response = when (error.cause) {
             is JsonProcessingException -> handleJsonProcessingException(error.cause as JsonProcessingException)
+                .also { LOG.warn(it.body().toString()) }
+
             else -> HttpResponse.serverError(ErrorMessage(error.message!!, UNKNOWN))
+                .also { LOG.error(it.body().toString()) }
         }
-        LOG.error(response.body().toString())
         return response
     }
 }
@@ -59,23 +82,47 @@ class ApiJsonErrorHandler : ExceptionHandler<JsonProcessingException, HttpRespon
 
     override fun handle(request: HttpRequest<*>?, error: JsonProcessingException): HttpResponse<ErrorMessage> {
         val response = handleJsonProcessingException(error)
-        LOG.error(response.body().toString())
+        LOG.warn(response.body().toString())
         return response
     }
 
 }
 
+// Alle disse returnerer badRequest (400) og bør logges som Warn mener jeg
 private fun handleJsonProcessingException(error: JsonProcessingException): HttpResponse<ErrorMessage> {
     return when (error) {
         is JsonParseException -> HttpResponse
-                .badRequest(ErrorMessage("Parse error: at ${error.location}", PARSE_ERROR))
+            .badRequest(ErrorMessage("Parse error: at ${error.location}", PARSE_ERROR))
+
         is InvalidFormatException -> HttpResponse
-                .badRequest(ErrorMessage("Invalid value: ${error.value} at field ${feltFraPathReference(error.pathReference)}", INVALID_VALUE))
-        is ValueInstantiationException -> HttpResponse.badRequest(ErrorMessage("Wrong value: ${error.message} at field ${feltFraPathReference(error.pathReference)}", INVALID_VALUE))
+            .badRequest(
+                ErrorMessage(
+                    "Invalid value: ${error.value} at field ${feltFraPathReference(error.pathReference)}",
+                    INVALID_VALUE
+                )
+            )
+
+        is ValueInstantiationException -> HttpResponse.badRequest(
+            ErrorMessage(
+                "Wrong value: ${error.message} at field ${
+                    feltFraPathReference(
+                        error.pathReference
+                    )
+                }", INVALID_VALUE
+            )
+        )
+
         is InvalidNullException -> HttpResponse
-                .badRequest(ErrorMessage("Missing parameter: ${error.propertyName.simpleName}", MISSING_PARAMETER))
+            .badRequest(ErrorMessage("Missing parameter: ${error.propertyName.simpleName}", MISSING_PARAMETER))
+
         is MismatchedInputException -> HttpResponse
-                .badRequest(ErrorMessage("Missing parameter: ${feltFraPathReference(error.pathReference)}", MISSING_PARAMETER))
+            .badRequest(
+                ErrorMessage(
+                    "Missing parameter: ${feltFraPathReference(error.pathReference)}",
+                    MISSING_PARAMETER
+                )
+            )
+
         else -> HttpResponse.badRequest(ErrorMessage("Bad Json: ${error.localizedMessage}", UNKNOWN))
     }
 }
@@ -95,5 +142,4 @@ private val LOG = LoggerFactory.getLogger("HttpRequestErrorHandler")
 
 class ImportApiError(message: String, val type: ErrorType) : Throwable(message)
 
-data class ErrorMessage (val message : String, val errorType: ErrorType, val errorRef: UUID = UUID.randomUUID())
-
+data class ErrorMessage(val message: String, val errorType: ErrorType, val errorRef: UUID = UUID.randomUUID())
