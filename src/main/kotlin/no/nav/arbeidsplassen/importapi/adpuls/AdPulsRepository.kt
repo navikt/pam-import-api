@@ -1,19 +1,30 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.QueryLog
 import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class AdPulsRepository(private val txTemplate: TxTemplate) :
-    BaseCrudRepository<AdPuls>(txTemplate) {
+interface AdPulsRepository : CrudRepository<AdPuls> {
+    fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls?
+
+    fun findByProviderIdAndUpdatedAfter(
+        providerId: Long,
+        updated: LocalDateTime,
+        pageable: Pageable
+    ): Slice<AdPuls>
+
+    fun deleteByUpdatedBefore(before: LocalDateTime): Long
+}
+
+class JdbcAdPulsRepository(private val txTemplate: TxTemplate) :
+    AdPulsRepository, BaseCrudRepository<AdPuls>(txTemplate) {
 
     override val insertSQL =
         """insert into ad_puls (provider_id, uuid, reference, type, total, created, updated ) values (?,?,?,?,?,?, current_timestamp)"""
@@ -67,13 +78,13 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
     override fun AdPuls.kopiMedNyId(nyId: Long): AdPuls =
         this.copy(id = nyId)
 
-    fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls? =
+    override fun findByUuidAndType(uuid: String, type: PulsEventType): AdPuls? =
         singleFind(findByUuidAndTypeSQL) {
             it.setString(1, uuid)
             it.setString(2, type.name)
         }
 
-    fun findByProviderIdAndUpdatedAfter(
+    override fun findByProviderIdAndUpdatedAfter(
         providerId: Long,
         updated: LocalDateTime,
         pageable: Pageable
@@ -97,7 +108,7 @@ class AdPulsRepository(private val txTemplate: TxTemplate) :
         }.let { Slice(it, pageable) }
     }
 
-    fun deleteByUpdatedBefore(before: LocalDateTime): Long =
+    override fun deleteByUpdatedBefore(before: LocalDateTime): Long =
         txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(deleteByUpdatedBeforeSQL).apply {

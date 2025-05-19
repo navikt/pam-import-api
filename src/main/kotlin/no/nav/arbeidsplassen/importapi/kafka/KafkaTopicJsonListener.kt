@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
 import kotlin.concurrent.thread
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.MDC

@@ -5,39 +5,36 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
+import java.util.Date
+import java.util.UUID
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
-import java.util.*
-import jakarta.inject.Singleton
 
-@Singleton
-class TokenService(private val secretSignatureConfiguration: SecretSignatureConfiguration) {
-
+class TokenService(private val secret: String) {
 
     fun token(provider: ProviderDTO): String {
-        val signer = MACSigner(secretSignatureConfiguration.secret)
+        val signer = MACSigner(secret)
         val claimsSet = JWTClaimsSet.Builder()
-                .subject(provider.email)
-                .jwtID(provider.jwtid)
-                .issuer("https://arbeidsplassen.nav.no")
-                .issueTime(Date())
-                .claim("roles", Roles.ROLE_PROVIDER)
-                .claim("providerId", provider.id)
-                .build()
+            .subject(provider.email)
+            .jwtID(provider.jwtid)
+            .issuer("https://arbeidsplassen.nav.no")
+            .issueTime(Date())
+            .claim("roles", Roles.ROLE_PROVIDER.name)
+            .claim("providerId", provider.id)
+            .build()
         val signedJWT = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimsSet)
         signedJWT.sign(signer)
         return signedJWT.serialize()
     }
 
     fun adminToken(): String {
-        val signer = MACSigner(secretSignatureConfiguration.secret)
+        val signer = MACSigner(secret)
         val claimsSet = JWTClaimsSet.Builder()
-                .subject("admin@arbeidsplassen.nav.no")
-                .jwtID(UUID.randomUUID().toString())
-                .issuer("https://arbeidsplassen.nav.no")
-                .issueTime(Date())
-                .claim("roles",Roles.ROLE_ADMIN)
-                .build()
+            .subject("admin@arbeidsplassen.nav.no")
+            .jwtID(UUID.randomUUID().toString())
+            .issuer("https://arbeidsplassen.nav.no")
+            .issueTime(Date())
+            .claim("roles", Roles.ROLE_ADMIN.name)
+            .build()
         val signedJWT = SignedJWT(JWSHeader(JWSAlgorithm.HS256), claimsSet)
         signedJWT.sign(signer)
         return signedJWT.serialize()

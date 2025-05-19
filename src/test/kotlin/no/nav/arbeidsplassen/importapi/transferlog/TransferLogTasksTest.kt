@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
+import no.nav.arbeidsplassen.importapi.adoutbox.JdbcAdOutboxRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
+import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
@@ -15,7 +16,6 @@ import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
-import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ class TransferLogTasksTest(
     private val providerRepository: ProviderRepository,
     private val objectMapper: ObjectMapper,
     private val adStateRepository: AdStateRepository,
-    private val adOutboxRepository: AdOutboxRepository
+    private val adOutboxRepository: JdbcAdOutboxRepository
 ) {
 
     @Inject

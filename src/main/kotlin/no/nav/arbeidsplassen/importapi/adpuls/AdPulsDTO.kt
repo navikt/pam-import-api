@@ -1,9 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.core.annotation.Introspected
 import java.time.LocalDateTime
 
-@Introspected
 data class AdPulsDTO(
     var id: Long? = null,
     val providerId: Long,

@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.config
 
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Requires

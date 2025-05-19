@@ -1,13 +1,9 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.micronaut.http.annotation.QueryValue
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.javalin.Javalin
+import io.javalin.http.Context
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import javax.annotation.Nullable
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.RestOrderBy
 import no.nav.arbeidsplassen.importapi.repository.RestPageable
@@ -15,27 +11,47 @@ import no.nav.arbeidsplassen.importapi.repository.RestSlice
 import no.nav.arbeidsplassen.importapi.repository.RestSortable
 import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.Sortable
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
-@Controller("/api/v1/stats/")
-@SecurityRequirement(name = "bearer-auth")
 class AdPulsController(private val adPulsService: AdPulsService) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsController::class.java)
+        private fun Context.providerIdParam(): Long = pathParam("providerId").toLong()
+        private fun Context.fromParam(): String =
+            queryParam("from") ?: throw IllegalArgumentException("from is required")
+
+        private fun Context.pageParam(): Long? = queryParam("page")?.toLong()
+        private fun Context.numberParam(): Long? = queryParam("number")?.toLong()
+        private fun Context.sizeParam(): Int? = queryParam("size")?.toInt()
+        private fun Context.sortParams(): List<String>? = queryParams("sort")
     }
 
-    @Get("/{providerId}")
+    fun setupRoutes(javalin: Javalin) {
+        javalin.get(
+            "/api/v1/stats/{providerId}",
+            {
+                getAllTodayStatsForProvider(
+                    it.providerIdParam(),
+                    it.fromParam(),
+                    it.pageParam(),
+                    it.numberParam(),
+                    it.sizeParam(),
+                    it.sortParams()
+                )
+            },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+    }
+
     fun getAllTodayStatsForProvider(
-        @PathVariable providerId: Long,
-        @QueryValue from: String,
-        @Nullable @QueryValue page: Long?,
-        @Nullable @QueryValue number: Long?,
-        @Nullable @QueryValue size: Int?,
-        @Nullable @QueryValue sort: List<String>?,
+        providerId: Long,
+        from: String,
+        page: Long?,
+        number: Long?,
+        size: Int?,
+        sort: List<String>?,
     ): RestSlice<AdPulsDTO> {
         LOG.info("Entering getAllTodayStatsForProvider")
         val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)

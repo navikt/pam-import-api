@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.kafka
 
 import java.time.Duration
 import java.time.LocalDateTime
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer

@@ -7,6 +7,7 @@ import io.micronaut.context.event.StartupEvent
 import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.LeaderElection
 import no.nav.arbeidsplassen.importapi.adadminstatus.InternalAdTopicListener
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.slf4j.LoggerFactory
 
 @Singleton

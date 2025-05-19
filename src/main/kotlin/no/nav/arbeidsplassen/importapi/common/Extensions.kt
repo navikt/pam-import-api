@@ -1,4 +1,4 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.common
 
 import java.security.MessageDigest
 
@@ -22,4 +22,3 @@ fun ByteArray.hexBinary(): String {
     }
     return r.toString()
 }
-

@@ -25,6 +25,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
+import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
@@ -35,7 +36,6 @@ import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
-import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.slf4j.LoggerFactory
 
 @ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])

@@ -55,7 +55,7 @@ class TransferLogTasks(
     fun mapTransferLog(transferLog: TransferLog) {
         try {
             txTemplate.doInTransaction {
-                val adList = mapTransferLogs(transferLog)
+                val adList: List<AdState> = mapTransferLogs(transferLog)
                 LOG.info("mapping transfer ${transferLog.id} for provider ${transferLog.providerId} with updated ${transferLog.updated} found ${adList.size} ads ")
                 val savedList = adStateRepository.saveAll(adList)
                 transferLogRepository.save(transferLog.copy(status = TransferLogStatus.DONE))

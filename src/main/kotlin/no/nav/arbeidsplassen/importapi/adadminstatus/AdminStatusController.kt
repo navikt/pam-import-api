@@ -1,31 +1,50 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.javalin.Javalin
+import io.javalin.http.Context
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
+import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
-@Controller("/api/v1/adminstatus")
-@SecurityRequirement(name = "bearer-auth")
 class AdminStatusController(private val adminStatusService: AdminStatusService) {
 
-    @Get("/{providerId}/{reference}")
-    fun adAdminStatus(@PathVariable providerId: Long, @PathVariable reference: String): AdAdminStatusDTO {
+    companion object {
+        private val LOG = LoggerFactory.getLogger(AdminStatusController::class.java)
+        private fun Context.providerIdParam(): Long = pathParam("providerId").toLong()
+        private fun Context.referenceParam(): String = pathParam("reference")
+        private fun Context.versionIdParam(): Long = pathParam("versionId").toLong()
+        private fun Context.uuidParam(): String = pathParam("uuid")
+    }
+
+    fun setupRoutes(javalin: Javalin) {
+        javalin.get(
+            "/api/v1/adminstatus/{providerId}/{reference}",
+            { adAdminStatus(it.providerIdParam(), it.referenceParam()) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+
+        javalin.get(
+            "/api/v1/adminstatus/{providerId}/versions/{versionId}",
+            { adAdminStatusByVersion(it.versionIdParam(), it.providerIdParam()) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+
+        javalin.get(
+            "/api/v1/adminstatus/{providerId}/uuid/{uuid}",
+            { adAdminStatusByUuid(it.providerIdParam(), it.uuidParam()) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+    }
+
+    fun adAdminStatus(providerId: Long, reference: String): AdAdminStatusDTO {
         return adminStatusService.findByProviderReference(providerId, reference)
     }
 
-    @Get("/{providerId}/versions/{versionId}")
-    fun adAdminStatusByVersion(@PathVariable versionId: Long, @PathVariable providerId: Long): List<AdAdminStatusDTO> {
+    fun adAdminStatusByVersion(versionId: Long, providerId: Long): List<AdAdminStatusDTO> {
         return adminStatusService.findByVersionAndProviderId(versionId, providerId)
     }
 
-    @Get("/{providerId}/uuid/{uuid}")
-    fun adAdminStatusByUuid(@PathVariable providerId: Long, @PathVariable uuid: String): AdAdminStatusDTO {
+    fun adAdminStatusByUuid(providerId: Long, uuid: String): AdAdminStatusDTO {
         return adminStatusService.findByUuid(uuid)
     }
 }
-

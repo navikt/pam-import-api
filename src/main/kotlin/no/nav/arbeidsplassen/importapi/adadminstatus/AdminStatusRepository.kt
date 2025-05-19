@@ -1,13 +1,20 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
-import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class AdminStatusRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdminStatus>(txTemplate) {
+interface AdminStatusRepository : CrudRepository<AdminStatus> {
+
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus?
+    fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus>
+    fun findByUuid(uuid: String): AdminStatus?
+}
+
+class JdbcAdminStatusRepository(private val txTemplate: TxTemplate) : AdminStatusRepository,
+    BaseCrudRepository<AdminStatus>(txTemplate) {
 
     override val insertSQL =
         """insert into admin_status (uuid, status, message, reference, provider_id, version_id, created, publish_status) values(?,?,?,?,?,?,?,?)"""
@@ -25,7 +32,7 @@ class AdminStatusRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
         """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where version_id = ? and provider_id = ?"""
     val findByProviderIdAndReferenceSQL =
         """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where provider_id = ? and reference = ?"""
-    
+
     override fun ResultSet.mapToEntity() = AdminStatus(
         id = getLong("id"),
         uuid = getString("uuid"),
@@ -57,19 +64,19 @@ class AdminStatusRepository(private val txTemplate: TxTemplate) : BaseCrudReposi
     override fun AdminStatus.kopiMedNyId(nyId: Long): AdminStatus =
         this.copy(id = nyId)
 
-    fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus? =
+    override fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus? =
         singleFind(findByProviderIdAndReferenceSQL) {
             it.setLong(1, providerId)
             it.setString(2, reference)
         }
 
-    fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus> =
+    override fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus> =
         listFind(findByVersionIdAndProviderIdSQL) {
             it.setLong(1, versionId)
             it.setLong(2, providerId)
         }
 
-    fun findByUuid(uuid: String): AdminStatus? =
+    override fun findByUuid(uuid: String): AdminStatus? =
         singleFind(findByUuidSQL) {
             it.setObject(1, uuid)
         }

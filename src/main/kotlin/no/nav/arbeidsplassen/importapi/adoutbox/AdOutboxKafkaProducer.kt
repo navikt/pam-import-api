@@ -1,15 +1,14 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import io.micronaut.context.annotation.Value
-import no.nav.arbeidsplassen.importapi.kafka.HealthService
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.header.internals.RecordHeader
 
-open class AdOutboxKafkaProducer(
+class AdOutboxKafkaProducer(
     private val kafkaProducer: KafkaProducer<String, ByteArray?>,
-    @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}") private val topic: String,
+    private val topic: String, // TODO @Value("\${adoutbox.kafka.topic:teampam.annonsemottak-1}")
     private val healthService: HealthService
 ) {
     private val headers = listOf(RecordHeader("@meldingstype", Meldingstype.IMPORT_API.name.toByteArray()))

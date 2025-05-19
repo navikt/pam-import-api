@@ -1,14 +1,16 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<Provider>(txTemplate) {
+interface ProviderRepository : CrudRepository<Provider>
+
+class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepository,
+    BaseCrudRepository<Provider>(txTemplate) {
 
     override val insertSQL =
         """insert into provider (jwtid, identifier, email, phone, created) values (?,?,?,?,?)"""

@@ -1,25 +1,22 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import java.time.LocalDateTime
+import java.util.*
 import no.nav.arbeidsplassen.importapi.adstate.AdState
-import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-import java.util.*
 
 @MicronautTest
 class AdOutboxServiceTest(
     private val adOutboxService: AdOutboxService,
-    private val adOutboxRepository: AdOutboxRepository,
+    private val adOutboxRepository: JdbcAdOutboxRepository,
     private val objectMapper: ObjectMapper,
     private val providerService: ProviderService
 ) {
@@ -34,14 +31,22 @@ class AdOutboxServiceTest(
             locationList = listOf(LocationDTO(country = "Danmark"))
         )
 
-        adOutboxService.lagreTilOutbox(AdState(providerId = provider.id!!, reference = "ref", versionId = 1, jsonPayload = objectMapper.writeValueAsString(ad)))
+        adOutboxService.lagreTilOutbox(
+            AdState(
+                providerId = provider.id!!,
+                reference = "ref",
+                versionId = 1,
+                jsonPayload = objectMapper.writeValueAsString(ad)
+            )
+        )
 
         val initiellAdOutbox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
         assertNull(initiellAdOutbox.prosessertDato)
         assertNull(initiellAdOutbox.sisteForsøkDato)
         assertFalse(initiellAdOutbox.harFeilet)
 
-        val initiellUprosessert = adOutboxService.hentUprosesserteMeldinger(outboxDelay = 0).also { assertEquals(1, it.size) }.first()
+        val initiellUprosessert =
+            adOutboxService.hentUprosesserteMeldinger(outboxDelay = 0).also { assertEquals(1, it.size) }.first()
         assertEquals(initiellAdOutbox, initiellUprosessert)
 
         adOutboxService.markerSomFeilet(initiellAdOutbox)

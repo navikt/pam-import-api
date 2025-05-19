@@ -1,13 +1,5 @@
-package no.nav.arbeidsplassen.importapi
+package no.nav.arbeidsplassen.importapi.nais
 
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.security.token.jwt.signature.secret.SecretSignatureConfiguration
-import io.swagger.v3.oas.annotations.Hidden
-import jakarta.annotation.security.PermitAll
-import no.nav.arbeidsplassen.importapi.kafka.HealthService
 import org.slf4j.LoggerFactory
 
 @PermitAll
