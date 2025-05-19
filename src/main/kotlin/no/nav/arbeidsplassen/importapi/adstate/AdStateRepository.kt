@@ -1,14 +1,20 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<AdState>(txTemplate) {
+interface AdStateRepository : CrudRepository<AdState> {
+    fun findByProviderIdAndReference(providerId: Long, reference: String): AdState?
+    fun findByUuid(uuid: String): AdState?
+    fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState?
+}
+
+class JdbcAdStateRepository(private val txTemplate: TxTemplate) : AdStateRepository,
+    BaseCrudRepository<AdState>(txTemplate) {
 
     override val insertSQL =
         """insert into ad_state (uuid, reference, provider_id, json_payload, version_id, created) values (?,?,?,?,?,?)"""
@@ -56,18 +62,18 @@ class AdStateRepository(private val txTemplate: TxTemplate) : BaseCrudRepository
     override fun AdState.kopiMedNyId(nyId: Long): AdState =
         this.copy(id = nyId)
 
-    fun findByProviderIdAndReference(providerId: Long, reference: String): AdState? =
+    override fun findByProviderIdAndReference(providerId: Long, reference: String): AdState? =
         singleFind(findByProviderIdAndReferenceSQL) { p ->
             p.setLong(1, providerId)
             p.setString(2, reference)
         }
 
-    fun findByUuid(uuid: String): AdState? =
+    override fun findByUuid(uuid: String): AdState? =
         singleFind(findByUuidSQL) { p ->
             p.setObject(1, uuid)
         }
 
-    fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState? =
+    override fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState? =
         singleFind(findByUuidAndProviderIdSQL) { p ->
             p.setObject(1, uuid)
             p.setLong(2, providerId)

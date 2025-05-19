@@ -7,7 +7,9 @@ import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-interface ProviderRepository : CrudRepository<Provider>
+interface ProviderRepository : CrudRepository<Provider> {
+    fun saveOnMigrate(entities: Iterable<Provider>) // Er ikke i bruk?
+}
 
 class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepository,
     BaseCrudRepository<Provider>(txTemplate) {
@@ -51,7 +53,7 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepos
     override fun Provider.kopiMedNyId(nyId: Long): Provider =
         this.copy(id = nyId)
 
-    fun saveOnMigrate(entities: Iterable<Provider>) {
+    override fun saveOnMigrate(entities: Iterable<Provider>) {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             entities.forEach {

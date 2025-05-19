@@ -8,7 +8,6 @@ import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
 import io.micronaut.http.annotation.QueryValue
-import io.swagger.v3.oas.annotations.Hidden
 import java.util.UUID
 import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory
 
 @ProviderAllowed(value = [Roles.ROLE_ADMIN])
 @Controller("/internal/providers")
-@Hidden
+// @Hidden
 class ProviderController(
     private val providerService: ProviderService,
     private val tokenService: TokenService

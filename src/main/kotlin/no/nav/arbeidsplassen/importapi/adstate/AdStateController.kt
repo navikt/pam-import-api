@@ -1,26 +1,38 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.javalin.Javalin
+import io.javalin.http.Context
 import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
+import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
-@Controller("/api/v1/adstates")
-@SecurityRequirement(name = "bearer-auth")
 class AdStateController(private val adStateService: AdStateService) {
 
-    @Get("/{providerId}/{reference}")
-    fun getAdStateByProviderReference(
-        @PathVariable providerId: Long,
-        @PathVariable reference: String
-    ): AdStatePublicDTO = adStateService.getAdStatesByProviderReference(providerId, reference)
+    companion object {
+        private val LOG = LoggerFactory.getLogger(AdStateController::class.java)
+        private fun Context.providerIdParam(): Long = pathParam("providerId").toLong()
+        private fun Context.referenceParam(): String = pathParam("reference")
+        private fun Context.uuidParam(): String = pathParam("uuid")
+    }
 
-    @Get("/{providerId}/uuid/{uuid}")
-    fun getAdStateByUuid(@PathVariable providerId: Long, @PathVariable uuid: String): AdStatePublicDTO =
+    fun setupRoutes(javalin: Javalin) {
+        javalin.get(
+            "/api/v1/adstates/{providerId}/{reference}",
+            { getAdStateByProviderReference(it.providerIdParam(), it.referenceParam()) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+
+        javalin.get(
+            "/api/v1/adstates/{providerId}/uuid/{uuid}",
+            { getAdStateByUuid(it.providerIdParam(), it.uuidParam()) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+    }
+
+    fun getAdStateByProviderReference(providerId: Long, reference: String): AdStatePublicDTO =
+        adStateService.getAdStatesByProviderReference(providerId, reference)
+
+    fun getAdStateByUuid(providerId: Long, uuid: String): AdStatePublicDTO =
         adStateService.getAdStateByUuidAndProviderId(uuid, providerId)
 
     /*

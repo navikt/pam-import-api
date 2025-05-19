@@ -1,12 +1,22 @@
 package no.nav.arbeidsplassen.importapi.properties
 
-import no.nav.arbeid.pam.kodeverk.ansettelse.*
+import no.nav.arbeid.pam.kodeverk.ansettelse.Ansettelsesform
+import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidsdager
+import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidstid
+import no.nav.arbeid.pam.kodeverk.ansettelse.Arbeidstidsordning
+import no.nav.arbeid.pam.kodeverk.ansettelse.Omfang
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames.*
-import jakarta.inject.Singleton
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.engagementtype
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.euresflagg
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.extent
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.jobarrangement
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.remote
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.sector
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workLanguage
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workday
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workhours
 
-@Singleton
 class PropertyNameValueValidation {
 
     private val propertiesToValidate =

@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
-import jakarta.inject.Singleton
 import java.net.InetAddress
 import java.util.Collections
 import java.util.UUID
@@ -18,7 +17,6 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
-@Singleton
 open class KafkaConfig(envInput: Map<String, String> = emptyMap()) {
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaConfig::class.java)

@@ -1,25 +1,19 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
-import io.micronaut.context.annotation.Requires
-import io.micronaut.context.annotation.Value
-import io.micronaut.context.event.ApplicationEventListener
-import io.micronaut.context.event.StartupEvent
-import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.LeaderElection
 import no.nav.arbeidsplassen.importapi.adadminstatus.InternalAdTopicListener
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.slf4j.LoggerFactory
 
-@Singleton
-@Requires(property = "adminstatussync.kafka.enabled", value = "true")
+// TODO @Requires(property = "adminstatussync.kafka.enabled", value = "true")
 class KafkaListenerStarter(
     private val adTransportProsessor: InternalAdTopicListener,
     private val healthService: HealthService,
     private val kafkaConfig: KafkaConfig,
     private val leaderElection: LeaderElection,
-    @Value("\${adminstatus.kafka.topic:teampam.stilling-intern-1}") private val topic: String,
-    @Value("\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}") private val groupId: String,
-) : ApplicationEventListener<StartupEvent> {
+    private val topic: String, // TODO @Value("\${adminstatus.kafka.topic:teampam.stilling-intern-1}")
+    private val groupId: String, // TODO @Value("\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}")
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaListenerStarter::class.java)
@@ -41,7 +35,7 @@ class KafkaListenerStarter(
         }
     }
 
-    override fun onApplicationEvent(event: StartupEvent?) {
+    fun onServerStartup() {
         LOG.info("onApplicationEvent StartupEvent")
         start()
     }

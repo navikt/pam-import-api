@@ -1,7 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.inject.Singleton
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
@@ -11,7 +10,6 @@ import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.provider.info
 
-@Singleton
 class AdStateService(
     private val adStateRepository: AdStateRepository,
     private val objectMapper: ObjectMapper,

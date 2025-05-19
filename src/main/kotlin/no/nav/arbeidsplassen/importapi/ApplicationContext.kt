@@ -18,6 +18,7 @@ import java.util.TimeZone
 import no.nav.arbeidsplassen.importapi.common.Singeltons
 import no.nav.arbeidsplassen.importapi.config.DatabaseConfig
 import no.nav.arbeidsplassen.importapi.config.lesEnvVarEllerKastFeil
+import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import no.nav.arbeidsplassen.importapi.nais.NaisController
 import no.nav.arbeidsplassen.importapi.provider.JdbcProviderRepository
@@ -71,6 +72,8 @@ open class ApplicationContext(envInn: Map<String, String>) {
         ProviderController(providerService, tokenService)
     }
 
-    val transferController = TransferController(objectMapper)
+    val transferController: TransferController = TODO()
+
+    val kafkaListenerStarter: KafkaListenerStarter = TODO()
 
 }

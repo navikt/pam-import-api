@@ -7,26 +7,21 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.micronaut.context.annotation.Value
-import io.micronaut.http.uri.UriTemplate
-import jakarta.inject.Singleton
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URL
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.UUID
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-@Singleton
 open class LokalOntologiGateway(
-    @Value("\${pam.ontologi.typeahead.url}") private val baseurl: String,
+    private val baseurl: String, // TODO @Value("\${pam.ontologi.typeahead.url}")
 ) {
 
     companion object {
@@ -36,7 +31,7 @@ open class LokalOntologiGateway(
             .registerModule(JavaTimeModule())
     }
 
-    fun hentTypeaheadStillingerFraOntologi() : List<Typeahead> {
+    fun hentTypeaheadStillingerFraOntologi(): List<Typeahead> {
         val url = "$baseurl/rest/typeahead/stillinger"
         val (responseCode, responseBody) = with(URI(url).toURL().openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -60,22 +55,23 @@ open class LokalOntologiGateway(
         }
     }
 
-    open fun hentTypeaheadStilling(stillingstittel : String) : List<Typeahead> {
+    // TODO: Trenger en test! Jeg fjerner bruken av Micronauts UriTemplate, må verifiseres
+    open fun hentTypeaheadStilling(stillingstittel: String): List<Typeahead> {
         val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
         val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${encodedPath}"
-        val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
+        // val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
 
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(uriTemplate))
+            .uri(URI.create(url))
             .header("Nav-CallId", UUID.randomUUID().toString())
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
 
-    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long) : KonseptGrupperingDTO? {
+    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long): KonseptGrupperingDTO? {
         val uri = URI("$baseurl/rest/ontologi/konseptGruppering/$konseptId")
 
         val client = HttpClient.newBuilder().build();
@@ -100,24 +96,26 @@ data class Typeahead(
 ) : Serializable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class KonseptDTO(val konseptId: Long,
-                      val type: String,
-                      val noLabel: String,
-                      val enLabel: String,
-                      val nnLabel: String,
-                      val styrk08SSB: List<String>,
-                      val esco: List<String>,
-                      val umbrella: Boolean,
-                      val noDescription: String,
-                      val enDescription: String,
-                      val termer: List<TermDTO>
+data class KonseptDTO(
+    val konseptId: Long,
+    val type: String,
+    val noLabel: String,
+    val enLabel: String,
+    val nnLabel: String,
+    val styrk08SSB: List<String>,
+    val esco: List<String>,
+    val umbrella: Boolean,
+    val noDescription: String,
+    val enDescription: String,
+    val termer: List<TermDTO>
 )
 
-data class TermDTO(val id: Int,
-                   val konseptId: Long,
-                   val tag: String,
-                   val spraak: String,
-                   val verdi: String
+data class TermDTO(
+    val id: Int,
+    val konseptId: Long,
+    val tag: String,
+    val spraak: String,
+    val verdi: String
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)

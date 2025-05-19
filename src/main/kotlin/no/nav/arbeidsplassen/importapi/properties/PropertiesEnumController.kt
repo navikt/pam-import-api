@@ -1,21 +1,33 @@
 package no.nav.arbeidsplassen.importapi.properties
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import jakarta.annotation.security.PermitAll
+import io.javalin.Javalin
+import io.javalin.http.Context
+import io.javalin.http.HttpStatus
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-@PermitAll
-@Controller("/api/v1/properties")
 class PropertiesEnumController(private val propertyNameValueValidation: PropertyNameValueValidation) {
 
-    @Get("/values")
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(PropertiesEnumController::class.java)
+        private fun Context.sortParam(): String = queryParam("sort") ?: "code"
+    }
+
+    fun setupRoutes(javalin: Javalin) {
+        javalin.get("/api/v1/properties/values", {
+            it.status(HttpStatus.OK).json(getPropertyValidValues())
+        })
+
+        javalin.get("/api/v1/properties/names", {
+            it.status(HttpStatus.OK).json(getPropertyNames())
+        })
+    }
+
     fun getPropertyValidValues(): HashMap<PropertyNames, Set<String>> {
         return propertyNameValueValidation.validValues
     }
 
-    @Get("/names")
     fun getPropertyNames(): Array<PropertyNames> {
         return PropertyNames.values()
     }
-
 }
