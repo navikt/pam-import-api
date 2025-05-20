@@ -9,7 +9,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class MyScheduler(
-    private val adOutboxJobEnabled: Boolean = true // @Requires(property = "adoutbox.scheduler.enabled", value = "true")
+    private val adOutboxJobEnabled: Boolean = true, // @Requires(property = "adoutbox.scheduler.enabled", value = "true"),
+    private val transferlogJobEnabled: Boolean = true // @Requires(property = "transferlog.scheduler.enabled", value = "true")
+
+
 ) {
     companion object {
         val log: Logger = LoggerFactory.getLogger(MyScheduler::class.java)
@@ -37,6 +40,25 @@ class MyScheduler(
         .withSchedule(CronScheduleBuilder.cronSchedule("05 15 01 * * *"))
         .build()
 
+    private val transferLogJob = newJob().ofType(AdOutboxJob::class.java)
+        .withIdentity("transferLogJob", "transferLog")
+        .build()
+
+    private val transferLogTrigger = newTrigger()
+        .withIdentity("transferLogTrigger", "transferLog")
+        .withSchedule(CronScheduleBuilder.cronSchedule("*/30 * * * * *"))
+        .build()
+
+    private val deleteTransferLogJob = newJob().ofType(AdOutboxJob::class.java)
+        .withIdentity("deleteTransferLogJob", "deleteTransferLog")
+        .build()
+
+    private val deleteTransferLogTrigger = newTrigger()
+        .withIdentity("deleteTransferLogTrigger", "deleteTransferLog")
+        .withSchedule(CronScheduleBuilder.cronSchedule("05 15 00 * * *"))
+        .build()
+
+
     private val scheduler: Scheduler = StdSchedulerFactory.getDefaultScheduler()!!
 
     init {
@@ -44,6 +66,10 @@ class MyScheduler(
             scheduler.scheduleJob(adOutboxJob, adOutboxTrigger)
         }
         scheduler.scheduleJob(adPulsJob, adPulsTrigger)
+        if (transferlogJobEnabled) {
+            scheduler.scheduleJob(transferLogJob, transferLogTrigger)
+            scheduler.scheduleJob(deleteTransferLogJob, deleteTransferLogTrigger)
+        }
     }
 
     fun start() {

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 class AdOutboxService(
     private val adOutboxKafkaProducer: AdOutboxKafkaProducer,
-    private val adOutboxRepository: JdbcAdOutboxRepository,
+    private val adOutboxRepository: AdOutboxRepository,
     private val adStateService: AdStateService,
     private val objectMapper: ObjectMapper
 ) {

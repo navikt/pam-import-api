@@ -1,23 +1,24 @@
 package no.nav.arbeidsplassen.importapi
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.context.annotation.Value
-import io.micronaut.http.client.annotation.Client
-import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import jakarta.inject.Singleton
-import org.slf4j.LoggerFactory
 import java.net.InetAddress
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 import java.time.LocalDateTime
+import org.slf4j.LoggerFactory
 
-@Singleton
-class LeaderElection(@Client("LeaderElect") val client: Rx3HttpClient,
-                     @Value("\${ELECTOR_PATH:NOLEADERELECTION}") val electorPath: String,
-                     val objectMapper: ObjectMapper) {
-
+class LeaderElection(
+    val httpClient: HttpClient,
+    val electorPath: String, // TODO @Value("\${ELECTOR_PATH:NOLEADERELECTION}")
+    val objectMapper: ObjectMapper
+) {
     private val hostname = InetAddress.getLocalHost().hostName
-    private var leader =  ""
+    private var leader = ""
     private var lastCalled = LocalDateTime.MIN
-    private val electorUri = "http://"+electorPath
+    private val electorUri = "http://" + electorPath
 
     companion object {
         private val LOG = LoggerFactory.getLogger(LeaderElection::class.java)
@@ -30,11 +31,29 @@ class LeaderElection(@Client("LeaderElect") val client: Rx3HttpClient,
     private fun getLeader(): String {
         if (electorPath == "NOLEADERELECTION") return hostname
         if (leader.isBlank() || lastCalled.isBefore(LocalDateTime.now().minusMinutes(2))) {
-            leader = objectMapper.readValue(client.retrieve(electorUri).blockingFirst(), Elector::class.java).name
+            leader = objectMapper.readValue(getResource(electorUri), Elector::class.java).name
             LOG.debug("Running leader election getLeader is {} ", leader)
             lastCalled = LocalDateTime.now()
         }
         return leader
+    }
+
+    private fun getResource(uri: String): String {
+        val request = HttpRequest.newBuilder()
+            .uri(URI(uri))
+            .timeout(Duration.ofSeconds(5))
+            .GET()
+            .build()
+
+        val response = httpClient
+            .send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() >= 300 || response.body() == null) {
+            LOG.error("Greide ikke å hente leader fra $uri ${response.statusCode()} : ${response.body()}")
+            throw RuntimeException("unknown error (responseCode=${response.statusCode()}) ved henting av leader")
+        }
+
+        return response.body()
     }
 }
 

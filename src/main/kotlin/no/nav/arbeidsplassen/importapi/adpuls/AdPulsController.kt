@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import io.javalin.Javalin
 import io.javalin.http.Context
+import io.javalin.http.HttpStatus
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import no.nav.arbeidsplassen.importapi.repository.Pageable
@@ -31,35 +32,26 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/api/v1/stats/{providerId}",
-            {
-                getAllTodayStatsForProvider(
-                    it.providerIdParam(),
-                    it.fromParam(),
-                    it.pageParam(),
-                    it.numberParam(),
-                    it.sizeParam(),
-                    it.sortParams()
-                )
-            },
+            { getAllTodayStatsForProvider(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
         )
     }
 
-    fun getAllTodayStatsForProvider(
-        providerId: Long,
-        from: String,
-        page: Long?,
-        number: Long?,
-        size: Int?,
-        sort: List<String>?,
-    ): RestSlice<AdPulsDTO> {
+    fun getAllTodayStatsForProvider(ctx: Context) {
+        val providerId = ctx.providerIdParam()
+        val from = ctx.fromParam()
+        val page = ctx.pageParam()
+        val number = ctx.numberParam()
+        val size = ctx.sizeParam()
+        val sort = ctx.sortParams()
         LOG.info("Entering getAllTodayStatsForProvider")
         val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
         LOG.info("Getting stats for provider $providerId from $fromDate")
         require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
 
         val pamImportPageable = mapPageable(page, number, size, sort)
-        return mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
+        val slice = mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
+        ctx.status(HttpStatus.OK).json(slice)
     }
 
     private fun <T> mapSlice(slice: Slice<T>): RestSlice<T> {

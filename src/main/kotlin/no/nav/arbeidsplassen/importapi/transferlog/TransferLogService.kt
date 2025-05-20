@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import jakarta.inject.Singleton
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -9,15 +8,14 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
 
 
-@Singleton
 class TransferLogService(
     private val transferLogRepository: TransferLogRepository,
     private val propertyNameValueValidation: PropertyNameValueValidation,

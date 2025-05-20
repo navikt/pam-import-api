@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.adadminstatus
 
 import io.javalin.Javalin
 import io.javalin.http.Context
-import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
+import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
@@ -19,32 +19,42 @@ class AdminStatusController(private val adminStatusService: AdminStatusService) 
     fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/api/v1/adminstatus/{providerId}/{reference}",
-            { adAdminStatus(it.providerIdParam(), it.referenceParam()) },
-            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+            { adAdminStatus(it) },
+            Roles.ROLE_PROVIDER,
+            Roles.ROLE_ADMIN
         )
-
         javalin.get(
             "/api/v1/adminstatus/{providerId}/versions/{versionId}",
-            { adAdminStatusByVersion(it.versionIdParam(), it.providerIdParam()) },
-            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+            { adAdminStatusByVersion(it) },
+            Roles.ROLE_PROVIDER,
+            Roles.ROLE_ADMIN
         )
-
         javalin.get(
             "/api/v1/adminstatus/{providerId}/uuid/{uuid}",
-            { adAdminStatusByUuid(it.providerIdParam(), it.uuidParam()) },
-            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+            { adAdminStatusByUuid(it) },
+            Roles.ROLE_PROVIDER,
+            Roles.ROLE_ADMIN
         )
     }
 
-    fun adAdminStatus(providerId: Long, reference: String): AdAdminStatusDTO {
-        return adminStatusService.findByProviderReference(providerId, reference)
+    fun adAdminStatus(ctx: Context) {
+        val providerId = ctx.providerIdParam()
+        val reference = ctx.referenceParam()
+        val adAdminStatus = adminStatusService.findByProviderReference(providerId, reference)
+        ctx.status(HttpStatus.OK).json(adAdminStatus)
     }
 
-    fun adAdminStatusByVersion(versionId: Long, providerId: Long): List<AdAdminStatusDTO> {
-        return adminStatusService.findByVersionAndProviderId(versionId, providerId)
+    fun adAdminStatusByVersion(ctx: Context) {
+        val providerId = ctx.providerIdParam()
+        val versionId = ctx.versionIdParam()
+        val adAdminStatusList = adminStatusService.findByVersionAndProviderId(versionId, providerId)
+        ctx.status(HttpStatus.OK).json(adAdminStatusList)
     }
 
-    fun adAdminStatusByUuid(providerId: Long, uuid: String): AdAdminStatusDTO {
-        return adminStatusService.findByUuid(uuid)
+    fun adAdminStatusByUuid(ctx: Context) {
+        val providerId = ctx.providerIdParam()
+        val uuid = ctx.uuidParam()
+        val adAdminStatus = adminStatusService.findByUuid(uuid)
+        ctx.status(HttpStatus.OK).json(adAdminStatus)
     }
 }

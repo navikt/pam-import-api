@@ -3,10 +3,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
-import io.micronaut.context.annotation.Value
-import jakarta.inject.Singleton
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
@@ -20,8 +17,6 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
-@Singleton
-@Open
 class TransferLogTasks(
     private val transferLogRepository: TransferLogRepository,
     private val adStateRepository: AdStateRepository,
@@ -31,8 +26,8 @@ class TransferLogTasks(
     private val lokalOntologiGateway: LokalOntologiGateway,
     private val adOutboxService: AdOutboxService,
     private val txTemplate: TxTemplate,
-    @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
-    @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long
+    private val logSize: Int, // TODO @Value("\${transferlog.tasks-size:50}")
+    private val deleteMonths: Long // TODO  @Value("\${transferlog.delete.months:6}")
 ) {
 
     companion object {

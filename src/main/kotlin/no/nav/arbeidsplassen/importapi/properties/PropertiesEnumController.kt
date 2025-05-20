@@ -9,25 +9,20 @@ import org.slf4j.LoggerFactory
 class PropertiesEnumController(private val propertyNameValueValidation: PropertyNameValueValidation) {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(PropertiesEnumController::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(PropertiesEnumController::class.java)
         private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
     fun setupRoutes(javalin: Javalin) {
-        javalin.get("/api/v1/properties/values", {
-            it.status(HttpStatus.OK).json(getPropertyValidValues())
-        })
-
-        javalin.get("/api/v1/properties/names", {
-            it.status(HttpStatus.OK).json(getPropertyNames())
-        })
+        javalin.get("/api/v1/properties/values", { getPropertyValidValues(it) })
+        javalin.get("/api/v1/properties/names", { getPropertyNames(it) })
     }
 
-    fun getPropertyValidValues(): HashMap<PropertyNames, Set<String>> {
-        return propertyNameValueValidation.validValues
+    fun getPropertyValidValues(ctx: Context) {
+        ctx.status(HttpStatus.OK).json(propertyNameValueValidation.validValues)
     }
 
-    fun getPropertyNames(): Array<PropertyNames> {
-        return PropertyNames.values()
+    fun getPropertyNames(ctx: Context) {
+        ctx.status(HttpStatus.OK).json(PropertyNames.values())
     }
 }

@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.provider.info
 

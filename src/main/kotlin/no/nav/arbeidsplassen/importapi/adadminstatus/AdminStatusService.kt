@@ -2,8 +2,8 @@ package no.nav.arbeidsplassen.importapi.adadminstatus
 
 
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 
 class AdminStatusService(
     private val adminStatusRepository: AdminStatusRepository,

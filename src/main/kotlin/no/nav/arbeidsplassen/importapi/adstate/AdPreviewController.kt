@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.adstate
 
 import io.javalin.Javalin
 import io.javalin.http.Context
-import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import io.javalin.http.HttpStatus
 import org.slf4j.LoggerFactory
 
 // TODO @Hidden
@@ -17,25 +17,20 @@ class AdPreviewController(
     }
 
     fun setupRoutes(javalin: Javalin) {
-        javalin.get(
-            "/api/v1/preview/{uuid}",
-            { previewAd(it.uuidParam()) },
-        )
-
-        javalin.get(
-            "/frontend/{uuid}",
-            { it.redirect(forwardIndexHtml(it.uuidParam())) },
-        )
+        javalin.get("/api/v1/preview/{uuid}", { previewAd(it) })
+        javalin.get("/frontend/{uuid}", { forwardIndexHtml(it) })
     }
 
     // Fixme: HPH Denne ser ikke ut til å være i bruk basert på accessloggene
-    fun previewAd(uuid: String): AdDTO {
+    fun previewAd(ctx: Context) {
+        val uuid: String = ctx.uuidParam()
         LOG.info("Previewing ad as json. Uuid:  {}", uuid)
-        return adStateService.getAdStateByUuid(uuid).ad
+        ctx.status(HttpStatus.OK).json(adStateService.getAdStateByUuid(uuid).ad)
     }
 
-    fun forwardIndexHtml(uuid: String): String {
+    fun forwardIndexHtml(ctx: Context) {
+        val uuid: String = ctx.uuidParam()
         LOG.info("Previewing ad. Redirecting to {} for uuid: {}", previewUrl, uuid)
-        return "$previewUrl/$uuid"
+        ctx.redirect("$previewUrl/$uuid")
     }
 }
