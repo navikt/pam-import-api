@@ -11,7 +11,7 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
@@ -23,7 +23,7 @@ class TransferLogTasks(
     private val objectMapper: ObjectMapper,
     private val meterRegistry: MeterRegistry,
     private val styrkCodeConverter: StyrkCodeConverter,
-    private val lokalOntologiGateway: LokalOntologiGateway,
+    private val lokalOntologiGateway: OntologiGateway,
     private val adOutboxService: AdOutboxService,
     private val txTemplate: TxTemplate,
     private val logSize: Int, // TODO @Value("\${transferlog.tasks-size:50}")

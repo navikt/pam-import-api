@@ -1,10 +1,13 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 
-import no.nav.arbeidsplassen.importapi.LeaderElection
+import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import org.slf4j.LoggerFactory
 
-class TransferLogScheduler(private val transferLogTasks: TransferLogTasks, private val leaderElection: LeaderElection) {
+class TransferLogScheduler(
+    private val transferLogTasks: TransferLogTasks,
+    private val leaderElection: LeaderElection
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferLogScheduler::class.java)

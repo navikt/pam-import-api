@@ -3,14 +3,14 @@ package no.nav.arbeidsplassen.importapi.properties
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class CategoryMapsController(
-    private val ontologiGateway: LokalOntologiGateway,
+    private val ontologiGateway: OntologiGateway,
     private val styrkCodeConverter: StyrkCodeConverter
 ) {
 

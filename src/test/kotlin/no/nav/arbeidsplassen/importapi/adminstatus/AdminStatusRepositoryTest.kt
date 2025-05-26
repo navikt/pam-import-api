@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.adminstatus
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import java.util.UUID
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-@MicronautTest
 class AdminStatusRepositoryTest(
     private val adminStatusRepository: AdminStatusRepository,
     private val providerRepository: ProviderRepository,

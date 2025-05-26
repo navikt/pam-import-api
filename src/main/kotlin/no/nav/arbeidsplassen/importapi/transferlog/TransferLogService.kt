@@ -10,7 +10,7 @@ import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 class TransferLogService(
     private val transferLogRepository: TransferLogRepository,
     private val propertyNameValueValidation: PropertyNameValueValidation,
-    private val ontologiGateway: LokalOntologiGateway
+    private val ontologiGateway: OntologiGateway
 ) {
 
     companion object {

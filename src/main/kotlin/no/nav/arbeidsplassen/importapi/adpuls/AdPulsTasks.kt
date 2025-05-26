@@ -1,10 +1,13 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.LeaderElection
+import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import org.slf4j.LoggerFactory
 
-class AdPulsTasks(private val adPulsRepository: AdPulsRepository, private val leaderElection: LeaderElection) {
+class AdPulsTasks(
+    private val adPulsRepository: AdPulsRepository,
+    private val leaderElection: LeaderElection
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsTasks::class.java)

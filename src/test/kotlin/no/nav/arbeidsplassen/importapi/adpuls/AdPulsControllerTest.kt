@@ -5,15 +5,14 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
+import java.net.URI
 import java.time.LocalDateTime
 import java.util.UUID
 import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
 import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
+import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
@@ -23,16 +22,14 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 
-@MicronautTest
+
 @Property(name = "JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
-class AdPulsControllerTest(
-    private val tokenService: TokenService,
-    private val repository: AdPulsRepository,
-    private val providerRepository: ProviderRepository
-) {
-    @Inject
-    @field:Client("\${micronaut.server.context-path}")
-    lateinit var client: Rx3HttpClient
+class AdPulsControllerTest() : TestRunningApplication() {
+    private val tokenService: TokenService = appCtx.servicesApplicationContext.tokenService
+    private val repository: AdPulsRepository = appCtx.databaseApplicationContext.adPulsRepository
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+
+    private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsControllerTest::class.java)

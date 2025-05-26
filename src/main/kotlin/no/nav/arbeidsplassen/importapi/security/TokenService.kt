@@ -7,13 +7,13 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import java.util.Date
 import java.util.UUID
-import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfiguration
+import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 
-class TokenService(private val secretSignatureConfiguration: SecretSignatureConfiguration) {
+class TokenService(private val secretSignatureConfigProperties: SecretSignatureConfigProperties) {
 
     fun token(provider: ProviderDTO): String {
-        val signer = MACSigner(secretSignatureConfiguration.secret)
+        val signer = MACSigner(secretSignatureConfigProperties.secret)
         val claimsSet = JWTClaimsSet.Builder()
             .subject(provider.email)
             .jwtID(provider.jwtid)
@@ -28,7 +28,7 @@ class TokenService(private val secretSignatureConfiguration: SecretSignatureConf
     }
 
     fun adminToken(): String {
-        val signer = MACSigner(secretSignatureConfiguration.secret)
+        val signer = MACSigner(secretSignatureConfigProperties.secret)
         val claimsSet = JWTClaimsSet.Builder()
             .subject("admin@arbeidsplassen.nav.no")
             .jwtID(UUID.randomUUID().toString())

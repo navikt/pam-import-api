@@ -2,7 +2,6 @@ package no.nav.arbeidsplassen.importapi.adoutbox
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxKafkaProducer.Meldingstype.IMPORT_API
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import org.apache.kafka.common.KafkaException
@@ -62,7 +61,7 @@ class AdOutboxService(
 
         uprossesserteMeldinger.forEach { adOutbox ->
             try {
-                adOutboxKafkaProducer.sendAndGet(adOutbox.uuid, adOutbox.payload.toByteArray(), IMPORT_API)
+                adOutboxKafkaProducer.sendAndGet(adOutbox.uuid, adOutbox.payload.toByteArray(), Meldingstype.IMPORT_API)
                 markerSomProsesert(adOutbox)
             } catch (e: KafkaException) {
                 LOG.warn("Feil ved prosessering av adOutbox med id ${adOutbox.id} - Stilling ${adOutbox.uuid} - $e")

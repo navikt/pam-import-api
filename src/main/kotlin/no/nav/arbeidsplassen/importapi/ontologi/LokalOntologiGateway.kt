@@ -21,8 +21,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 open class LokalOntologiGateway(
-    private val baseurl: String, // TODO @Value("\${pam.ontologi.typeahead.url}")
-) {
+    private val baseurl: String,
+) : OntologiGateway {
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(LokalOntologiGateway::class.java)
@@ -31,7 +31,7 @@ open class LokalOntologiGateway(
             .registerModule(JavaTimeModule())
     }
 
-    fun hentTypeaheadStillingerFraOntologi(): List<Typeahead> {
+    override fun hentTypeaheadStillingerFraOntologi(): List<Typeahead> {
         val url = "$baseurl/rest/typeahead/stillinger"
         val (responseCode, responseBody) = with(URI(url).toURL().openConnection() as HttpURLConnection) {
             requestMethod = "GET"
@@ -56,7 +56,7 @@ open class LokalOntologiGateway(
     }
 
     // TODO: Trenger en test! Jeg fjerner bruken av Micronauts UriTemplate, må verifiseres
-    open fun hentTypeaheadStilling(stillingstittel: String): List<Typeahead> {
+    override fun hentTypeaheadStilling(stillingstittel: String): List<Typeahead> {
         val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
         val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${encodedPath}"
         // val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
@@ -71,7 +71,7 @@ open class LokalOntologiGateway(
         return jacksonObjectMapper().readValue(response.body(), object : TypeReference<List<Typeahead>>() {})
     }
 
-    open fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long): KonseptGrupperingDTO? {
+    override fun hentStyrkOgEscoKonsepterBasertPaJanzz(konseptId: Long): KonseptGrupperingDTO? {
         val uri = URI("$baseurl/rest/ontologi/konseptGruppering/$konseptId")
 
         val client = HttpClient.newBuilder().build();

@@ -13,8 +13,9 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.util.UUID
 import javax.sql.DataSource
 import no.nav.arbeidsplassen.importapi.common.RequestLogger.logRequest
+import no.nav.arbeidsplassen.importapi.config.OnServerShutdown
+import no.nav.arbeidsplassen.importapi.config.OnServerStartup
 import no.nav.arbeidsplassen.importapi.exception.ImportApiErrorHandler.importApiErrorHandler
-import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
 import no.nav.arbeidsplassen.importapi.security.JavalinAccessManager
 import org.flywaydb.core.Flyway
 import org.slf4j.MDC
@@ -43,19 +44,15 @@ const val KONSUMENT_ID_MDC_KEY = "konsument_id"
 
 fun ApplicationContext.startApp(): Javalin {
 
-    kjørFlywayMigreringer(dataSource)
-
-    val accessManager = JavalinAccessManager(
-        providerService = providerService,
-        verifier = tokenVerifier
-    )
+    kjørFlywayMigreringer(this.databaseApplicationContext.dataSource)
 
     val javalin = startJavalin(
         port = 8080,
-        jsonMapper = JavalinJackson(objectMapper),
-        meterRegistry = prometheusRegistry,
-        accessManager = accessManager,
-        kafkaListenerStarter = kafkaListenerStarter,
+        jsonMapper = JavalinJackson(this.baseServicesApplicationContext.objectMapper),
+        meterRegistry = this.baseServicesApplicationContext.prometheusRegistry,
+        accessManager = this.servicesApplicationContext.accessManager,
+        onServerStartedListeners = listOf(this.servicesApplicationContext, this.schedulerApplicationContext),
+        onServerStoppingListeners = listOf(this.schedulerApplicationContext)
     )
 
     setupAllRoutes(javalin)
@@ -64,9 +61,14 @@ fun ApplicationContext.startApp(): Javalin {
 }
 
 private fun ApplicationContext.setupAllRoutes(javalin: Javalin) {
-    naisController.setupRoutes(javalin)
-    // providerController.setupRoutes(javalin)
-    // transferController.setupRoutes(javalin)
+    this.controllerApplicationContext.naisController.setupRoutes(javalin)
+    this.controllerApplicationContext.providerController.setupRoutes(javalin)
+    this.controllerApplicationContext.adStateController.setupRoutes(javalin)
+    this.controllerApplicationContext.adPulsController.setupRoutes(javalin)
+    this.controllerApplicationContext.adPreviewController.setupRoutes(javalin)
+    this.controllerApplicationContext.adminStatusController.setupRoutes(javalin)
+    this.controllerApplicationContext.adStateInternalController.setupRoutes(javalin)
+    this.controllerApplicationContext.transferController.setupRoutes(javalin)
 }
 
 fun kjørFlywayMigreringer(dataSource: DataSource) {
@@ -82,7 +84,8 @@ fun startJavalin(
     jsonMapper: JavalinJackson,
     meterRegistry: PrometheusMeterRegistry,
     accessManager: JavalinAccessManager,
-    kafkaListenerStarter: KafkaListenerStarter
+    onServerStartedListeners: List<OnServerStartup>,
+    onServerStoppingListeners: List<OnServerShutdown>
 ): Javalin {
 
     val micrometerPlugin = MicrometerPlugin { micrometerConfig ->
@@ -121,6 +124,7 @@ fun startJavalin(
     }
         .importApiErrorHandler()
         .events { eventConfig ->
-            eventConfig.serverStarted { kafkaListenerStarter.onServerStartup() }
+            eventConfig.serverStarted { onServerStartedListeners.forEach { it.onServerStartup() } }
+            eventConfig.serverStopping { onServerStoppingListeners.forEach { it.onServerShutdown() } }
         }.start(port)
 }

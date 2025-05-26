@@ -69,16 +69,19 @@ dependencies {
     implementation("org.quartz-scheduler:quartz:2.5.0")
 
     testImplementation(kotlin("test"))
-    testImplementation("no.nav.security:mock-oauth2-server:2.1.9")
+    // testImplementation("no.nav.security:mock-oauth2-server:2.1.9")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.testcontainers:testcontainers:1.20.5")
     testImplementation("org.testcontainers:postgresql:1.20.5")
+    testImplementation("org.testcontainers:kafka:1.20.5")
     testImplementation("org.testcontainers:junit-jupiter:1.20.5")
     testImplementation("io.mockk:mockk:1.13.16")
     testImplementation("org.awaitility:awaitility:4.2.2")
+    testImplementation("org.mockito:mockito-core:5.18.0")
 
     testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.7.0")
     testImplementation("io.micronaut:micronaut-jackson-databind:4.8.9")
+    testImplementation("net.javacrumbs.json-unit:json-unit:4.1.0")
 }
 
 

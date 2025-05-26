@@ -1,25 +1,29 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 import no.nav.arbeidsplassen.importapi.adstate.AdState
+import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-@MicronautTest
 class AdOutboxServiceTest(
     private val adOutboxService: AdOutboxService,
     private val adOutboxRepository: JdbcAdOutboxRepository,
     private val objectMapper: ObjectMapper,
     private val providerService: ProviderService
-) {
+) : TestRunningApplication() {
+
     @Test
     fun `AdOutboxService prosesserer og markerer outboxelementer riktig`() {
         val provider = providerService.save(ProviderDTO(identifier = "test", email = "test", phone = "test"))

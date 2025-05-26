@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.arbeidsplassen.importapi.LeaderElection
-import no.nav.arbeidsplassen.importapi.kafka.HealthService
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
+import no.nav.arbeidsplassen.importapi.leaderelection.NaisLeaderElection
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -24,7 +24,7 @@ class InternalAdTopicListenerTest {
     @Test
     fun `skal kunne starte opp og lytte til Kafka uten feil`() {
 
-        val leaderElection = mock<LeaderElection>()
+        val leaderElection = mock<NaisLeaderElection>()
         `when`(leaderElection.isLeader()).thenReturn(false)
         val healthService = HealthService()
         val objectMapper = jacksonObjectMapper()
@@ -48,7 +48,8 @@ class InternalAdTopicListenerTest {
                 kafkaConfig = kafkaConfig,
                 leaderElection = leaderElection,
                 topic = "teampam.stilling-intern-1",
-                groupId = "import-api-adminstatussync-gcp"
+                groupId = "import-api-adminstatussync-gcp",
+                adminStatusSyncKafkaEnabled = true
             )
 
             // Testen er bare at den skal kunne starte opp uten feil
