@@ -16,13 +16,15 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-class AdOutboxServiceTest(
-    private val adOutboxService: AdOutboxService,
-    private val adOutboxRepository: JdbcAdOutboxRepository,
-    private val objectMapper: ObjectMapper,
-    private val providerService: ProviderService
-) : TestRunningApplication() {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AdOutboxServiceTest : TestRunningApplication() {
+
+    private val adOutboxService: AdOutboxService = appCtx.servicesApplicationContext.adOutboxService
+    private val adOutboxRepository: AdOutboxRepository = appCtx.databaseApplicationContext.adOutboxRepository
+    private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
+    private val providerService: ProviderService = appCtx.securityServicesApplicationContext.providerService
 
     @Test
     fun `AdOutboxService prosesserer og markerer outboxelementer riktig`() {

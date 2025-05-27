@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.arbeidsplassen.importapi.config.TestKafkaConfigProperties
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
 import no.nav.arbeidsplassen.importapi.leaderelection.NaisLeaderElection
@@ -19,7 +20,6 @@ import org.testcontainers.utility.DockerImageName
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InternalAdTopicListenerTest {
-
 
     @Test
     fun `skal kunne starte opp og lytte til Kafka uten feil`() {
@@ -41,7 +41,8 @@ class InternalAdTopicListenerTest {
         KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
             container.start()
 
-            val kafkaConfig = KafkaConfig(mapOf("KAFKA_BROKERS" to container.bootstrapServers))
+            val kafkaConfig =
+                KafkaConfig(TestKafkaConfigProperties(mapOf("KAFKA_BROKERS" to container.bootstrapServers)))
             val kafkaListenerStarter = KafkaListenerStarter(
                 adTransportProsessor = internalAdTopicListener,
                 healthService = healthService,
@@ -54,6 +55,8 @@ class InternalAdTopicListenerTest {
 
             // Testen er bare at den skal kunne starte opp uten feil
             assertDoesNotThrow { kafkaListenerStarter.start() }
+            kafkaListenerStarter.stop()
+            container.stop()
         }
     }
 }

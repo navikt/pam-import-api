@@ -1,26 +1,23 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest.GET
 import io.micronaut.http.HttpRequest.POST
 import io.micronaut.http.HttpRequest.PUT
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.annotation.Client
 import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
+import java.net.URI
+import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 
-@MicronautTest
-@Property(name = "JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
-class ProviderControllerTest(private val tokenService: TokenService) {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ProviderControllerTest : TestRunningApplication() {
 
-    @Inject
-    @field:Client("\${micronaut.server.context-path}")
-    lateinit var client: Rx3HttpClient
+    private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
+    private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
 
     @Test
     fun `create read update provider`() {

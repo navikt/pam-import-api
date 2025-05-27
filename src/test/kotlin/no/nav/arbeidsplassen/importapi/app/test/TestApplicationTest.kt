@@ -1,14 +1,18 @@
 package no.nav.arbeidsplassen.importapi.app.test
 
 import kotlin.test.assertTrue
-import no.nav.arbeidsplassen.importapi.provider.MockProviderRepository
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestApplicationTest : TestRunningApplication() {
 
-    // @Test
-    // Jeg kjører testene med TestContainer og mocker ikk ut denne
-    fun `Skal ha fått en mocket versjon av ProviderRepository`() {
-        assertTrue("ProviderRepository skal være en MockProviderRepository") { appCtx.providerRepository is MockProviderRepository }
+    @Test
+    fun `Skal ha fått en mocket versjon av OntologiGateway`() {
+        assertTrue("OntologiGateway skal være en anonymous class") { isAnonymous(appCtx.outgoingPortsApplicationContext.ontologiGateway) }
     }
 
+    private fun isAnonymous(obj: Any): Boolean {
+        return obj.javaClass.isAnonymousClass
+    }
 }

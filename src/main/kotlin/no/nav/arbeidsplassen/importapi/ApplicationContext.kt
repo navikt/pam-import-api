@@ -1,69 +1,101 @@
 package no.nav.arbeidsplassen.importapi
 
+import no.nav.arbeidsplassen.importapi.config.ApplicationProperties
 import no.nav.arbeidsplassen.importapi.config.BaseServicesApplicationContext
 import no.nav.arbeidsplassen.importapi.config.ControllerApplicationContext
-import no.nav.arbeidsplassen.importapi.config.ControllerConfigProperties.Companion.ControllerConfigProperties
+import no.nav.arbeidsplassen.importapi.config.ControllerConfigProperties
 import no.nav.arbeidsplassen.importapi.config.DatabaseApplicationContext
-import no.nav.arbeidsplassen.importapi.config.DatabaseConfigProperties.Companion.DatabaseConfigProperties
+import no.nav.arbeidsplassen.importapi.config.DatabaseConfigProperties
 import no.nav.arbeidsplassen.importapi.config.DefaultOutgoingPortsApplicationContext
+import no.nav.arbeidsplassen.importapi.config.KafkaConfigProperties
 import no.nav.arbeidsplassen.importapi.config.OutgoingPortsApplicationContext
-import no.nav.arbeidsplassen.importapi.config.OutgoingPortsConfigurationProperties.Companion.OutgoingPortsConfigurationProperties
+import no.nav.arbeidsplassen.importapi.config.OutgoingPortsConfigProperties
 import no.nav.arbeidsplassen.importapi.config.SchedulerApplicationContext
-import no.nav.arbeidsplassen.importapi.config.SchedulerConfigurationProperties.Companion.SchedulerConfigurationProperties
-import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties.Companion.SecretSignatureConfigProperties
+import no.nav.arbeidsplassen.importapi.config.SchedulerConfigProperties
+import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties
+import no.nav.arbeidsplassen.importapi.config.SecurityServicesApplicationContext
 import no.nav.arbeidsplassen.importapi.config.ServicesApplicationContext
-import no.nav.arbeidsplassen.importapi.config.ServicesConfigurationProperties.Companion.ServicesConfigurationProperties
+import no.nav.arbeidsplassen.importapi.config.ServicesConfigProperties
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 
-open class ApplicationContext(envInn: Map<String, String>) {
-
-    private val env: Map<String, String> = envInn
+open class ApplicationContext(applicationProperties: ApplicationProperties) {
 
     //Properties:
-    open val secretSignatureConfigProperties = SecretSignatureConfigProperties(env)
-    open val outgoingPortsConfigurationProperties = OutgoingPortsConfigurationProperties(env)
-    open val servicesConfigurationProperties = ServicesConfigurationProperties(env)
-    open val databaseConfigurationProperties = DatabaseConfigProperties(env)
-    open val controllerConfigProperties = ControllerConfigProperties(env)
-    open val schedulerConfigurationProperties = SchedulerConfigurationProperties(env)
+    open val secretSignatureConfigProperties: SecretSignatureConfigProperties =
+        applicationProperties.secretSignatureConfigProperties
+
+    open val outgoingPortsConfigurationProperties: OutgoingPortsConfigProperties =
+        applicationProperties.outgoingPortsConfigProperties
+
+    open val servicesConfigurationProperties: ServicesConfigProperties =
+        applicationProperties.servicesConfigProperties
+
+    open val databaseConfigurationProperties: DatabaseConfigProperties =
+        applicationProperties.databaseConfigProperties
+
+    open val controllerConfigProperties: ControllerConfigProperties =
+        applicationProperties.controllerConfigProperties
+
+    open val schedulerConfigurationProperties: SchedulerConfigProperties =
+        applicationProperties.schedulerConfigProperties
+
+    open val kafkaConfigProperties: KafkaConfigProperties =
+        applicationProperties.kafkaConfigProperties
 
     //Brukes flere steder:
-    open val baseServicesApplicationContext = BaseServicesApplicationContext()
-    open val kafkaConfig = KafkaConfig(env)
-    open val outgoingPortsApplicationContext: OutgoingPortsApplicationContext = DefaultOutgoingPortsApplicationContext(
-        kafkaConfig = kafkaConfig,
-        outgoingPortsConfigurationProperties = outgoingPortsConfigurationProperties,
-        baseServicesApplicationContext = baseServicesApplicationContext
-    )
+    open val baseServicesApplicationContext by lazy { BaseServicesApplicationContext() }
+    open val kafkaConfig by lazy { KafkaConfig(kafkaConfigProperties) }
+    open val outgoingPortsApplicationContext: OutgoingPortsApplicationContext by lazy {
+        DefaultOutgoingPortsApplicationContext(
+            kafkaConfig = kafkaConfig,
+            outgoingPortsConfigProperties = outgoingPortsConfigurationProperties,
+            baseServicesApplicationContext = baseServicesApplicationContext
+        )
+    }
 
     // Database og repositories:
-    open val databaseApplicationContext = DatabaseApplicationContext(
-        databaseConfigurationProperties,
-        collectorRegistry = baseServicesApplicationContext.prometheusRegistry.prometheusRegistry
-    )
+    open val databaseApplicationContext by lazy {
+        DatabaseApplicationContext(
+            databaseConfigProperties = databaseConfigurationProperties,
+            baseServicesApplicationContext = baseServicesApplicationContext
+        )
+    }
 
     // Services
+    open val securityServicesApplicationContext by lazy {
+        SecurityServicesApplicationContext(
+            secretSignatureConfigProperties = secretSignatureConfigProperties,
+            databaseApplicationContext = databaseApplicationContext,
+        )
+    }
 
-    open val servicesApplicationContext = ServicesApplicationContext(
-        servicesConfigurationProperties = servicesConfigurationProperties,
-        databaseApplicationContext = databaseApplicationContext,
-        baseServicesApplicationContext = baseServicesApplicationContext,
-        outgoingPortsApplicationContext = outgoingPortsApplicationContext,
-        kafkaConfig = kafkaConfig,
-        secretSignatureConfigProperties = secretSignatureConfigProperties,
-    )
+    open val servicesApplicationContext by lazy {
+        ServicesApplicationContext(
+            servicesConfigProperties = servicesConfigurationProperties,
+            databaseApplicationContext = databaseApplicationContext,
+            baseServicesApplicationContext = baseServicesApplicationContext,
+            outgoingPortsApplicationContext = outgoingPortsApplicationContext,
+            kafkaConfig = kafkaConfig,
+            securityServicesApplicationContext = securityServicesApplicationContext,
+        )
+    }
 
     // Controllers
-    open val controllerApplicationContext = ControllerApplicationContext(
-        secretSignatureConfigProperties = secretSignatureConfigProperties,
-        controllerConfigProperties = controllerConfigProperties,
-        baseServicesApplicationContext = baseServicesApplicationContext,
-        servicesApplicationContext = servicesApplicationContext,
-    )
+    open val controllerApplicationContext by lazy {
+        ControllerApplicationContext(
+            secretSignatureConfigProperties = secretSignatureConfigProperties,
+            controllerConfigProperties = controllerConfigProperties,
+            baseServicesApplicationContext = baseServicesApplicationContext,
+            servicesApplicationContext = servicesApplicationContext,
+            securityServicesApplicationContext = securityServicesApplicationContext,
+        )
+    }
 
     // Scheduler:
-    open val schedulerApplicationContext = SchedulerApplicationContext(
-        schedulerConfigurationProperties = schedulerConfigurationProperties,
-        servicesApplicationContext = servicesApplicationContext
-    )
+    open val schedulerApplicationContext by lazy {
+        SchedulerApplicationContext(
+            schedulerConfigProperties = schedulerConfigurationProperties,
+            servicesApplicationContext = servicesApplicationContext
+        )
+    }
 }

@@ -95,6 +95,8 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     }
 
     private fun validatePageable(page: Long, size: Int, sort: List<String>) {
+        println("Sort: " + sort)
+        println("Filtered Sort: " + sort.filterNot { it == "updated" || it == "created" || it == "asc" || it == "desc" })
         require(page >= 0) { "size can not be less than 0" }
         require(size <= 1000) { "size can not be more than 1000" }
         require(

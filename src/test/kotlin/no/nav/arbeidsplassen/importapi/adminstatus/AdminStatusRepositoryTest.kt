@@ -5,6 +5,7 @@ import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
+import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
@@ -13,12 +14,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-class AdminStatusRepositoryTest(
-    private val adminStatusRepository: AdminStatusRepository,
-    private val providerRepository: ProviderRepository,
-    private val transferLogRepository: TransferLogRepository
-) {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AdminStatusRepositoryTest : TestRepositories() {
+
+    private val adminStatusRepository: AdminStatusRepository = appCtx.databaseApplicationContext.adminStatusRepository
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+    private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
 
     @Test
     fun adAdminStatusCRUDTest() {

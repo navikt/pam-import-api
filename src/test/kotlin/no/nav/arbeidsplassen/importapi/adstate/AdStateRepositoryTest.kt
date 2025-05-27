@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
@@ -11,14 +11,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-@MicronautTest
-class AdStateRepositoryTest(
-    private val adStateRepository: AdStateRepository,
-    private val objectMapper: ObjectMapper,
-    private val providerRepository: ProviderRepository,
-    private val transferLogRepository: TransferLogRepository
-) {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+// @Testcontainers
+class AdStateRepositoryTest : TestRepositories() {
+
+    private val adStateRepository: AdStateRepository = appCtx.databaseApplicationContext.adStateRepository
+    private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+    private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
 
     @Test
     fun adStateCrudTest() {

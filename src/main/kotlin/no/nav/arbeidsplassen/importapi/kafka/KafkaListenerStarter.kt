@@ -19,6 +19,8 @@ class KafkaListenerStarter(
         private val LOG = LoggerFactory.getLogger(KafkaListenerStarter::class.java)
     }
 
+    lateinit var listenerThread: Thread
+
     fun start() {
         // Leader skal ikke lytte på kafkameldinger slik at leader vil overleve en potensiell giftpille
         // og fortsatt kunne håndtere REST-kall
@@ -27,9 +29,23 @@ class KafkaListenerStarter(
             try {
                 val consumerConfig = kafkaConfig.kafkaJsonConsumer(topic, groupId)
                 val listener = KafkaTopicJsonListener(consumerConfig, healthService, adTransportProsessor)
-                listener.startListener()
+                listenerThread = listener.startListener()
             } catch (e: Exception) {
                 LOG.error("Greide ikke å starte Kafka listener: ${e.message}", e)
+                healthService.addUnhealthyVote()
+            }
+        } else {
+            LOG.info("Starter IKKE kafka rapid listener; adminStatusSyncKafkaEnabled=$adminStatusSyncKafkaEnabled og leaderElection=${leaderElection.isLeader()}")
+        }
+    }
+
+    fun stop() {
+        if (adminStatusSyncKafkaEnabled && !leaderElection.isLeader()) {
+            LOG.info("Stopper kafka rapid listener")
+            try {
+                listenerThread.interrupt()
+            } catch (e: Exception) {
+                LOG.error("Greide ikke å stoppe Kafka listener: ${e.message}", e)
                 healthService.addUnhealthyVote()
             }
         }

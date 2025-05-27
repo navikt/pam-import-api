@@ -2,8 +2,8 @@ package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepositoryTest
+import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
@@ -15,13 +15,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-@MicronautTest
-class TransferLogRepositoryTest(
-    private val providerRepository: ProviderRepository,
-    private val transferLogRepository: TransferLogRepository,
-    private val objectMapper: ObjectMapper
-) {
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TransferLogRepositoryTest : TestRepositories() {
+
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+    private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
+    private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
+
     @Test
     fun transferLogCrudTest() {
         val provider = providerRepository.newTestProvider()

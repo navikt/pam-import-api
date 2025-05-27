@@ -15,22 +15,9 @@ interface OutgoingPortsApplicationContext {
     val ontologiGateway: OntologiGateway
 }
 
-class OutgoingPortsConfigurationProperties(
-    val ontologiBaseUrl: String,
-    val electorPath: String,
-) {
-    companion object {
-        fun OutgoingPortsConfigurationProperties(env: Map<String, String>): OutgoingPortsConfigurationProperties =
-            OutgoingPortsConfigurationProperties(
-                ontologiBaseUrl = env.variable("pam.ontologi.typeahead.url"),
-                electorPath = env.nullableVariable("ELECTOR_PATH") ?: "NOLEADERELECTION",
-            )
-    }
-}
-
 open class DefaultOutgoingPortsApplicationContext(
     baseServicesApplicationContext: BaseServicesApplicationContext,
-    outgoingPortsConfigurationProperties: OutgoingPortsConfigurationProperties,
+    outgoingPortsConfigProperties: OutgoingPortsConfigProperties,
     kafkaConfig: KafkaConfig,
 ) : OutgoingPortsApplicationContext {
 
@@ -45,11 +32,11 @@ open class DefaultOutgoingPortsApplicationContext(
 
     override val leaderElection: LeaderElection = NaisLeaderElection(
         httpClient = httpClient,
-        electorPath = outgoingPortsConfigurationProperties.electorPath,
+        electorPath = outgoingPortsConfigProperties.electorPath,
         objectMapper = baseServicesApplicationContext.objectMapper,
     )
 
     override val ontologiGateway: OntologiGateway = LokalOntologiGateway(
-        baseurl = outgoingPortsConfigurationProperties.ontologiBaseUrl
+        baseurl = outgoingPortsConfigProperties.ontologiBaseUrl
     )
 }

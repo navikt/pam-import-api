@@ -1,15 +1,18 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+
+import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class ProviderRepositoryTest : TestRepositories() {
 
-@MicronautTest
-class ProviderRepositoryTest(private val providerRepository: ProviderRepository){
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
 
     @Test
     fun providerCRUDTest() {
@@ -20,7 +23,7 @@ class ProviderRepositoryTest(private val providerRepository: ProviderRepository)
         assertNotNull(read)
         assertEquals(provider.email, read!!.email)
         assertEquals(provider.identifier, read.identifier)
-        val update = read.copy(email="updated@test.test")
+        val update = read.copy(email = "updated@test.test")
         val updated = providerRepository.save(update)
         assertEquals("updated@test.test", updated.email)
         println(updated.toString())

@@ -15,7 +15,7 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics
 import java.util.TimeZone
 import no.nav.arbeidsplassen.importapi.common.Singeltons
 
-open class BaseServicesApplicationContext() {
+open class BaseServicesApplicationContext {
 
     val objectMapper: ObjectMapper = jacksonObjectMapper()
         .registerModule(JavaTimeModule())

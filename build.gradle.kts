@@ -82,6 +82,8 @@ dependencies {
     testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.7.0")
     testImplementation("io.micronaut:micronaut-jackson-databind:4.8.9")
     testImplementation("net.javacrumbs.json-unit:json-unit:4.1.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.0")
 }
 
 

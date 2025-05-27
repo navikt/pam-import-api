@@ -9,25 +9,12 @@ import no.nav.arbeidsplassen.importapi.nais.NaisController
 import no.nav.arbeidsplassen.importapi.provider.ProviderController
 import no.nav.arbeidsplassen.importapi.transferlog.TransferController
 
-
-class ControllerConfigProperties(
-    val adPreviewUrl: String,
-    val adsSize: Int = 100,
-) {
-    companion object {
-        fun ControllerConfigProperties(env: Map<String, String>): ControllerConfigProperties =
-            ControllerConfigProperties(
-                adPreviewUrl = env.variable("ad.preview.url"),
-                adsSize = env.nullableVariable("transferlog.batch-size")?.toInt() ?: 100,
-            )
-    }
-}
-
 class ControllerApplicationContext(
     secretSignatureConfigProperties: SecretSignatureConfigProperties,
     controllerConfigProperties: ControllerConfigProperties,
     baseServicesApplicationContext: BaseServicesApplicationContext,
     servicesApplicationContext: ServicesApplicationContext,
+    securityServicesApplicationContext: SecurityServicesApplicationContext,
 ) {
 
     val naisController = NaisController(
@@ -37,16 +24,16 @@ class ControllerApplicationContext(
     )
     val providerController by lazy {
         ProviderController(
-            providerService = servicesApplicationContext.providerService,
-            tokenService = servicesApplicationContext.tokenService
+            providerService = securityServicesApplicationContext.providerService,
+            tokenService = securityServicesApplicationContext.tokenService
         )
     }
     val transferController: TransferController = TransferController(
         transferLogService = servicesApplicationContext.transferLogService,
-        providerService = servicesApplicationContext.providerService,
+        providerService = securityServicesApplicationContext.providerService,
         adStateService = servicesApplicationContext.adStateService,
         objectMapper = baseServicesApplicationContext.objectMapper,
-        adsSize = controllerConfigProperties.adsSize
+        adsSize = controllerConfigProperties.transferlogBatchSize
     )
     val adStateController: AdStateController = AdStateController(servicesApplicationContext.adStateService)
     val adStateInternalController: AdStateInternalController =

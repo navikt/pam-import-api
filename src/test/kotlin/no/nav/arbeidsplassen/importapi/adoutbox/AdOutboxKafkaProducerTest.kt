@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
 import java.util.UUID
+import no.nav.arbeidsplassen.importapi.config.TestKafkaConfigProperties
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,7 +23,7 @@ class AdOutboxKafkaProducerTest {
             val producer = AdOutboxKafkaProducer(
                 synchronousKafkaSendAndGet = KafkaAdOutboxSendAndGet(
                     kafkaProducer =
-                        KafkaConfig(mapOf("KAFKA_BROKERS" to container.bootstrapServers)).kafkaProducer()
+                        KafkaConfig(TestKafkaConfigProperties(mapOf("KAFKA_BROKERS" to container.bootstrapServers))).kafkaProducer()
                 ),
                 topic = "teampam.annonsemottak-1",
                 healthService = healthService
@@ -35,6 +36,8 @@ class AdOutboxKafkaProducerTest {
             )
             assertEquals("hallo :)".toByteArray().size, recordMetadata.serializedValueSize())
             assertTrue(healthService.isHealthy())
+
+            container.stop()
         }
     }
 }

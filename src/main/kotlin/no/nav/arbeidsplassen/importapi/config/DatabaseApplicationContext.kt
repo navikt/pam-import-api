@@ -17,31 +17,6 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.transferlog.JdbcTransferLogRepository
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
 
-class DatabaseConfigProperties(
-    val host: String,
-    val port: String,
-    val database: String,
-    val user: String,
-    val pw: String,
-    val dbDriver: String,
-    // private val url :String,
-    val additionalParameter: String,
-) {
-    companion object {
-        fun DatabaseConfigProperties(env: Map<String, String>): DatabaseConfigProperties =
-            DatabaseConfigProperties(
-                host = env.variable("DB_HOST"),
-                port = env.variable("DB_PORT"),
-                database = env.variable("DB_DATABASE"),
-                user = env.variable("DB_USERNAME"),
-                pw = env.variable("DB_PASSWORD"),
-                dbDriver = env.variable("DB_DRIVER"),
-                // url = env.variable("DB_URL"),
-                additionalParameter = env["DB_ADDITIONAL_PARAMETER"] ?: ""
-            )
-    }
-}
-
 class DatabaseApplicationContext(
     private val databaseConfigProperties: DatabaseConfigProperties,
     private val baseServicesApplicationContext: BaseServicesApplicationContext,
@@ -66,7 +41,7 @@ class DatabaseApplicationContext(
 
     val providerRepository: ProviderRepository = JdbcProviderRepository(txTemplate)
     val transferLogRepository: TransferLogRepository = JdbcTransferLogRepository(txTemplate)
-    val adStatRepository: AdStateRepository = JdbcAdStateRepository(txTemplate)
+    val adStateRepository: AdStateRepository = JdbcAdStateRepository(txTemplate)
     val adminStatusRepository: AdminStatusRepository = JdbcAdminStatusRepository(txTemplate)
     val adPulsRepository: AdPulsRepository = JdbcAdPulsRepository(txTemplate)
     val adOutboxRepository: AdOutboxRepository = JdbcAdOutboxRepository(txTemplate)

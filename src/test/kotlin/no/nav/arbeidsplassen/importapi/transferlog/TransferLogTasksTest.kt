@@ -1,11 +1,10 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.adoutbox.JdbcAdOutboxRepository
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
+import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
@@ -19,19 +18,18 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
-@MicronautTest
-class TransferLogTasksTest(
-    private val transferLogTasks: TransferLogTasks,
-    private val transferLogRepository: TransferLogRepository,
-    private val providerRepository: ProviderRepository,
-    private val objectMapper: ObjectMapper,
-    private val adStateRepository: AdStateRepository,
-    private val adOutboxRepository: JdbcAdOutboxRepository
-) {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TransferLogTasksTest : TestRunningApplication() {
 
-    @Inject
-    lateinit var txTemplate: TxTemplate
+    private val transferLogTasks: TransferLogTasks = appCtx.servicesApplicationContext.transferLogTasks
+    private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+    private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
+    private val adStateRepository: AdStateRepository = appCtx.databaseApplicationContext.adStateRepository
+    private val adOutboxRepository: AdOutboxRepository = appCtx.databaseApplicationContext.adOutboxRepository
+    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
     @Test
     fun doTransferLogTaskTest() {

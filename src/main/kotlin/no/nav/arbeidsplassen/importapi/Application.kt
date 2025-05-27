@@ -13,6 +13,8 @@ import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.util.UUID
 import javax.sql.DataSource
 import no.nav.arbeidsplassen.importapi.common.RequestLogger.logRequest
+import no.nav.arbeidsplassen.importapi.config.ApplicationProperties
+import no.nav.arbeidsplassen.importapi.config.ApplicationProperties.Companion.NaisApplicationProperties
 import no.nav.arbeidsplassen.importapi.config.OnServerShutdown
 import no.nav.arbeidsplassen.importapi.config.OnServerStartup
 import no.nav.arbeidsplassen.importapi.exception.ImportApiErrorHandler.importApiErrorHandler
@@ -36,7 +38,8 @@ import org.slf4j.MDC
 
 fun main() {
     val env = System.getenv()
-    val appContext = ApplicationContext(env)
+    val applProperties: ApplicationProperties = NaisApplicationProperties(env)
+    val appContext = ApplicationContext(applProperties)
     appContext.startApp()
 }
 
@@ -47,12 +50,12 @@ fun ApplicationContext.startApp(): Javalin {
     kjørFlywayMigreringer(this.databaseApplicationContext.dataSource)
 
     val javalin = startJavalin(
-        port = 8080,
+        port = 9028,
         jsonMapper = JavalinJackson(this.baseServicesApplicationContext.objectMapper),
         meterRegistry = this.baseServicesApplicationContext.prometheusRegistry,
-        accessManager = this.servicesApplicationContext.accessManager,
+        accessManager = this.securityServicesApplicationContext.accessManager,
         onServerStartedListeners = listOf(this.servicesApplicationContext, this.schedulerApplicationContext),
-        onServerStoppingListeners = listOf(this.schedulerApplicationContext)
+        onServerStoppingListeners = listOf(this.servicesApplicationContext, this.schedulerApplicationContext)
     )
 
     setupAllRoutes(javalin)
@@ -61,14 +64,15 @@ fun ApplicationContext.startApp(): Javalin {
 }
 
 private fun ApplicationContext.setupAllRoutes(javalin: Javalin) {
-    this.controllerApplicationContext.naisController.setupRoutes(javalin)
-    this.controllerApplicationContext.providerController.setupRoutes(javalin)
-    this.controllerApplicationContext.adStateController.setupRoutes(javalin)
-    this.controllerApplicationContext.adPulsController.setupRoutes(javalin)
-    this.controllerApplicationContext.adPreviewController.setupRoutes(javalin)
-    this.controllerApplicationContext.adminStatusController.setupRoutes(javalin)
-    this.controllerApplicationContext.adStateInternalController.setupRoutes(javalin)
-    this.controllerApplicationContext.transferController.setupRoutes(javalin)
+    this.controllerApplicationContext.run {
+        naisController.setupRoutes(javalin)
+        providerController.setupRoutes(javalin)
+        adPulsController.setupRoutes(javalin)
+        adPreviewController.setupRoutes(javalin)
+        adminStatusController.setupRoutes(javalin)
+        adStateInternalController.setupRoutes(javalin)
+        transferController.setupRoutes(javalin)
+    }
 }
 
 fun kjørFlywayMigreringer(dataSource: DataSource) {
@@ -80,7 +84,7 @@ fun kjørFlywayMigreringer(dataSource: DataSource) {
 }
 
 fun startJavalin(
-    port: Int = 8080,
+    port: Int = 9028,
     jsonMapper: JavalinJackson,
     meterRegistry: PrometheusMeterRegistry,
     accessManager: JavalinAccessManager,

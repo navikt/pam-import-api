@@ -9,6 +9,7 @@ import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
 interface ProviderRepository : CrudRepository<Provider> {
     fun saveOnMigrate(entities: Iterable<Provider>) // Er ikke i bruk?
+    fun findByIdentifier(identifier: String): Provider?
 }
 
 class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepository,
@@ -23,6 +24,8 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepos
     override val findAllSQL =
         """select id, identifier, jwtid, email, phone, created, updated from provider"""
     override val deleteSQL = """delete from provider where id = ?"""
+    val findByIdentifierSQL =
+        """select id, identifier, jwtid, email, phone, created, updated from provider where identifier = ?"""
     val migrateSQL =
         """insert into provider (jwtid, identifier, email, phone, created, updated, id) values (?,?,?,?,?,?,?)"""
 
@@ -68,6 +71,12 @@ class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepos
                     execute()
                 }
             }
+        }
+    }
+
+    override fun findByIdentifier(identifier: String): Provider? {
+        return singleFind(findByIdentifierSQL) {
+            it.setString(1, identifier)
         }
     }
 }

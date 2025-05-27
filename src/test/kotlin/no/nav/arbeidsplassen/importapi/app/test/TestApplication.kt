@@ -4,6 +4,7 @@ import no.nav.arbeidsplassen.importapi.app.testEnv
 import no.nav.arbeidsplassen.importapi.startApp
 
 fun main() {
-    val localAppCtx = TestApplicationContext(testEnv)
-    localAppCtx.startApp()
+    // TODO Trenger ENV-variabler for db og kafka
+    val localAppCtx = TestApplicationContext(TestApplicationContext.testApplicationProperties(testEnv))
+    localAppCtx.applicationContext.startApp()
 }

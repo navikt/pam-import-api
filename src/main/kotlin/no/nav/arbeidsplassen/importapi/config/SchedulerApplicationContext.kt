@@ -5,32 +5,19 @@ import no.nav.arbeidsplassen.importapi.scheduler.JavalinJobFactory
 import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder
 import org.quartz.Scheduler
+import org.quartz.SimpleScheduleBuilder
 import org.quartz.TriggerBuilder
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-data class SchedulerConfigurationProperties(
-    val adOutboxJobEnabled: Boolean,
-    val transferlogJobEnabled: Boolean,
-) {
-    companion object {
-        fun SchedulerConfigurationProperties(env: Map<String, String>): SchedulerConfigurationProperties =
-            SchedulerConfigurationProperties(
-                adOutboxJobEnabled = env.nullableVariable("adoutbox.scheduler.enabled")?.toBoolean() ?: false,
-                transferlogJobEnabled = env.nullableVariable("transferlog.scheduler.enabled")?.toBoolean() ?: false,
-            )
-    }
-}
-
 class SchedulerApplicationContext(
-    schedulerConfigurationProperties: SchedulerConfigurationProperties,
+    schedulerConfigProperties: SchedulerConfigProperties,
     servicesApplicationContext: ServicesApplicationContext
 ) : OnServerStartup, OnServerShutdown {
     companion object {
         val LOG: Logger = LoggerFactory.getLogger(SchedulerApplicationContext::class.java)
     }
-
 
     private val adOutboxJob = JobBuilder.newJob().ofType(AdOutboxJob::class.java)
         .withIdentity("adOutboxJob", "adOutbox")
@@ -39,7 +26,7 @@ class SchedulerApplicationContext(
     // @Scheduled(cron = "*/15 * * * * *")
     private val adOutboxTrigger = TriggerBuilder.newTrigger()
         .withIdentity("adOutboxTrigger", "adOutbox")
-        .withSchedule(CronScheduleBuilder.cronSchedule("*/15 * * * * *"))
+        .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(15))
         .build()
 
 
@@ -50,7 +37,7 @@ class SchedulerApplicationContext(
     // @Scheduled(cron="05 15 01 * * *")
     private val adPulsTrigger = TriggerBuilder.newTrigger()
         .withIdentity("adPulsTrigger", "adPuls")
-        .withSchedule(CronScheduleBuilder.cronSchedule("05 15 01 * * *"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("5 15 1 * * ?"))
         .build()
 
     private val transferLogJob = JobBuilder.newJob().ofType(AdOutboxJob::class.java)
@@ -59,7 +46,7 @@ class SchedulerApplicationContext(
 
     private val transferLogTrigger = TriggerBuilder.newTrigger()
         .withIdentity("transferLogTrigger", "transferLog")
-        .withSchedule(CronScheduleBuilder.cronSchedule("*/30 * * * * *"))
+        .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(30))
         .build()
 
     private val deleteTransferLogJob = JobBuilder.newJob().ofType(AdOutboxJob::class.java)
@@ -68,7 +55,7 @@ class SchedulerApplicationContext(
 
     private val deleteTransferLogTrigger = TriggerBuilder.newTrigger()
         .withIdentity("deleteTransferLogTrigger", "deleteTransferLog")
-        .withSchedule(CronScheduleBuilder.cronSchedule("05 15 00 * * *"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("5 15 0 * * ?"))
         .build()
 
     private val jobFactory = JavalinJobFactory(
@@ -80,12 +67,13 @@ class SchedulerApplicationContext(
     private val scheduler: Scheduler = StdSchedulerFactory.getDefaultScheduler()!!
 
     init {
+        LOG.info("Creating scheduler")
         scheduler.setJobFactory(jobFactory)
-        if (schedulerConfigurationProperties.adOutboxJobEnabled) {
+        if (schedulerConfigProperties.adOutboxJobEnabled) {
             scheduler.scheduleJob(adOutboxJob, adOutboxTrigger)
         }
         scheduler.scheduleJob(adPulsJob, adPulsTrigger)
-        if (schedulerConfigurationProperties.transferlogJobEnabled) {
+        if (schedulerConfigProperties.transferlogJobEnabled) {
             scheduler.scheduleJob(transferLogJob, transferLogTrigger)
             scheduler.scheduleJob(deleteTransferLogJob, deleteTransferLogTrigger)
         }
@@ -95,7 +83,7 @@ class SchedulerApplicationContext(
         LOG.info("Starter scheduler")
         scheduler.start()
         LOG.info("Trigger jobb ved oppstart")
-        scheduler.triggerJob(adOutboxJob.key)
+        // scheduler.triggerJob(adOutboxJob.key)
     }
 
     override fun onServerShutdown() {
