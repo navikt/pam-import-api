@@ -6,78 +6,16 @@ import no.nav.arbeidsplassen.importapi.ApplicationContext
 import no.nav.arbeidsplassen.importapi.kjørFlywayMigreringer
 import no.nav.arbeidsplassen.importapi.startApp
 import no.nav.arbeidsplassen.importapi.startJavalin
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.utility.DockerImageName
 
 abstract class TestRunningApplication {
 
     companion object {
         const val lokalUrlBase = "http://localhost:9028"
-
-        private val postgresContainer: PostgreSQLContainer<*> =
-            PostgreSQLContainer(DockerImageName.parse("postgres:15-alpine"))
-                .waitingFor(Wait.forListeningPort())
-                .withDatabaseName("test")
-                .withUsername("test")
-                .withPassword("test")
-                .apply {
-                    start()
-                }
-                .also { localConfig ->
-                    // localEnv["DB_URL"] = localConfig.jdbcUrl.addInitScript()
-                    dbHost = localConfig.host
-                    dbPort = localConfig.getMappedPort(5432).toString()
-                    // env["DB_HOST"] = localConfig.host
-                    // env["DB_PORT"] = localConfig.getMappedPort(5432).toString()
-                    // localEnv["DB_ADDITIONAL_PARAMETER"] = "?TC_INITSCRIPT=postgres/postgres-init.sql"
-                }
-
-        private val kafkaContainer: KafkaContainer =
-            KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka"))
-                .waitingFor(Wait.forListeningPort())
-                .withReuse(false)
-                .apply {
-                    start()
-                }
-                .also { localConfig ->
-                    kafkaBrokers = localConfig.bootstrapServers
-                    // env["KAFKA_BROKERS"] = localConfig.bootstrapServers
-                }
-
-        private val dbHost: String
-        private val dbPort: String
-        private val kafkaBrokers: String
+        private val localEnv: MutableMap<String, String> = mutableMapOf()
 
         @JvmStatic
-        val appCtx: ApplicationContext =
-            TestApplicationContext(
-                TestApplicationContext.testApplicationProperties(
-                    dbHost,
-                    dbPort,
-                    kafkaBrokers
-                )
-            ).applicationContext
-
-        @JvmStatic
-        val javalin: Javalin = appCtx.startApp()
-
-        @BeforeAll
-        @JvmStatic
-        fun setup() {
-
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun teardown() {
-            javalin.stop()
-            postgresContainer.stop()
-            kafkaContainer.stop()
-        }
+        val appCtx: ApplicationContext = TestApplicationContext(localEnv).applicationContext
+        val javaLin = appCtx.startApp()
     }
 }
 
@@ -85,47 +23,12 @@ abstract class TestRepositories {
 
     companion object {
         const val lokalUrlBase = "http://localhost:9028"
-
-        private val postgresContainer: PostgreSQLContainer<*> =
-            PostgreSQLContainer(DockerImageName.parse("postgres:15-alpine"))
-                .waitingFor(Wait.forListeningPort())
-                .withReuse(false)
-                .withDatabaseName("test")
-                .withUsername("test")
-                .withPassword("test")
-                .apply {
-                    start()
-                }
-                .also { localConfig ->
-                    // localEnv["DB_URL"] = localConfig.jdbcUrl.addInitScript()
-                    dbHost = localConfig.host
-                    dbPort = localConfig.getMappedPort(5432).toString()
-                    // env["DB_HOST"] = localConfig.host
-                    // env["DB_PORT"] = localConfig.getMappedPort(5432).toString()
-                    // localEnv["DB_ADDITIONAL_PARAMETER"] = "?TC_INITSCRIPT=postgres/postgres-init.sql"
-                }
-
-        private val dbHost: String
-        private val dbPort: String
+        private val localEnv: MutableMap<String, String> = mutableMapOf()
 
         @JvmStatic
-        val appCtx: TestRepositoriesContext = TestRepositoriesContext(dbHost, dbPort)
-
-        @JvmStatic
+        val appCtx: TestRepositoriesContext = TestRepositoriesContext(localEnv)
         val javalin: Javalin = appCtx.startApp()
 
-        @BeforeAll
-        @JvmStatic
-        fun setup() {
-
-        }
-
-        @AfterAll
-        @JvmStatic
-        fun teardown() {
-            javalin.stop()
-            postgresContainer.stop()
-        }
 
         private fun TestRepositoriesContext.startApp(): Javalin {
 

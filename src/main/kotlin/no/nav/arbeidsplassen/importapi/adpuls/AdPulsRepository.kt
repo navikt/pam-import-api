@@ -21,6 +21,7 @@ interface AdPulsRepository : CrudRepository<AdPuls> {
     ): Slice<AdPuls>
 
     fun deleteByUpdatedBefore(before: LocalDateTime): Long
+    fun deleteByProviderId(providerId: Long)
 }
 
 class JdbcAdPulsRepository(private val txTemplate: TxTemplate) :
@@ -47,6 +48,7 @@ class JdbcAdPulsRepository(private val txTemplate: TxTemplate) :
         """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by updated asc offset ? LIMIT ?"""
     val findByProviderIdAndUpdatedAfterAndPageableUpdatedDescSQL =
         """select id, provider_id, uuid, reference, type, total, created, updated from ad_puls where provider_id = ? and updated > ? order by updated desc offset ? LIMIT ?"""
+    val deleteByProviderIdSQL = """delete from ad_puls where provider_id = ?"""
 
     override fun ResultSet.mapToEntity(): AdPuls = AdPuls(
         id = getLong("id"),
@@ -115,4 +117,14 @@ class JdbcAdPulsRepository(private val txTemplate: TxTemplate) :
                 setTimestamp(1, before.toTimeStamp())
             }.executeUpdate().toLong()
         }
+
+    override fun deleteByProviderId(providerId: Long) {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByProviderIdSQL).apply {
+                setLong(1, providerId)
+                executeUpdate()
+            }
+        }
+    }
 }

@@ -18,13 +18,11 @@ class LokalOntologiGatewayTest {
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
             .setBody(ontologiBody(konseptId = "19564", label = "Møbelsnekker/ interiørsnekker"))
-
         server.enqueue(response)
-
         server.start()
+        val httpUrl = server.url("/")
 
-        lokalOntologiGateway = LokalOntologiGateway("http://unittest-pam-ontologi") // TODO Ble dette riktig?
-
+        lokalOntologiGateway = LokalOntologiGateway(httpUrl.toString())
         val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
 
         assertEquals(19564L, ontologiResponse[0].code)
@@ -47,13 +45,11 @@ class LokalOntologiGatewayTest {
                     esco = EscoDTO(label = "modellsnekker", uri = "www.esco.com/modellsnekker")
                 )
             )
-
         server.enqueue(response)
-
         server.start()
+        val httpUrl = server.url("/")
 
-        lokalOntologiGateway = LokalOntologiGateway("http://unittest-pam-ontologi") // TODO Ble dette riktig?
-
+        lokalOntologiGateway = LokalOntologiGateway(httpUrl.toString())
         val konseptGrupperingsresponse = lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(19574)
 
         assertEquals(19574L, konseptGrupperingsresponse?.konseptId)

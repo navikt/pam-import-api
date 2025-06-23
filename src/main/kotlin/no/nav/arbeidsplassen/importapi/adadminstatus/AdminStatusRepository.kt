@@ -11,6 +11,7 @@ interface AdminStatusRepository : CrudRepository<AdminStatus> {
     fun findByProviderIdAndReference(providerId: Long, reference: String): AdminStatus?
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): List<AdminStatus>
     fun findByUuid(uuid: String): AdminStatus?
+    fun deleteByProviderId(providerId: Long)
 }
 
 class JdbcAdminStatusRepository(private val txTemplate: TxTemplate) : AdminStatusRepository,
@@ -32,6 +33,7 @@ class JdbcAdminStatusRepository(private val txTemplate: TxTemplate) : AdminStatu
         """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where version_id = ? and provider_id = ?"""
     val findByProviderIdAndReferenceSQL =
         """select id, uuid, status, message, reference, provider_id, version_id, created, updated, publish_status from admin_status where provider_id = ? and reference = ?"""
+    val deleteByProviderIdSQL = """delete from admin_status where provider_id = ?"""
 
     override fun ResultSet.mapToEntity() = AdminStatus(
         id = getLong("id"),
@@ -80,4 +82,14 @@ class JdbcAdminStatusRepository(private val txTemplate: TxTemplate) : AdminStatu
         singleFind(findByUuidSQL) {
             it.setObject(1, uuid)
         }
+
+    override fun deleteByProviderId(providerId: Long) {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByProviderIdSQL).apply {
+                setLong(1, providerId)
+                executeUpdate()
+            }
+        }
+    }
 }

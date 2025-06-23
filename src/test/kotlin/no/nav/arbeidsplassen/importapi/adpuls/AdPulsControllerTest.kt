@@ -12,10 +12,12 @@ import java.util.UUID
 import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
 import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
 import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.security.TokenService
-import org.junit.Ignore
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
@@ -26,22 +28,24 @@ import org.slf4j.LoggerFactory
 
 // TODO: Denne kjører ikke grønt, og jeg forstår ikke hvorfor
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Ignore
+// @Disabled
 class AdPulsControllerTest() : TestRunningApplication() {
 
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
+    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
     private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsControllerTest::class.java)
 
+        val repository: AdPulsRepository = appCtx.databaseApplicationContext.adPulsRepository
+        val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+
+
         @BeforeAll
         @JvmStatic
         fun setup() {
-            val repository: AdPulsRepository = appCtx.databaseApplicationContext.adPulsRepository
-            val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
-
             val provider = providerRepository.newTestProvider()
             val first = repository.save(
                 AdPuls(
@@ -58,7 +62,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
 
             repository.saveAll(
                 (1..20).map {
-                    Thread.sleep(1)
+                    // Thread.sleep(1)
                     AdPuls(
                         providerId = provider.id!!,
                         uuid = UUID.randomUUID().toString(),
@@ -69,11 +73,20 @@ class AdPulsControllerTest() : TestRunningApplication() {
                 }
             )
         }
+
+        @AfterAll
+        @JvmStatic
+        fun teardown() {
+            val providerId = providerRepository.findTestProvider().id!!
+            repository.deleteByProviderId(providerId)
+            providerRepository.deleteById(providerId)
+        }
     }
+
 
     @Test
     fun `GET med sort, size og page skal fungere`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
@@ -106,7 +119,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
               "offset" : 10,
               "size" : 10
             }
-        """.trimIndent()
+            """.trimIndent()
         assertJsonEquals(
             expectedJson,
             response.body(),
@@ -117,7 +130,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
 
     @Test
     fun `GET uten sort, size og page skal gi defaults`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
@@ -167,8 +180,10 @@ class AdPulsControllerTest() : TestRunningApplication() {
     }
 
     @Test
-    fun `GET med feilaktig sort skal gi 500`() {
-        val providerId = 10000
+    fun `GET med feilaktig sort skal gi 400`() {
+        // HPH : Denne er endret fra Micronaut til Javalin, i Micronaut returnerte den 500,
+        // men jeg synes 400 gir mer mening og tenker det er en grei endring..
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
@@ -183,13 +198,13 @@ class AdPulsControllerTest() : TestRunningApplication() {
             // Litt usikker på hvorfor den automatisk mapper til en exception i stedet for at dette fungerer:
             // assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status)
         } catch (ex: HttpClientResponseException) {
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.status)
+            assertEquals(HttpStatus.BAD_REQUEST, ex.status)
         }
     }
 
     @Test
     fun `GET med sort men uten direction skal gi default direction`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
@@ -237,5 +252,4 @@ class AdPulsControllerTest() : TestRunningApplication() {
         )
         LOG.info("Body" + response.body())
     }
-
 }

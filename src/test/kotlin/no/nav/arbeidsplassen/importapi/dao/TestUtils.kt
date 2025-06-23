@@ -9,8 +9,17 @@ import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 class TestUtils
 
 fun ProviderRepository.newTestProvider(): Provider {
-    findByIdentifier("tester")?.let { deleteById(it.id!!) }
-    return save(Provider(identifier = "tester", email = "tester@tester.test", phone = "12345678"))
+    return save(
+        Provider(
+            identifier = "tester",
+            email = "tester@tester.test",
+            phone = "12345678"
+        )
+    )
+}
+
+fun ProviderRepository.findTestProvider(): Provider {
+    return findByIdentifier("tester")!!
 }
 
 fun ObjectMapper.transferJsonString(): String {

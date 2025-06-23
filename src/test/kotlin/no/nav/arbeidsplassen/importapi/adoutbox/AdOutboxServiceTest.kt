@@ -10,6 +10,7 @@ import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -25,55 +26,60 @@ class AdOutboxServiceTest : TestRunningApplication() {
     private val adOutboxRepository: AdOutboxRepository = appCtx.databaseApplicationContext.adOutboxRepository
     private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
     private val providerService: ProviderService = appCtx.securityServicesApplicationContext.providerService
+    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
     @Test
     fun `AdOutboxService prosesserer og markerer outboxelementer riktig`() {
-        val provider = providerService.save(ProviderDTO(identifier = "test", email = "test", phone = "test"))
+        txTemplate.doInTransactionNullable { ctx ->
+            val provider = providerService.save(ProviderDTO(identifier = "test", email = "test", phone = "test"))
 
-        val ad = AdDTO(
-            published = LocalDateTime.now(), expires = LocalDateTime.now(),
-            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
-            reference = UUID.randomUUID().toString(), title = "title",
-            locationList = listOf(LocationDTO(country = "Danmark"))
-        )
-
-        adOutboxService.lagreTilOutbox(
-            AdState(
-                providerId = provider.id!!,
-                reference = "ref",
-                versionId = 1,
-                jsonPayload = objectMapper.writeValueAsString(ad)
+            val ad = AdDTO(
+                published = LocalDateTime.now(), expires = LocalDateTime.now(),
+                adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+                reference = UUID.randomUUID().toString(), title = "title",
+                locationList = listOf(LocationDTO(country = "Danmark"))
             )
-        )
 
-        val initiellAdOutbox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
-        assertNull(initiellAdOutbox.prosessertDato)
-        assertNull(initiellAdOutbox.sisteForsøkDato)
-        assertFalse(initiellAdOutbox.harFeilet)
+            adOutboxService.lagreTilOutbox(
+                AdState(
+                    providerId = provider.id!!,
+                    reference = "ref",
+                    versionId = 1,
+                    jsonPayload = objectMapper.writeValueAsString(ad)
+                )
+            )
 
-        val initiellUprosessert =
-            adOutboxService.hentUprosesserteMeldinger(outboxDelay = 0).also { assertEquals(1, it.size) }.first()
-        assertEquals(initiellAdOutbox, initiellUprosessert)
+            val initiellAdOutbox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
+            assertNull(initiellAdOutbox.prosessertDato)
+            assertNull(initiellAdOutbox.sisteForsøkDato)
+            assertFalse(initiellAdOutbox.harFeilet)
 
-        adOutboxService.markerSomFeilet(initiellAdOutbox)
+            val initiellUprosessert =
+                adOutboxService.hentUprosesserteMeldinger(outboxDelay = 0).also { assertEquals(1, it.size) }.first()
+            assertEquals(initiellAdOutbox, initiellUprosessert)
 
-        val feiletAdOutbox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
-        assertNull(feiletAdOutbox.prosessertDato)
-        assertNotNull(feiletAdOutbox.sisteForsøkDato)
-        assertTrue(feiletAdOutbox.harFeilet)
-        assertEquals(initiellAdOutbox.uuid, feiletAdOutbox.uuid)
-        assertEquals(initiellAdOutbox.id, feiletAdOutbox.id)
-        assertEquals(initiellAdOutbox.payload, feiletAdOutbox.payload)
+            adOutboxService.markerSomFeilet(initiellAdOutbox)
 
-        adOutboxService.markerSomProsesert(feiletAdOutbox)
-        val prosessertAdOubox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
-        assertNotNull(prosessertAdOubox.prosessertDato)
-        assertNotNull(prosessertAdOubox.sisteForsøkDato)
-        assertTrue(prosessertAdOubox.harFeilet)
-        assertEquals(initiellAdOutbox.uuid, prosessertAdOubox.uuid)
-        assertEquals(initiellAdOutbox.id, prosessertAdOubox.id)
-        assertEquals(initiellAdOutbox.payload, prosessertAdOubox.payload)
+            val feiletAdOutbox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
+            assertNull(feiletAdOutbox.prosessertDato)
+            assertNotNull(feiletAdOutbox.sisteForsøkDato)
+            assertTrue(feiletAdOutbox.harFeilet)
+            assertEquals(initiellAdOutbox.uuid, feiletAdOutbox.uuid)
+            assertEquals(initiellAdOutbox.id, feiletAdOutbox.id)
+            assertEquals(initiellAdOutbox.payload, feiletAdOutbox.payload)
 
-        assertEquals(0, adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0).size)
+            adOutboxService.markerSomProsesert(feiletAdOutbox)
+            val prosessertAdOubox = adOutboxRepository.hentAlle().also { assertEquals(1, it.size) }.first()
+            assertNotNull(prosessertAdOubox.prosessertDato)
+            assertNotNull(prosessertAdOubox.sisteForsøkDato)
+            assertTrue(prosessertAdOubox.harFeilet)
+            assertEquals(initiellAdOutbox.uuid, prosessertAdOubox.uuid)
+            assertEquals(initiellAdOutbox.id, prosessertAdOubox.id)
+            assertEquals(initiellAdOutbox.payload, prosessertAdOubox.payload)
+
+            assertEquals(0, adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0).size)
+
+            ctx.setRollbackOnly()
+        }
     }
 }

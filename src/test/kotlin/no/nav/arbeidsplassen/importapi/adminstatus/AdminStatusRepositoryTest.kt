@@ -8,6 +8,7 @@ import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLog
 import no.nav.arbeidsplassen.importapi.transferlog.TransferLogRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,43 +23,48 @@ class AdminStatusRepositoryTest : TestRepositories() {
     private val adminStatusRepository: AdminStatusRepository = appCtx.databaseApplicationContext.adminStatusRepository
     private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
     private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
+    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
     @Test
     fun adAdminStatusCRUDTest() {
-        val provider = providerRepository.newTestProvider()
-        val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
-        val transferInDb = transferLogRepository.save(transferLog)
-        val adminStatus = AdminStatus(
-            message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
-            versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString()
-        )
-        val created = adminStatusRepository.save(adminStatus)
-        assertNotNull(created.id)
-        val read = adminStatusRepository.findById(created.id!!)
-        assertNotNull(read)
-        assertEquals("12345", read!!.reference)
-        val update = read.copy(message = null, status = Status.DONE, publishStatus = PublishStatus.REJECTED)
-        val updated = adminStatusRepository.save(update)
-        assertEquals(created.id!!, updated.id!!)
-        assertNull(updated.message)
-        assertEquals(Status.DONE, updated.status)
-        assertEquals(PublishStatus.REJECTED, updated.publishStatus)
-        println(updated)
-        adminStatusRepository.deleteById(updated.id!!)
-        val deleted = adminStatusRepository.findById(created.id!!)
-        assertNull(deleted)
-        val adminStatus2 = AdminStatus(
-            message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
-            versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString()
-        )
-        val adminStatuses = listOf(adminStatus, adminStatus2)
-        adminStatusRepository.saveAll(adminStatuses)
-        assertEquals(2, adminStatusRepository.findAll().count())
+        txTemplate.doInTransactionNullable { ctx ->
+            val provider = providerRepository.newTestProvider()
+            val transferLog = TransferLog(providerId = provider.id!!, md5 = "123456", payload = "jsonstring", items = 1)
+            val transferInDb = transferLogRepository.save(transferLog)
+            val adminStatus = AdminStatus(
+                message = "Diskriminerende", reference = "12345", providerId = provider.id!!,
+                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString()
+            )
+            val created = adminStatusRepository.save(adminStatus)
+            assertNotNull(created.id)
+            val read = adminStatusRepository.findById(created.id!!)
+            assertNotNull(read)
+            assertEquals("12345", read!!.reference)
+            val update = read.copy(message = null, status = Status.DONE, publishStatus = PublishStatus.REJECTED)
+            val updated = adminStatusRepository.save(update)
+            assertEquals(created.id!!, updated.id!!)
+            assertNull(updated.message)
+            assertEquals(Status.DONE, updated.status)
+            assertEquals(PublishStatus.REJECTED, updated.publishStatus)
+            println(updated)
+            adminStatusRepository.deleteById(updated.id!!)
+            val deleted = adminStatusRepository.findById(created.id!!)
+            assertNull(deleted)
+            val adminStatus2 = AdminStatus(
+                message = "Diskriminerende", reference = "54321", providerId = provider.id!!,
+                versionId = transferInDb.id!!, uuid = UUID.randomUUID().toString()
+            )
+            val adminStatuses = listOf(adminStatus, adminStatus2)
+            adminStatusRepository.saveAll(adminStatuses)
+            assertEquals(2, adminStatusRepository.findAll().count())
 
-        val adminStatusListe = adminStatusRepository.findByVersionIdAndProviderId(
-            versionId = transferInDb.id!!,
-            providerId = provider.id!!
-        )
-        assertEquals(2, adminStatusListe.count())
+            val adminStatusListe = adminStatusRepository.findByVersionIdAndProviderId(
+                versionId = transferInDb.id!!,
+                providerId = provider.id!!
+            )
+            assertEquals(2, adminStatusListe.count())
+
+            ctx.setRollbackOnly()
+        }
     }
 }

@@ -26,7 +26,7 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         private fun Context.pageParam(): Long? = queryParam("page")?.toLong()
         private fun Context.numberParam(): Long? = queryParam("number")?.toLong()
         private fun Context.sizeParam(): Int? = queryParam("size")?.toInt()
-        private fun Context.sortParams(): List<String>? = queryParams("sort")
+        private fun Context.sortParams(): List<String>? = queryParams("sort").flatMap { it.split(",") }
     }
 
     fun setupRoutes(javalin: Javalin) {
@@ -38,20 +38,28 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     }
 
     fun getAllTodayStatsForProvider(ctx: Context) {
-        val providerId = ctx.providerIdParam()
-        val from = ctx.fromParam()
-        val page = ctx.pageParam()
-        val number = ctx.numberParam()
-        val size = ctx.sizeParam()
-        val sort = ctx.sortParams()
-        LOG.info("Entering getAllTodayStatsForProvider")
-        val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
-        LOG.info("Getting stats for provider $providerId from $fromDate")
-        require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
+        try {
+            LOG.debug("Entering getAllTodayStatsForProvider")
+            val providerId = ctx.providerIdParam()
+            val from = ctx.fromParam()
+            val page = ctx.pageParam()
+            val number = ctx.numberParam()
+            val size = ctx.sizeParam()
+            val sort = ctx.sortParams()
+            LOG.info("Retrieved params in getAllTodayStatsForProvider")
+            val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
+            LOG.info("Getting stats for provider $providerId from $fromDate")
+            require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
 
-        val pamImportPageable = mapPageable(page, number, size, sort)
-        val slice = mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
-        ctx.status(HttpStatus.OK).json(slice)
+            val pamImportPageable = mapPageable(page, number, size, sort)
+            val slice = mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
+            LOG.debug("Returning json in getAllTodayStatsForProvider")
+            ctx.status(HttpStatus.OK).json(slice)
+            LOG.debug("Exiting getAllTodayStatsForProvider")
+        } catch (e: Exception) {
+            LOG.error("Error in getAllTodayStatsForProvider", e)
+            throw e
+        }
     }
 
     private fun <T> mapSlice(slice: Slice<T>): RestSlice<T> {
@@ -95,8 +103,8 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     }
 
     private fun validatePageable(page: Long, size: Int, sort: List<String>) {
-        println("Sort: " + sort)
-        println("Filtered Sort: " + sort.filterNot { it == "updated" || it == "created" || it == "asc" || it == "desc" })
+        LOG.info("Sort: " + sort)
+        LOG.info("Filtered Sort: " + sort.filterNot { it == "updated" || it == "created" || it == "asc" || it == "desc" })
         require(page >= 0) { "size can not be less than 0" }
         require(size <= 1000) { "size can not be more than 1000" }
         require(

@@ -17,6 +17,7 @@ interface TransferLogRepository : CrudRepository<TransferLog> {
     fun findByIdAndProviderId(id: Long, providerId: Long): TransferLog?
     fun findByStatus(status: TransferLogStatus): List<TransferLog>
     fun deleteByUpdatedBefore(updated: LocalDateTime)
+    fun deleteByProviderId(providerId: Long)
 }
 
 class JdbcTransferLogRepository(private val txTemplate: TxTemplate) : TransferLogRepository,
@@ -43,6 +44,7 @@ class JdbcTransferLogRepository(private val txTemplate: TxTemplate) : TransferLo
     val findByProviderIdAndMd5SQL =
         """select id, provider_id, md5, items, payload, status, message, created, updated from transfer_log where provider_id = ? and md5 = ?"""
     val deleteByUpdatedBeforeSQL = """delete from transfer_log where updated < ?"""
+    val deleteByProviderIdSQL = """delete from transfer_log where provider_id = ?"""
 
     override fun ResultSet.mapToEntity(): TransferLog = TransferLog(
         id = getLong("id"),
@@ -103,4 +105,13 @@ class JdbcTransferLogRepository(private val txTemplate: TxTemplate) : TransferLo
         }
     }
 
+    override fun deleteByProviderId(providerId: Long) {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByProviderIdSQL).apply {
+                setLong(1, providerId)
+                executeUpdate()
+            }
+        }
+    }
 }

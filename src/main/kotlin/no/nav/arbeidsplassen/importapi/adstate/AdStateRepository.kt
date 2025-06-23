@@ -11,6 +11,7 @@ interface AdStateRepository : CrudRepository<AdState> {
     fun findByProviderIdAndReference(providerId: Long, reference: String): AdState?
     fun findByUuid(uuid: String): AdState?
     fun findByUuidAndProviderId(uuid: String, providerId: Long): AdState?
+    fun deleteByProviderId(providerId: Long)
 }
 
 class JdbcAdStateRepository(private val txTemplate: TxTemplate) : AdStateRepository,
@@ -32,6 +33,8 @@ class JdbcAdStateRepository(private val txTemplate: TxTemplate) : AdStateReposit
         """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=?"""
     val findByUuidAndProviderIdSQL =
         """select id, uuid, provider_id, reference, version_id, json_payload, created, updated from ad_state where uuid=? and provider_id=?"""
+    val deleteByProviderIdSQL =
+        """delete from ad_state where provider_id = ?"""
 
     override fun ResultSet.mapToEntity(): AdState = AdState(
         id = getLong("id"),
@@ -78,4 +81,14 @@ class JdbcAdStateRepository(private val txTemplate: TxTemplate) : AdStateReposit
             p.setObject(1, uuid)
             p.setLong(2, providerId)
         }
+
+    override fun deleteByProviderId(providerId: Long) {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByProviderIdSQL).apply {
+                setLong(1, providerId)
+                executeUpdate()
+            }
+        }
+    }
 }

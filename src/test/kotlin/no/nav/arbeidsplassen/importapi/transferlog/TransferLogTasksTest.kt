@@ -33,33 +33,37 @@ class TransferLogTasksTest : TestRunningApplication() {
 
     @Test
     fun doTransferLogTaskTest() {
-        val payload = objectMapper.transferJsonString()
-        val provider = providerRepository.newTestProvider()
-        transferLogRepository.save(
-            TransferLog(
-                providerId = provider.id!!,
-                md5 = payload.toMD5Hex(),
-                payload = payload,
-                items = 2
+        txTemplate.doInTransactionNullable { ctx ->
+
+            val payload = objectMapper.transferJsonString()
+            val provider = providerRepository.newTestProvider()
+            transferLogRepository.save(
+                TransferLog(
+                    providerId = provider.id!!,
+                    md5 = payload.toMD5Hex(),
+                    payload = payload,
+                    items = 2
+                )
             )
-        )
-        transferLogTasks.processTransferLogTask()
-        val adstates = adStateRepository.findAll()
-        adstates.forEach { println(it.jsonPayload) }
-        assertEquals(2, adstates.count())
-        val transferLog =
-            transferLogRepository.findByStatus(TransferLogStatus.DONE)
-        assertEquals(1, transferLog.count())
-        val adOutbox = adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0)
-        assertEquals(2, adOutbox.size)
+            transferLogTasks.processTransferLogTask()
+            val adstates = adStateRepository.findAll()
+            adstates.forEach { println(it.jsonPayload) }
+            assertEquals(2, adstates.count())
+            val transferLog =
+                transferLogRepository.findByStatus(TransferLogStatus.DONE)
+            assertEquals(1, transferLog.count())
+            val adOutbox = adOutboxRepository.hentUprosesserteMeldinger(outboxDelay = 0)
+            assertEquals(2, adOutbox.size)
+
+            ctx.setRollbackOnly()
+        }
     }
 
     @Test
     fun deleteTransferLogTaskTest() {
-        // Jeg måtte innføre dette for å kompensere for at transaksjonshåndteringen ikke lenger er helt Micronaut-kompatibel..
-        // (By default, when using @MicronautTest, each @Test method will be wrapped in a transaction that will be rolled back when the test finishes.)
-        txTemplate.doInTransaction { tx ->
-            tx.setRollbackOnly()
+        txTemplate.doInTransactionNullable { ctx ->
+            // Jeg måtte innføre dette for å kompensere for at transaksjonshåndteringen ikke lenger er helt Micronaut-kompatibel..
+            // (By default, when using @MicronautTest, each @Test method will be wrapped in a transaction that will be rolled back when the test finishes.)
 
             val provider = providerRepository.newTestProvider()
             transferLogRepository.save(
@@ -73,6 +77,8 @@ class TransferLogTasksTest : TestRunningApplication() {
             val date = LocalDateTime.now().plusMonths(7)
             transferLogTasks.deleteTransferLogTask(date)
             assertEquals(0, transferLogRepository.findAll().count())
+            
+            ctx.setRollbackOnly()
         }
     }
 
