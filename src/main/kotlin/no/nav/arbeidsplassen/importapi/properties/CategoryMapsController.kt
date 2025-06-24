@@ -3,6 +3,11 @@ package no.nav.arbeidsplassen.importapi.properties
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiResponse
+import io.javalin.openapi.OpenApiSecurity
 import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
@@ -22,10 +27,46 @@ class CategoryMapsController(
     fun setupRoutes(javalin: Javalin) {
         javalin.get("/api/v1/categories/pyrk/occupations", { getPyrkCategoryMap(it) })
         javalin.get("/api/v1/categories/styrk/occupations", { getStyrkCategoryMap(it) })
-
         javalin.get("/api/v1/categories/janzz/occupations", { getJanzzCategories(it) })
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/pyrk/occupations",
+        methods = [HttpMethod.GET],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getPyrkCategoryMap 200 response",
+                content = [OpenApiContent(
+
+                    from = PurkOccupationMapWrapper::class,
+                    // properties = [
+                    //     OpenApiContentProperty(name = "foobar", from = PyrkOccupation::class)
+                    // ],
+                    example = """
+                       {
+                         "additionalProp1": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         },
+                         "additionalProp2": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         },
+                         "additionalProp3": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         }
+                       } 
+                    """
+                )],
+            ),
+        ]
+    )
     fun getPyrkCategoryMap(ctx: Context) {
         //TODO  IntelliJ ga meg egentlig Map<String?, PyrkOccupation> ..
         val pyrkCategoryMap: Map<String, PyrkOccupation> = styrkCodeConverter.occupationMap

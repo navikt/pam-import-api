@@ -6,23 +6,28 @@ import io.javalin.openapi.plugin.SecurityComponentConfiguration
 import no.nav.arbeidsplassen.importapi.security.Roles
 
 
+//TODO: Deprecated felter håndteres ulikt i Javalin og Micronaut. Hva gjør jeg med det?
 fun getOpenApiPlugin() = OpenApiPlugin { openApiConfig ->
     openApiConfig
-        .withDocumentationPath("/rest/internal/openapi.json")
+        // .withDocumentationPath("/rest/internal/openapi.json")
         .withRoles(Roles.ROLE_UNPROTECTED)
         .withDefinitionConfiguration { _: String, definition: DefinitionConfiguration ->
             definition.withInfo { openApiInfo: OpenApiInfo ->
-                openApiInfo.title = "Arbeidsplassen CV API"
-                openApiInfo.description = "API for henting av brukers CV data"
-                openApiInfo.version = "v2.0"
-            }.withServer { openApiServer ->
-                openApiServer.url = "https://pam-cv-api-gcp.intern.dev.nav.no"
+                openApiInfo.title = "Arbeidsplassen import api"
+                openApiInfo.description = "Import api for available jobs"
+                openApiInfo.version = "1.0"
+            }
+                /*
+            .withServer { openApiServer ->
+                openApiServer.url = "https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport/"
                 openApiServer.description = "dev-gcp"
             }.withServer { openApiServer ->
-                openApiServer.url = "https://pam-cv-api-gcp.intern.nav.no"
+                openApiServer.url = "https://arbeidsplassen-api.ekstern.nav.no/stillingsimport/"
                 openApiServer.description = "prod-gcp"
-            }.withSecurity(SecurityComponentConfiguration().apply {
-                withSecurityScheme("BearerAuth", BearerAuth())
-            })
+            }
+            */
+                .withSecurity(SecurityComponentConfiguration().apply {
+                    withSecurityScheme("BearerAuth", BearerAuth())
+                })
         }
 }

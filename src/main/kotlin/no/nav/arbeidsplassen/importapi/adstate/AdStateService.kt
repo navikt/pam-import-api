@@ -22,9 +22,9 @@ class AdStateService(
             ?: throw ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)
     }
 
-    fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long):
-            AdStatePublicDTO = adStateRepository.findByUuidAndProviderId(uuid, providerId)?.toDTO()
-        ?: throw ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)
+    fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long): AdStatePublicDTO =
+        adStateRepository.findByUuidAndProviderId(uuid, providerId)?.toDTO()
+            ?: throw ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)
 
     fun getAdStatesByProviderReference(providerId: Long, reference: String): AdStatePublicDTO =
         adStateRepository.findByProviderIdAndReference(providerId, reference)?.toDTO()

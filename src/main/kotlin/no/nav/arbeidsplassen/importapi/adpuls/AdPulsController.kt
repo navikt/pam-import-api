@@ -3,12 +3,18 @@ package no.nav.arbeidsplassen.importapi.adpuls
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiParam
+import io.javalin.openapi.OpenApiResponse
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.RestOrderBy
 import no.nav.arbeidsplassen.importapi.repository.RestPageable
 import no.nav.arbeidsplassen.importapi.repository.RestSlice
+import no.nav.arbeidsplassen.importapi.repository.RestSliceAdPulsDTO
 import no.nav.arbeidsplassen.importapi.repository.RestSortable
 import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.Sortable
@@ -37,6 +43,38 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         )
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/stats/{providerId}",
+        methods = [HttpMethod.GET],
+        pathParams = [OpenApiParam(
+            name = "providerId",
+            type = Long::class,
+            required = true,
+            description = "providerId"
+        )],
+        queryParams = [
+            OpenApiParam(name = "from", type = String::class, required = false, description = "from"),
+            OpenApiParam(name = "page", type = Long::class, required = false, description = "page"),
+            OpenApiParam(name = "number", type = Long::class, required = false, description = "number"),
+            OpenApiParam(name = "size", type = Int::class, required = false, description = "size"),
+            OpenApiParam(
+                name = "sort",
+                type = Array<String>::class,
+                required = false,
+                description = "sort",
+                example = "created, updated, asc, desc"
+            ),
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getAllTodayStatsForProvider 200 response",
+                content = [OpenApiContent(
+                    from = RestSliceAdPulsDTO::class,
+                )],
+            ),
+        ]
+    )
     fun getAllTodayStatsForProvider(ctx: Context) {
         try {
             LOG.debug("Entering getAllTodayStatsForProvider")

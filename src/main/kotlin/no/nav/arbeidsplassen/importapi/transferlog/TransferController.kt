@@ -13,6 +13,13 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiParam
+import io.javalin.openapi.OpenApiRequestBody
+import io.javalin.openapi.OpenApiResponse
+import io.javalin.openapi.OpenApiSecurity
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
@@ -76,6 +83,25 @@ class TransferController(
         )
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/batch/{providerId}",
+        methods = [HttpMethod.POST],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId")
+        ],
+        requestBody = OpenApiRequestBody(
+            required = true,
+            content = [OpenApiContent(from = Array<AdDTO>::class)]
+        ),
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "postTransfer 200 response",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
     private fun postTransfer(ctx: Context) {
         val providerId = ctx.providerIdParam()
         val ads = ctx.adListBody()
@@ -115,6 +141,27 @@ class TransferController(
     }
 
     // @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}",
+        methods = [HttpMethod.POST],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId")
+        ],
+        requestBody = OpenApiRequestBody(
+            required = true,
+            // TODO Micronaut gir her ut ingenting, som jo åpenbart er feil. Dette er heller ikke riktig, men bedre..
+            content = [OpenApiContent(mimeType = "application/x-json-stream", from = AdDTO::class)]
+        ),
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "postStream 200 response",
+                // TODO: Dette er det Micronaut gir ut, men det er vel strengt tatt ikke helt korrekt
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
     private fun streamTransfer(ctx: Context) {
         // Når man leser denne metoden så kan man kanskje reagere på at feilsituasjoner håndteres litt ulikt
         // Dette er et valg tatt for å emulere hvordan det var i Micronaut.
@@ -198,12 +245,44 @@ class TransferController(
         }.getOrElse { handleError(it, providerId) }
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/versions/{versionId}",
+        methods = [HttpMethod.GET],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "versionId", type = Long::class, required = true, description = "versionId")
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getTransfer 200 response",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
     private fun getTransfer(ctx: Context) {
         val providerId: Long = ctx.providerIdParam()
         val versionId: Long = ctx.versionIdParam()
         ctx.status(HttpStatus.OK).json(transferLogService.findByVersionIdAndProviderId(versionId, providerId))
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/versions/{versionId}/payload",
+        methods = [HttpMethod.GET],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "versionId", type = Long::class, required = true, description = "versionId")
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getTransferPayload 200 response",
+                content = [OpenApiContent(from = Array<AdDTO>::class)]
+            ),
+        ]
+    )
     private fun getTransferPayload(ctx: Context) {
         val providerId: Long = ctx.providerIdParam()
         val versionId: Long = ctx.versionIdParam()
@@ -213,6 +292,31 @@ class TransferController(
         ctx.status(HttpStatus.OK).json(adList)
     }
 
+
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/{reference}",
+        methods = [HttpMethod.DELETE],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "reference", type = String::class, required = true, description = "reference")
+        ],
+        queryParams = [
+            OpenApiParam(
+                name = "delete",
+                type = Boolean::class,
+                required = false,
+                description = "Default value : false"
+            ),
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "stopAdByProviderReference 200 response. TransferLogDTO.payload is set to null",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
     private fun stopAdByProviderReference(ctx: Context) {
         val providerId: Long = ctx.providerIdParam()
         val reference: String = ctx.referenceParam()
