@@ -77,7 +77,7 @@ class AdminStatusControllerTest : TestRunningApplication() {
         val providerId = providerRepository.findTestProvider().id!!
 
         val adminToken = tokenService.adminToken()
-        val get = HttpRequest.GET<AdAdminStatusDTO>("/api/v1/adminstatus/$providerId/12345")
+        val get = HttpRequest.GET<AdAdminStatusDTO>("api/v1/adminstatus/$providerId/12345")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .bearerAuth(adminToken)

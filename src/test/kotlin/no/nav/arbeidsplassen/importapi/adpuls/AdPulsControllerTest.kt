@@ -90,7 +90,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -134,7 +134,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -187,7 +187,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -208,7 +208,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)

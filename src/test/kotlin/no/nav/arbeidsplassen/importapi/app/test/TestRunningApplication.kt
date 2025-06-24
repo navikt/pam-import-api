@@ -10,7 +10,7 @@ import no.nav.arbeidsplassen.importapi.startJavalin
 abstract class TestRunningApplication {
 
     companion object {
-        const val lokalUrlBase = "http://localhost:9028"
+        const val lokalUrlBase = "http://localhost:9028/stillingsimport/"
         private val localEnv: MutableMap<String, String> = mutableMapOf()
 
         @JvmStatic
@@ -22,7 +22,7 @@ abstract class TestRunningApplication {
 abstract class TestRepositories {
 
     companion object {
-        const val lokalUrlBase = "http://localhost:9028"
+        const val lokalUrlBase = "http://localhost:9028/stillingsimport/"
         private val localEnv: MutableMap<String, String> = mutableMapOf()
 
         @JvmStatic
@@ -35,7 +35,7 @@ abstract class TestRepositories {
             kjørFlywayMigreringer(this.databaseApplicationContext.dataSource)
 
             val javalin = startJavalin(
-                port = 8080,
+                port = 8088,
                 jsonMapper = JavalinJackson(this.baseServicesApplicationContext.objectMapper),
                 meterRegistry = this.baseServicesApplicationContext.prometheusRegistry,
                 accessManager = this.securityServicesApplicationContext.accessManager,

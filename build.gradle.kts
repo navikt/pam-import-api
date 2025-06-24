@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val jacksonVersion = "2.17.2"
-val javalinVersion = "6.3.0"
+val javalinVersion = "6.6.0"
 val micrometerVersion = "1.12.4"
 val postgresqlVersion = "42.7.3"
 val pamAnsettelsesKodeverkVersion = "1.18"
@@ -9,7 +9,8 @@ val pamStyrkKategoriMapperVersion = "1.20241030-dc26b440"
 val htmlSanitizer = "20220608.1"
 
 plugins {
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.10"
+    kotlin("kapt") version "2.1.10"
     id("com.gradleup.shadow") version "8.3.2"
     // id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     application
@@ -36,6 +37,12 @@ tasks.test {
 tasks.withType<ShadowJar> {
     archiveFileName.set("pam-import-api-all.jar")
     mergeServiceFiles()
+}
+
+kapt {
+    javacOptions {
+        option("--enable-preview", "")
+    }
 }
 
 dependencies {
@@ -67,6 +74,12 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:$htmlSanitizer")
     implementation("org.apache.commons:commons-text:1.10.0")
     implementation("org.quartz-scheduler:quartz:2.5.0")
+
+    kapt("io.javalin.community.openapi:openapi-annotation-processor:6.6.0")
+    implementation("io.javalin.community.openapi:javalin-openapi-plugin:6.6.0") // for /openapi route with JSON scheme
+    implementation("io.javalin.community.openapi:javalin-swagger-plugin:6.6.0") // for Swagger UI
+    implementation("io.javalin.community.openapi:javalin-redoc-plugin:6.6.0") // for Swagger UI
+
 
     testImplementation(kotlin("test"))
     // testImplementation("no.nav.security:mock-oauth2-server:2.1.9")

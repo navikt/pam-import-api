@@ -45,7 +45,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             // create provider
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +59,10 @@ class TransferLogControllerTest : TestRunningApplication() {
             println(provider)
 
             // start the transfer
-            val post = HttpRequest.POST("/api/v1/transfers/batch/${provider.id}", objectMapper.transferToAdList())
+            val post = HttpRequest.POST(
+                "api/v1/transfers/batch/${provider.id}",
+                objectMapper.transferToAdList()
+            )
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(providertoken)
@@ -89,7 +92,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test2", email = "test2@test2.no", phone = "123")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +102,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -193,7 +196,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test3", email = "test3@test3.no", phone = "123")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -204,7 +207,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -366,7 +369,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test4", email = "test4@test4.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -376,7 +379,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -529,7 +532,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test5", email = "test5@test5.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -539,7 +542,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
         """.trimIndent()
             )
                 .contentType(MediaType.APPLICATION_JSON_STREAM)
@@ -566,7 +569,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test6", email = "test6@test6.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -576,7 +579,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
                 jfkdfjdk
             {
               "reference": "140095810",
@@ -669,7 +672,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test7", email = "test7@test7.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -679,7 +682,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             {
               "foo": "bar"
             }
@@ -707,7 +710,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test8", email = "test8@test8.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -717,7 +720,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             [
             {
               "reference": "140095810",
@@ -821,7 +824,7 @@ class TransferLogControllerTest : TestRunningApplication() {
 
             val adminToken = tokenService.adminToken()
             val postProvider = HttpRequest.POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "test9", email = "test8@test9.no", phone = "124")
             )
                 .contentType(MediaType.APPLICATION_JSON)
@@ -831,7 +834,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             val providertoken = tokenService.token(provider!!)
             // start the transfer
             val post = HttpRequest.POST(
-                "/api/v1/transfers/${provider.id}", """
+                "api/v1/transfers/${provider.id}", """
             [
             ]
         """.trimIndent()

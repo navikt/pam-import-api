@@ -28,21 +28,21 @@ class ProviderControllerTest : TestRunningApplication() {
             // create provider
             val adminToken = tokenService.adminToken()
             val create = POST(
-                "/internal/providers",
+                "internal/providers",
                 ProviderDTO(identifier = "webcruiter", email = "test@test.no", phone = "12345678")
             )
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
             val created = client.exchange(create, ProviderDTO::class.java).blockingFirst().body()
-            val read = GET<Long>("/internal/providers/${created?.id}")
+            val read = GET<Long>("internal/providers/${created?.id}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
             val reddit = client.exchange(read, ProviderDTO::class.java).blockingFirst().body()
             assertEquals(created, reddit)
             val put = PUT(
-                "/internal/providers/${created?.id}",
+                "internal/providers/${created?.id}",
                 ProviderDTO(identifier = "webcruiter2", email = "test@test.no", phone = "12345678")
             )
                 .contentType(MediaType.APPLICATION_JSON)

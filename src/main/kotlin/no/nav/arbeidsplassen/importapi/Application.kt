@@ -84,7 +84,7 @@ fun kjørFlywayMigreringer(dataSource: DataSource) {
 }
 
 fun startJavalin(
-    port: Int = 9028,
+    port: Int,
     jsonMapper: JavalinJackson,
     meterRegistry: PrometheusMeterRegistry,
     accessManager: JavalinAccessManager,
@@ -97,6 +97,7 @@ fun startJavalin(
     }
 
     return Javalin.create {
+        it.router.contextPath = "/stillingsimport"
         it.router.ignoreTrailingSlashes = true
         it.router.treatMultipleSlashesAsSingleSlash = true
         it.requestLogger.http { ctx, ms ->
@@ -110,6 +111,13 @@ fun startJavalin(
         it.http.defaultContentType = "application/json"
         it.jsonMapper(jsonMapper)
         it.registerPlugin(micrometerPlugin)
+        // it.registerPlugin(getOpenApiPlugin())
+        // it.registerPlugin(ReDocPlugin())
+        // it.registerPlugin(SwaggerPlugin { swaggerConfiguration ->
+        //     swaggerConfiguration.roles = arrayOf(Roles.ROLE_UNPROTECTED)
+        //     swaggerConfiguration.documentationPath = "/rest/internal/openapi.json"
+        //     swaggerConfiguration.uiPath = "/internal/swagger"
+        // })
 
     }.beforeMatched { ctx ->
         if (ctx.routeRoles().isEmpty()) {
