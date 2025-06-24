@@ -8,8 +8,6 @@ package no.nav.arbeidsplassen.importapi
 // import io.swagger.v3.oas.annotations.security.SecurityScheme
 import getOpenApiPlugin
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder.get
-import io.javalin.apibuilder.ApiBuilder.path
 import io.javalin.json.JavalinJackson
 import io.javalin.micrometer.MicrometerPlugin
 import io.javalin.openapi.plugin.redoc.ReDocPlugin
@@ -24,6 +22,7 @@ import no.nav.arbeidsplassen.importapi.config.OnServerShutdown
 import no.nav.arbeidsplassen.importapi.config.OnServerStartup
 import no.nav.arbeidsplassen.importapi.exception.ImportApiErrorHandler.importApiErrorHandler
 import no.nav.arbeidsplassen.importapi.security.JavalinAccessManager
+import no.nav.arbeidsplassen.importapi.security.Roles
 import org.flywaydb.core.Flyway
 import org.slf4j.MDC
 
@@ -117,22 +116,16 @@ fun startJavalin(
         it.jsonMapper(jsonMapper)
         it.registerPlugin(micrometerPlugin)
         it.registerPlugin(getOpenApiPlugin())
-        /*
-        it.registerPlugin(ReDocPlugin())
         it.registerPlugin(SwaggerPlugin { swaggerConfiguration ->
             swaggerConfiguration.roles = arrayOf(Roles.ROLE_UNPROTECTED)
-            swaggerConfiguration.documentationPath = "/rest/internal/openapi.json"
-            swaggerConfiguration.uiPath = "/internal/swagger"
+            swaggerConfiguration.documentationPath = "/openapi/arbeidsplassen-1.0-openapi.json"
+            swaggerConfiguration.uiPath = "/swagger-ui"
         })
-
-         */
-        it.registerPlugin(SwaggerPlugin())
-        it.registerPlugin(ReDocPlugin())
-        it.router.apiBuilder {
-            path("/api/v2/adminstatus/{providerId}/{reference}") {
-                get({})
-            }
-        }
+        it.registerPlugin(ReDocPlugin { redocConfiguration ->
+            redocConfiguration.roles = arrayOf(Roles.ROLE_UNPROTECTED)
+            redocConfiguration.documentationPath = "/openapi/arbeidsplassen-1.0-openapi.json"
+            redocConfiguration.uiPath = "/redoc"
+        })
 
     }.beforeMatched { ctx ->
         if (ctx.routeRoles().isEmpty()) {

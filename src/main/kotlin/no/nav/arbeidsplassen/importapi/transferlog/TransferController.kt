@@ -317,6 +317,7 @@ class TransferController(
             ),
         ]
     )
+    
     private fun stopAdByProviderReference(ctx: Context) {
         val providerId: Long = ctx.providerIdParam()
         val reference: String = ctx.referenceParam()

@@ -9,7 +9,7 @@ import no.nav.arbeidsplassen.importapi.security.Roles
 //TODO: Deprecated felter håndteres ulikt i Javalin og Micronaut. Hva gjør jeg med det?
 fun getOpenApiPlugin() = OpenApiPlugin { openApiConfig ->
     openApiConfig
-        // .withDocumentationPath("/rest/internal/openapi.json")
+        .withDocumentationPath("/openapi/arbeidsplassen-1.0-openapi.json")
         .withRoles(Roles.ROLE_UNPROTECTED)
         .withDefinitionConfiguration { _: String, definition: DefinitionConfiguration ->
             definition.withInfo { openApiInfo: OpenApiInfo ->
