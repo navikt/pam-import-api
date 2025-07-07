@@ -6,7 +6,19 @@ val micrometerVersion = "1.12.4"
 val postgresqlVersion = "42.7.3"
 val pamAnsettelsesKodeverkVersion = "1.18"
 val pamStyrkKategoriMapperVersion = "1.20241030-dc26b440"
-val htmlSanitizer = "20220608.1"
+val htmlSanitizerVersion = "20220608.1"
+val quartzVersion = "2.5.0"
+val commonsTextVersion = "1.10.0"
+val logbackVersion = "1.5.18"
+val logbackEncoderVersion = "7.4"
+val logbackSyslogVersion = "1.0.0"
+val nimbusVersion = "10.0.1"
+val flywayVersion = "11.5.0"
+val hikariVersion = "5.1.0"
+val kafkaClientsVersion = "3.6.1"
+val openApiVersion = "6.7.0-1"
+
+val testContainersVersion = "1.21.3"
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -47,7 +59,6 @@ kapt {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("io.javalin:javalin:$javalinVersion")
     implementation("org.eclipse.jetty:jetty-util")
     implementation("io.javalin:javalin-micrometer:$javalinVersion")
@@ -58,44 +69,42 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
-    implementation("ch.qos.logback:logback-classic:1.4.14")
-    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
-    implementation("com.papertrailapp:logback-syslog4j:1.0.0")
-    implementation("com.nimbusds:nimbus-jose-jwt:10.0.1")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
+    implementation("com.papertrailapp:logback-syslog4j:$logbackSyslogVersion")
+    implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
 
-    implementation("org.flywaydb:flyway-core:11.5.0")
-    implementation("org.flywaydb:flyway-database-postgresql:11.5.0")
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
 
-    implementation("org.apache.kafka:kafka-clients:3.6.1")
+    implementation("org.apache.kafka:kafka-clients:$kafkaClientsVersion")
     implementation("no.nav.arbeid.pam:pam-ansettelseskodeverk:$pamAnsettelsesKodeverkVersion")
     implementation("no.nav.arbeid.pam:pam-styrk-yrkeskategori-mapper:$pamStyrkKategoriMapperVersion")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:$htmlSanitizer")
-    implementation("org.apache.commons:commons-text:1.10.0")
-    implementation("org.quartz-scheduler:quartz:2.5.0")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:$htmlSanitizerVersion")
+    implementation("org.apache.commons:commons-text:$commonsTextVersion")
+    implementation("org.quartz-scheduler:quartz:$quartzVersion")
 
-    kapt("io.javalin.community.openapi:openapi-annotation-processor:6.7.0-1")
-    implementation("io.javalin.community.openapi:javalin-openapi-plugin:6.7.0-1") // for /openapi route with JSON scheme
-    implementation("io.javalin.community.openapi:javalin-swagger-plugin:6.7.0-1") // for Swagger UI
-    implementation("io.javalin.community.openapi:javalin-redoc-plugin:6.7.0-1") // for Swagger UI
-    
+    kapt("io.javalin.community.openapi:openapi-annotation-processor:$openApiVersion")
+    implementation("io.javalin.community.openapi:javalin-openapi-plugin:$openApiVersion") // for /openapi route with JSON scheme
+    implementation("io.javalin.community.openapi:javalin-swagger-plugin:$openApiVersion") // for Swagger UI
+    implementation("io.javalin.community.openapi:javalin-redoc-plugin:$openApiVersion") // for Redoc UI
+
     testImplementation(kotlin("test"))
-    // testImplementation("no.nav.security:mock-oauth2-server:2.1.9")
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("org.testcontainers:testcontainers:1.20.5")
-    testImplementation("org.testcontainers:postgresql:1.20.5")
-    testImplementation("org.testcontainers:kafka:1.20.5")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+    testImplementation("org.assertj:assertj-core:3.27.3")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion")
+    testImplementation("org.testcontainers:kafka:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("io.mockk:mockk:1.13.16")
     testImplementation("org.awaitility:awaitility:4.2.2")
     testImplementation("org.mockito:mockito-core:5.18.0")
 
-    testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.7.0")
+    testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.8.0")
     testImplementation("io.micronaut:micronaut-jackson-databind:4.8.9")
     testImplementation("net.javacrumbs.json-unit:json-unit:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.0")
 }
 
 

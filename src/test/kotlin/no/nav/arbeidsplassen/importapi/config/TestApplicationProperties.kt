@@ -52,7 +52,7 @@ class TestServicesConfigProperties(
     adminStatusPreviewUrl: String = "http://localhost:8080/stillinger/intern",
     adminStatusTopic: String = "teampam.stilling-intern-1",
     adminStatusGroupId: String = "import-api-adminstatussync-gcp",
-    adminStatusSyncKafkaEnabled: Boolean = true,
+    adminStatusSyncKafkaEnabled: Boolean = false,
     adOutboxKafkaProducerTopic: String = "teampam.annonsemottak-1"
 ) : ServicesConfigProperties(
     adminStatusPreviewUrl = adminStatusPreviewUrl,
@@ -63,8 +63,8 @@ class TestServicesConfigProperties(
 )
 
 class TestSchedulerConfigProperties(
-    adOutboxJobEnabled: Boolean = true,
-    transferlogJobEnabled: Boolean = true
+    adOutboxJobEnabled: Boolean = false,
+    transferlogJobEnabled: Boolean = false
 ) : SchedulerConfigProperties(
     adOutboxJobEnabled = adOutboxJobEnabled,
     transferlogJobEnabled = transferlogJobEnabled,
