@@ -6,7 +6,7 @@ package no.nav.arbeidsplassen.importapi
 // import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 // import io.swagger.v3.oas.annotations.info.Info
 // import io.swagger.v3.oas.annotations.security.SecurityScheme
-import getOpenApiPlugin
+import OpenApiConfig
 import io.javalin.Javalin
 import io.javalin.json.JavalinJackson
 import io.javalin.micrometer.MicrometerPlugin
@@ -109,7 +109,7 @@ fun startJavalin(
         it.http.defaultContentType = "application/json"
         it.jsonMapper(jsonMapper)
         it.registerPlugin(micrometerPlugin)
-        it.registerPlugin(getOpenApiPlugin())
+        it.registerPlugin(OpenApiConfig.getOpenApiPlugin())
         it.registerPlugin(SwaggerPlugin { swaggerConfiguration ->
             swaggerConfiguration.roles = arrayOf(Roles.ROLE_UNPROTECTED)
             swaggerConfiguration.documentationPath = "/openapi/arbeidsplassen-1.0-openapi.json"
