@@ -9,7 +9,6 @@ import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties
 import org.slf4j.LoggerFactory
 
-// @Hidden
 class NaisController(
     private val healthService: HealthService,
     private val prometheusMeterRegistry: PrometheusMeterRegistry,

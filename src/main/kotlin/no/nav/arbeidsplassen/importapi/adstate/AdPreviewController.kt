@@ -6,7 +6,6 @@ import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.config.JavalinController
 import org.slf4j.LoggerFactory
 
-// @Hidden
 class AdPreviewController(
     private val adStateService: AdStateService,
     private val previewUrl: String // @Value("\${ad.preview.url}")

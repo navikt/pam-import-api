@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsplassen.importapi.config.TestKafkaConfigProperties
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.kafka.KafkaListenerStarter
-import no.nav.arbeidsplassen.importapi.leaderelection.NaisLeaderElection
+import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -24,7 +24,7 @@ class InternalAdTopicListenerTest {
     @Test
     fun `skal kunne starte opp og lytte til Kafka uten feil`() {
 
-        val leaderElection = mock<NaisLeaderElection>()
+        val leaderElection = mock<LeaderElection>()
         `when`(leaderElection.isLeader()).thenReturn(false)
         val healthService = HealthService()
         val objectMapper = jacksonObjectMapper()
