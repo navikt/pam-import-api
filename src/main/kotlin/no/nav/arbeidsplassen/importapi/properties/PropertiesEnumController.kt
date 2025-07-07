@@ -5,7 +5,9 @@ import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
 import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiAdditionalContent
 import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiContentProperty
 import io.javalin.openapi.OpenApiResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -28,8 +30,37 @@ class PropertiesEnumController(private val propertyNameValueValidation: Property
         responses = [
             OpenApiResponse(
                 status = "200",
-                description = "getPropertyValidValues 200 response",
-                content = [OpenApiContent(from = Map::class)] // TODO Must fix
+                description = "getPropertyValidValues 200 response. The OpenAPI schema only show a couple of the values returned.",
+                content = [OpenApiContent(
+                    mimeType = "application/map-string-object",
+                    from = Any::class,
+                    properties = [
+                        OpenApiContentProperty(
+                            name = "workLanguage",
+                            from = Array<String>::class
+                        ),
+                        OpenApiContentProperty(
+                            name = "extent",
+                            from = Array<String>::class
+                        )],
+                    additionalProperties = OpenApiAdditionalContent(
+                        from = Array<String>::class
+                    ),
+                    example = """
+                       {
+                          "workLanguage": {
+                            "Norsk", 
+                            "Engelsk", 
+                            "Skandinavisk", 
+                            "Samisk"
+                          },
+                          "extent": {
+                            "heltid",
+                            "deltid"
+                          }
+                       }
+                    """,
+                )]
             ),
         ]
     )
@@ -44,7 +75,7 @@ class PropertiesEnumController(private val propertyNameValueValidation: Property
             OpenApiResponse(
                 status = "200",
                 description = "getPropertyNames 200 response",
-                content = [OpenApiContent(from = Array<PropertyNames>::class)] // TODO Denne blir ikke helt lik som i Micronaut
+                content = [OpenApiContent(from = PropertyNames::class)] // TODO Denne blir ikke helt lik som i Micronaut
             ),
         ]
     )

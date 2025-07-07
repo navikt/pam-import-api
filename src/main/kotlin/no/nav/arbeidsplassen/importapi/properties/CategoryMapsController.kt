@@ -5,10 +5,11 @@ import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
 import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiAdditionalContent
 import io.javalin.openapi.OpenApiContent
 import io.javalin.openapi.OpenApiResponse
-import io.javalin.openapi.OpenApiSecurity
 import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
 import org.slf4j.Logger
@@ -33,17 +34,15 @@ class CategoryMapsController(
     @OpenApi(
         path = "/stillingsimport/api/v1/categories/pyrk/occupations",
         methods = [HttpMethod.GET],
-        security = [OpenApiSecurity(name = "BearerAuth")],
         responses = [
             OpenApiResponse(
                 status = "200",
                 description = "getPyrkCategoryMap 200 response",
                 content = [OpenApiContent(
-
-                    from = PurkOccupationMapWrapper::class,
-                    // properties = [
-                    //     OpenApiContentProperty(name = "foobar", from = PyrkOccupation::class)
-                    // ],
+                    mimeType = "application/map-string-object",
+                    additionalProperties = OpenApiAdditionalContent(
+                        from = PyrkOccupation::class
+                    ),
                     example = """
                        {
                          "additionalProp1": {
@@ -78,6 +77,44 @@ class CategoryMapsController(
         ctx.status(HttpStatus.OK).json(pyrkCategoryMap)
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/styrk/occupations",
+        methods = [HttpMethod.GET],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getStyrkCategoryMap 200 response",
+                content = [OpenApiContent(
+                    mimeType = "application/map-string-object",
+                    additionalProperties = OpenApiAdditionalContent(
+                        from = Occupation::class
+                    ),
+                    example = """
+                       {
+                          "additionalProp1": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          },
+                          "additionalProp2": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          },
+                          "additionalProp3": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          }
+                       }
+                    """
+                )],
+            ),
+        ]
+    )
     fun getStyrkCategoryMap(ctx: Context) {
         val sort = ctx.sortParam()
         val styrkCategoryMap = if ("alfa" == sort) {
@@ -94,6 +131,19 @@ class CategoryMapsController(
         ctx.status(HttpStatus.OK).json(styrkCategoryMap)
     }
 
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/janzz/occupations",
+        methods = [HttpMethod.GET],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getJanzzCategoryMap 200 response",
+                content = [OpenApiContent(
+                    from = Array<Typeahead>::class,
+                )],
+            ),
+        ]
+    )
     fun getJanzzCategories(ctx: Context) {
         try {
             LOG.info("Henter stillinger fra ontologi.")

@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val jacksonVersion = "2.17.2"
-val javalinVersion = "6.6.0"
+val javalinVersion = "6.7.0"
 val micrometerVersion = "1.12.4"
 val postgresqlVersion = "42.7.3"
 val pamAnsettelsesKodeverkVersion = "1.18"
@@ -75,12 +75,11 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.10.0")
     implementation("org.quartz-scheduler:quartz:2.5.0")
 
-    kapt("io.javalin.community.openapi:openapi-annotation-processor:6.6.0")
-    implementation("io.javalin.community.openapi:javalin-openapi-plugin:6.6.0") // for /openapi route with JSON scheme
-    implementation("io.javalin.community.openapi:javalin-swagger-plugin:6.6.0") // for Swagger UI
-    implementation("io.javalin.community.openapi:javalin-redoc-plugin:6.6.0") // for Swagger UI
-
-
+    kapt("io.javalin.community.openapi:openapi-annotation-processor:6.7.0-1")
+    implementation("io.javalin.community.openapi:javalin-openapi-plugin:6.7.0-1") // for /openapi route with JSON scheme
+    implementation("io.javalin.community.openapi:javalin-swagger-plugin:6.7.0-1") // for Swagger UI
+    implementation("io.javalin.community.openapi:javalin-redoc-plugin:6.7.0-1") // for Swagger UI
+    
     testImplementation(kotlin("test"))
     // testImplementation("no.nav.security:mock-oauth2-server:2.1.9")
     testImplementation("org.assertj:assertj-core:3.24.2")
