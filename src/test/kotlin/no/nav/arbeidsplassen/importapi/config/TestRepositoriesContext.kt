@@ -1,11 +1,5 @@
-package no.nav.arbeidsplassen.importapi.app.test
+package no.nav.arbeidsplassen.importapi.config
 
-import no.nav.arbeidsplassen.importapi.config.BaseServicesApplicationContext
-import no.nav.arbeidsplassen.importapi.config.DatabaseApplicationContext
-import no.nav.arbeidsplassen.importapi.config.SecurityServicesApplicationContext
-import no.nav.arbeidsplassen.importapi.config.TestDatabaseConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestSecretSignatureConfigProperties
-import no.nav.arbeidsplassen.importapi.config.variable
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.utility.DockerImageName

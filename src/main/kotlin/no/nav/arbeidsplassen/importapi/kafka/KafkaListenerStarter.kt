@@ -22,9 +22,9 @@ class KafkaListenerStarter(
     lateinit var listenerThread: Thread
 
     fun start() {
-        // Leader skal ikke lytte på kafkameldinger slik at leader vil overleve en potensiell giftpille
+        // Når kun leader lytter på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
         // og fortsatt kunne håndtere REST-kall
-        if (adminStatusSyncKafkaEnabled && !leaderElection.isLeader()) {
+        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
             LOG.info("Starter kafka rapid listener")
             try {
                 val consumerConfig = kafkaConfig.kafkaJsonConsumer(topic, groupId)
@@ -40,7 +40,7 @@ class KafkaListenerStarter(
     }
 
     fun stop() {
-        if (adminStatusSyncKafkaEnabled && !leaderElection.isLeader()) {
+        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
             LOG.info("Stopper kafka rapid listener")
             try {
                 listenerThread.interrupt()

@@ -10,7 +10,7 @@ import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO

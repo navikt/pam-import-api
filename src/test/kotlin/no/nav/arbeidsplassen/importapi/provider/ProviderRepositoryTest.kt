@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.provider
 
 
-import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
+import no.nav.arbeidsplassen.importapi.app.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals

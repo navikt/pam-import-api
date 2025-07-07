@@ -1,6 +1,6 @@
-package no.nav.arbeidsplassen.importapi.app.test
+package no.nav.arbeidsplassen.importapi.app
 
-import no.nav.arbeidsplassen.importapi.app.testEnv
+import no.nav.arbeidsplassen.importapi.config.TestApplicationContext
 import no.nav.arbeidsplassen.importapi.startApp
 
 fun main() {

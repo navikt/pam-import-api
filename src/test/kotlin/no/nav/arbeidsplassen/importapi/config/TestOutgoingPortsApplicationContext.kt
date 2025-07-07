@@ -1,8 +1,7 @@
-package no.nav.arbeidsplassen.importapi.app.test
+package no.nav.arbeidsplassen.importapi.config
 
 import no.nav.arbeidsplassen.importapi.adoutbox.Meldingstype
 import no.nav.arbeidsplassen.importapi.adoutbox.SynchronousKafkaSendAndGet
-import no.nav.arbeidsplassen.importapi.config.OutgoingPortsApplicationContext
 import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import no.nav.arbeidsplassen.importapi.ontologi.EscoDTO
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
@@ -23,7 +22,7 @@ class TestOutgoingPortsApplicationContext : OutgoingPortsApplicationContext {
 
     override val leaderElection = object : LeaderElection {
         override fun isLeader(): Boolean {
-            return false
+            return true
         }
     }
 

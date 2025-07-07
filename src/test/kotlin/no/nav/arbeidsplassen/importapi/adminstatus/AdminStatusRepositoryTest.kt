@@ -5,7 +5,7 @@ import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
-import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
+import no.nav.arbeidsplassen.importapi.app.TestRepositories
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate

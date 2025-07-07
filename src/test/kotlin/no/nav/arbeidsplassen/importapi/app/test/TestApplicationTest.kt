@@ -1,6 +1,7 @@
 package no.nav.arbeidsplassen.importapi.app.test
 
 import kotlin.test.assertTrue
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 

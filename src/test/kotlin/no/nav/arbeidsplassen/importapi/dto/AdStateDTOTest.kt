@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository

@@ -11,7 +11,7 @@ import java.net.URI
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO

@@ -1,16 +1,6 @@
-package no.nav.arbeidsplassen.importapi.app.test
+package no.nav.arbeidsplassen.importapi.config
 
 import no.nav.arbeidsplassen.importapi.ApplicationContext
-import no.nav.arbeidsplassen.importapi.config.ApplicationProperties
-import no.nav.arbeidsplassen.importapi.config.OutgoingPortsApplicationContext
-import no.nav.arbeidsplassen.importapi.config.TestControllerConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestDatabaseConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestKafkaConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestOutgoingPortsConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestSchedulerConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestSecretSignatureConfigProperties
-import no.nav.arbeidsplassen.importapi.config.TestServicesConfigProperties
-import no.nav.arbeidsplassen.importapi.config.variable
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait

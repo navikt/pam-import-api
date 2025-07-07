@@ -1,7 +1,7 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
 import java.util.UUID
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate

@@ -3,7 +3,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepositoryTest
-import no.nav.arbeidsplassen.importapi.app.test.TestRepositories
+import no.nav.arbeidsplassen.importapi.app.TestRepositories
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString

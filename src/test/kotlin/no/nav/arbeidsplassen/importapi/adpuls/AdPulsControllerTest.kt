@@ -11,7 +11,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
 import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository

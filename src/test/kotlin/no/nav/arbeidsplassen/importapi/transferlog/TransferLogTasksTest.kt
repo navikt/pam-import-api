@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dao.transferJsonString
@@ -77,7 +77,7 @@ class TransferLogTasksTest : TestRunningApplication() {
             val date = LocalDateTime.now().plusMonths(7)
             transferLogTasks.deleteTransferLogTask(date)
             assertEquals(0, transferLogRepository.findAll().count())
-            
+
             ctx.setRollbackOnly()
         }
     }

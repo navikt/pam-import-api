@@ -6,7 +6,7 @@ import io.micronaut.http.HttpRequest.PUT
 import io.micronaut.http.MediaType
 import io.micronaut.rxjava3.http.client.Rx3HttpClient
 import java.net.URI
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.Assertions.assertEquals

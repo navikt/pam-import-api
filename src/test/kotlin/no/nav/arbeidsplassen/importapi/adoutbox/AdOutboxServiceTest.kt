@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.LocalDateTime
 import java.util.UUID
 import no.nav.arbeidsplassen.importapi.adstate.AdState
-import no.nav.arbeidsplassen.importapi.app.test.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
 import no.nav.arbeidsplassen.importapi.dto.LocationDTO

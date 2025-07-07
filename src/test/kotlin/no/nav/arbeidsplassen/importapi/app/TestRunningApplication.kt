@@ -1,8 +1,10 @@
-package no.nav.arbeidsplassen.importapi.app.test
+package no.nav.arbeidsplassen.importapi.app
 
 import io.javalin.Javalin
 import io.javalin.json.JavalinJackson
 import no.nav.arbeidsplassen.importapi.ApplicationContext
+import no.nav.arbeidsplassen.importapi.config.TestApplicationContext
+import no.nav.arbeidsplassen.importapi.config.TestRepositoriesContext
 import no.nav.arbeidsplassen.importapi.kjørFlywayMigreringer
 import no.nav.arbeidsplassen.importapi.startApp
 import no.nav.arbeidsplassen.importapi.startJavalin
