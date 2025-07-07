@@ -9,17 +9,19 @@ import io.javalin.openapi.OpenApiAdditionalContent
 import io.javalin.openapi.OpenApiContent
 import io.javalin.openapi.OpenApiContentProperty
 import io.javalin.openapi.OpenApiResponse
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PropertiesEnumController(private val propertyNameValueValidation: PropertyNameValueValidation) {
+class PropertiesEnumController(private val propertyNameValueValidation: PropertyNameValueValidation) :
+    JavalinController {
 
     companion object {
         val LOG: Logger = LoggerFactory.getLogger(PropertiesEnumController::class.java)
         private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get("/api/v1/properties/values", { getPropertyValidValues(it) })
         javalin.get("/api/v1/properties/names", { getPropertyNames(it) })
     }

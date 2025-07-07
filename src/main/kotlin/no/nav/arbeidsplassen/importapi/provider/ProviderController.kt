@@ -4,6 +4,7 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import java.util.UUID
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory
 class ProviderController(
     private val providerService: ProviderService,
     private val tokenService: TokenService
-) {
+) : JavalinController {
     companion object {
         private val LOG = LoggerFactory.getLogger(ProviderController::class.java)
 
@@ -22,7 +23,7 @@ class ProviderController(
         private fun Context.providerBody(): ProviderDTO = this.bodyAsClass(ProviderDTO::class.java)
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get("/internal/providers/{id}", { getProvider(it) }, Roles.ROLE_ADMIN)
         javalin.post("/internal/providers", { createProvider(it) }, Roles.ROLE_ADMIN)
         javalin.put("/internal/providers/{id}", { updateProvider(it) }, Roles.ROLE_ADMIN)

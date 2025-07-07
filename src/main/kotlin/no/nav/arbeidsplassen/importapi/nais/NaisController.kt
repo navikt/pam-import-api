@@ -5,6 +5,7 @@ import io.javalin.http.ContentType
 import io.javalin.http.HttpStatus
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.exporter.common.TextFormat
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties
 import org.slf4j.LoggerFactory
 
@@ -13,12 +14,12 @@ class NaisController(
     private val healthService: HealthService,
     private val prometheusMeterRegistry: PrometheusMeterRegistry,
     private val secretSignatureConfigProperties: SecretSignatureConfigProperties,
-) {
+) : JavalinController {
     companion object {
         private val LOG = LoggerFactory.getLogger(NaisController::class.java)
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get("/internal/isReady", {
             if ("Thisisaverylongsecretandcanonlybeusedintest" == secretSignatureConfigProperties.secret) {
                 it

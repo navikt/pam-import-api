@@ -8,6 +8,7 @@ import io.javalin.openapi.OpenApi
 import io.javalin.openapi.OpenApiAdditionalContent
 import io.javalin.openapi.OpenApiContent
 import io.javalin.openapi.OpenApiResponse
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
@@ -18,14 +19,14 @@ import org.slf4j.LoggerFactory
 class CategoryMapsController(
     private val ontologiGateway: OntologiGateway,
     private val styrkCodeConverter: StyrkCodeConverter
-) {
+) : JavalinController {
 
     companion object {
         val LOG: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
         private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get("/api/v1/categories/pyrk/occupations", { getPyrkCategoryMap(it) })
         javalin.get("/api/v1/categories/styrk/occupations", { getStyrkCategoryMap(it) })
         javalin.get("/api/v1/categories/janzz/occupations", { getJanzzCategories(it) })

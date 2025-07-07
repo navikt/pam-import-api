@@ -9,11 +9,12 @@ import io.javalin.openapi.OpenApiContent
 import io.javalin.openapi.OpenApiParam
 import io.javalin.openapi.OpenApiResponse
 import io.javalin.openapi.OpenApiSecurity
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-class AdStateController(private val adStateService: AdStateService) {
+class AdStateController(private val adStateService: AdStateService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdStateController::class.java)
@@ -22,7 +23,7 @@ class AdStateController(private val adStateService: AdStateService) {
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/api/v1/adstates/{providerId}/{reference}",
             { getAdStateByProviderReference(it) },

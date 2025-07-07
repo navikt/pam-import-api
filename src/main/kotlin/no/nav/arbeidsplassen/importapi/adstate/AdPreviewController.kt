@@ -3,20 +3,21 @@ package no.nav.arbeidsplassen.importapi.adstate
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import org.slf4j.LoggerFactory
 
 // @Hidden
 class AdPreviewController(
     private val adStateService: AdStateService,
     private val previewUrl: String // @Value("\${ad.preview.url}")
-) {
+) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPreviewController::class.java)
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get("/api/v1/preview/{uuid}", { previewAd(it) })
         javalin.get("/frontend/{uuid}", { forwardIndexHtml(it) })
     }

@@ -3,19 +3,20 @@ package no.nav.arbeidsplassen.importapi.adstate
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
 
 // TODO @Hidden
-class AdStateInternalController(private val adStateService: AdStateService) {
+class AdStateInternalController(private val adStateService: AdStateService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdStateInternalController::class.java)
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/internal/adstates/{uuid}",
             { getAdState(it) },

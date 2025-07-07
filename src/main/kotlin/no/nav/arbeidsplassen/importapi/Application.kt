@@ -68,14 +68,8 @@ fun ApplicationContext.startApp(): Javalin {
 }
 
 private fun ApplicationContext.setupAllRoutes(javalin: Javalin) {
-    this.controllerApplicationContext.run {
-        naisController.setupRoutes(javalin)
-        providerController.setupRoutes(javalin)
-        adPulsController.setupRoutes(javalin)
-        adPreviewController.setupRoutes(javalin)
-        adminStatusController.setupRoutes(javalin)
-        adStateInternalController.setupRoutes(javalin)
-        transferController.setupRoutes(javalin)
+    this.controllerApplicationContext.controllers.forEach {
+        it.setupRoutes(javalin)
     }
 }
 

@@ -6,8 +6,12 @@ import no.nav.arbeidsplassen.importapi.adstate.AdPreviewController
 import no.nav.arbeidsplassen.importapi.adstate.AdStateController
 import no.nav.arbeidsplassen.importapi.adstate.AdStateInternalController
 import no.nav.arbeidsplassen.importapi.nais.NaisController
+import no.nav.arbeidsplassen.importapi.properties.CategoryMapsController
+import no.nav.arbeidsplassen.importapi.properties.PropertiesEnumController
+import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.provider.ProviderController
 import no.nav.arbeidsplassen.importapi.transferlog.TransferController
+import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 
 class ControllerApplicationContext(
     secretSignatureConfigProperties: SecretSignatureConfigProperties,
@@ -15,6 +19,7 @@ class ControllerApplicationContext(
     baseServicesApplicationContext: BaseServicesApplicationContext,
     servicesApplicationContext: ServicesApplicationContext,
     securityServicesApplicationContext: SecurityServicesApplicationContext,
+    outgoingPortsApplicationContext: OutgoingPortsApplicationContext,
 ) {
 
     val naisController = NaisController(
@@ -45,4 +50,21 @@ class ControllerApplicationContext(
     val adminStatusController: AdminStatusController =
         AdminStatusController(servicesApplicationContext.adminStatusService)
     val adPulsController: AdPulsController = AdPulsController(servicesApplicationContext.adPulsService)
+    val categoryMapsController: CategoryMapsController = CategoryMapsController(
+        outgoingPortsApplicationContext.ontologiGateway,
+        styrkCodeConverter = StyrkCodeConverter()
+    )
+    val propertiesEnumController: PropertiesEnumController = PropertiesEnumController(PropertyNameValueValidation())
+    val controllers = setOf(
+        naisController,
+        providerController,
+        transferController,
+        adStateController,
+        adStateInternalController,
+        adPreviewController,
+        adminStatusController,
+        adPulsController,
+        categoryMapsController,
+        propertiesEnumController,
+    )
 }

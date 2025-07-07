@@ -10,6 +10,7 @@ import io.javalin.openapi.OpenApiParam
 import io.javalin.openapi.OpenApiResponse
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.RestOrderBy
 import no.nav.arbeidsplassen.importapi.repository.RestPageable
@@ -21,7 +22,7 @@ import no.nav.arbeidsplassen.importapi.repository.Sortable
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-class AdPulsController(private val adPulsService: AdPulsService) {
+class AdPulsController(private val adPulsService: AdPulsService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsController::class.java)
@@ -35,7 +36,7 @@ class AdPulsController(private val adPulsService: AdPulsService) {
         private fun Context.sortParams(): List<String>? = queryParams("sort").flatMap { it.split(",") }
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/api/v1/stats/{providerId}",
             { getAllTodayStatsForProvider(it) },

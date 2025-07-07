@@ -88,6 +88,7 @@ open class ApplicationContext(applicationProperties: ApplicationProperties) {
             baseServicesApplicationContext = baseServicesApplicationContext,
             servicesApplicationContext = servicesApplicationContext,
             securityServicesApplicationContext = securityServicesApplicationContext,
+            outgoingPortsApplicationContext = outgoingPortsApplicationContext,
         )
     }
 

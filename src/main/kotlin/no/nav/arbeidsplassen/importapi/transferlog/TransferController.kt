@@ -23,6 +23,7 @@ import io.javalin.openapi.OpenApiSecurity
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
@@ -39,7 +40,7 @@ class TransferController(
     private val adStateService: AdStateService,
     private val objectMapper: ObjectMapper,
     val adsSize: Int // @Value("\${transferlog.batch-size:100}")
-) {
+) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferController::class.java)
@@ -55,7 +56,7 @@ class TransferController(
         }
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.post(
             "/api/v1/transfers/batch/{providerId}",
             { postTransfer(it) },
@@ -317,7 +318,7 @@ class TransferController(
             ),
         ]
     )
-    
+
     private fun stopAdByProviderReference(ctx: Context) {
         val providerId: Long = ctx.providerIdParam()
         val reference: String = ctx.referenceParam()
