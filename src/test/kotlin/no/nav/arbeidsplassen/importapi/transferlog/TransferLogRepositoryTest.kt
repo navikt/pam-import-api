@@ -40,14 +40,14 @@ class TransferLogRepositoryTest : TestRepositories() {
             val provider = providerRepository.newTestProvider()
             val payload = objectMapper.transferJsonString()
             val md5hash = payload.toMD5Hex()
-            println("md5hash: $md5hash")
+            LOG.info("md5hash: $md5hash")
             val transferLog = TransferLog(providerId = provider.id!!, md5 = md5hash, payload = payload, items = 1)
             val create = transferLogRepository.save(transferLog)
             val read = transferLogRepository.findById(create.id!!)!!
             assertNotNull(read)
             assertTrue(transferLogRepository.existsByProviderIdAndMd5(provider.id!!, md5hash))
             val updated = transferLogRepository.save(read.copy(status = TransferLogStatus.DONE))
-            println(updated)
+            LOG.info(updated.toString())
             transferLogRepository.deleteById(updated.id!!)
             assertEquals(0, transferLogRepository.findAll().count())
 

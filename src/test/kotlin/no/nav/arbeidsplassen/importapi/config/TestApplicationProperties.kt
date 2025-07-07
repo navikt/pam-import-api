@@ -33,7 +33,7 @@ class TestKafkaConfigProperties(
 }
 
 class TestOutgoingPortsConfigProperties(
-    ontologiBaseUrl: String = "http://pam-ontologi", // TODO Denne vil vel aldri være i bruk ?
+    ontologiBaseUrl: String = "http://pam-ontologi",
     electorPath: String = "NOLEADERELECTION",
 ) : OutgoingPortsConfigProperties(
     ontologiBaseUrl = ontologiBaseUrl,

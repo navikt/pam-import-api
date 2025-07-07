@@ -90,13 +90,13 @@ class NaisControllerConfigProperties(env: Map<String, String>) : ControllerConfi
 )
 
 abstract class ServicesConfigProperties(
-    val adminStatusPreviewUrl: String,
+    val adminStatusPreviewUrl: String, // @Value("\${ad.preview.url}")
     val adminStatusTopic: String,
     val adminStatusGroupId: String,
     val adminStatusSyncKafkaEnabled: Boolean,
     val adOutboxKafkaProducerTopic: String,
-    val logSize: Int = 500, // TODO Er dette transferlog.task-size ?
-    val transferlogDeleteMonths: Long = 6
+    val logSize: Int = 50, // @Value("\${transferlog.tasks-size:50}") // TODO: Denne er ikke egentlig i bruk
+    val transferlogDeleteMonths: Long = 6 // @Value("\${transferlog.delete.months:6}")
 )
 
 class NaisServicesConfigProperties(env: Map<String, String>) : ServicesConfigProperties(

@@ -56,7 +56,7 @@ class TransferLogControllerTest : TestRunningApplication() {
             assertEquals(HttpStatus.CREATED, message.status)
             val provider = message.body()
             val providertoken = tokenService.token(provider!!)
-            println(provider)
+            LOG.info(provider.toString())
 
             // start the transfer
             val post = HttpRequest.POST(

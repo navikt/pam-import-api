@@ -9,8 +9,6 @@ import no.nav.arbeidsplassen.importapi.security.Roles
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.slf4j.LoggerFactory
 
-
-// TODO @Hidden
 class ProviderController(
     private val providerService: ProviderService,
     private val tokenService: TokenService

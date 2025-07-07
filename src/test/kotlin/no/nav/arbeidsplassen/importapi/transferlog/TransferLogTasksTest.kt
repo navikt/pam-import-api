@@ -19,9 +19,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransferLogTasksTest : TestRunningApplication() {
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(TransferLogTasksTest::class.java)
+    }
 
     private val transferLogTasks: TransferLogTasks = appCtx.servicesApplicationContext.transferLogTasks
     private val transferLogRepository: TransferLogRepository = appCtx.databaseApplicationContext.transferLogRepository
@@ -47,7 +53,7 @@ class TransferLogTasksTest : TestRunningApplication() {
             )
             transferLogTasks.processTransferLogTask()
             val adstates = adStateRepository.findAll()
-            adstates.forEach { println(it.jsonPayload) }
+            adstates.forEach { LOG.info(it.jsonPayload) }
             assertEquals(2, adstates.count())
             val transferLog =
                 transferLogRepository.findByStatus(TransferLogStatus.DONE)

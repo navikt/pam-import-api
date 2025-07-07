@@ -151,14 +151,12 @@ class TransferController(
         ],
         requestBody = OpenApiRequestBody(
             required = true,
-            // TODO Micronaut gir her ut ingenting, som jo åpenbart er feil. Dette er heller ikke riktig, men bedre..
             content = [OpenApiContent(mimeType = "application/x-json-stream", from = AdDTO::class)]
         ),
         responses = [
             OpenApiResponse(
                 status = "200",
                 description = "postStream 200 response",
-                // TODO: Dette er det Micronaut gir ut, men det er vel strengt tatt ikke helt korrekt
                 content = [OpenApiContent(from = TransferLogDTO::class)]
             ),
         ]

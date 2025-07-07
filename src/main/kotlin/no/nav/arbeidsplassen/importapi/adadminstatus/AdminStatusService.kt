@@ -7,7 +7,7 @@ import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 
 class AdminStatusService(
     private val adminStatusRepository: AdminStatusRepository,
-    private val previewUrl: String // TODO @Value("\${ad.preview.url}")
+    private val previewUrl: String
 ) {
 
     fun findByProviderReference(providerId: Long, reference: String): AdAdminStatusDTO {

@@ -77,7 +77,7 @@ class PropertiesEnumController(private val propertyNameValueValidation: Property
             OpenApiResponse(
                 status = "200",
                 description = "getPropertyNames 200 response",
-                content = [OpenApiContent(from = PropertyNames::class)] // TODO Denne blir ikke helt lik som i Micronaut
+                content = [OpenApiContent(from = PropertyNames::class)]
             ),
         ]
     )

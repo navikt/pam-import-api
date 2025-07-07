@@ -6,7 +6,6 @@ import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-// TODO @Hidden
 class TransferlogInternalController(private val transferLogService: TransferLogService) {
 
     companion object {

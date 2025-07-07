@@ -8,9 +8,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProviderRepositoryTest : TestRepositories() {
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(ProviderRepositoryTest::class.java)
+    }
 
     private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
     private val txTemplate = appCtx.databaseApplicationContext.txTemplate
@@ -28,7 +34,7 @@ class ProviderRepositoryTest : TestRepositories() {
             val update = read.copy(email = "updated@test.test")
             val updated = providerRepository.save(update)
             assertEquals("updated@test.test", updated.email)
-            println(updated.toString())
+            LOG.info(updated.toString())
             providerRepository.deleteById(id)
             val deleted = providerRepository.findById(provider.id!!)
             Assertions.assertNull(deleted)

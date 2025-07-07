@@ -26,8 +26,8 @@ class TransferLogTasks(
     private val lokalOntologiGateway: OntologiGateway,
     private val adOutboxService: AdOutboxService,
     private val txTemplate: TxTemplate,
-    private val logSize: Int, // TODO @Value("\${transferlog.tasks-size:50}")
-    private val deleteMonths: Long // TODO  @Value("\${transferlog.delete.months:6}")
+    private val logSize: Int,
+    private val deleteMonths: Long
 ) {
 
     companion object {

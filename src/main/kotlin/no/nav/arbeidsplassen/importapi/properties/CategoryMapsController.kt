@@ -68,7 +68,6 @@ class CategoryMapsController(
         ]
     )
     fun getPyrkCategoryMap(ctx: Context) {
-        //TODO  IntelliJ ga meg egentlig Map<String?, PyrkOccupation> ..
         val pyrkCategoryMap: Map<String, PyrkOccupation> = styrkCodeConverter.occupationMap
             .toList()
             .distinctBy { (_, v) -> v.categoryLevel2 }

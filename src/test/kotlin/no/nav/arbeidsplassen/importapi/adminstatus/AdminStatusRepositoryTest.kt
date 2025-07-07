@@ -16,9 +16,15 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdminStatusRepositoryTest : TestRepositories() {
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(AdminStatusRepositoryTest::class.java)
+    }
 
     private val adminStatusRepository: AdminStatusRepository = appCtx.databaseApplicationContext.adminStatusRepository
     private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
@@ -46,7 +52,7 @@ class AdminStatusRepositoryTest : TestRepositories() {
             assertNull(updated.message)
             assertEquals(Status.DONE, updated.status)
             assertEquals(PublishStatus.REJECTED, updated.publishStatus)
-            println(updated)
+            LOG.info(updated.toString())
             adminStatusRepository.deleteById(updated.id!!)
             val deleted = adminStatusRepository.findById(created.id!!)
             assertNull(deleted)

@@ -7,8 +7,6 @@ import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-
-// TODO @Hidden
 class AdStateInternalController(private val adStateService: AdStateService) : JavalinController {
 
     companion object {

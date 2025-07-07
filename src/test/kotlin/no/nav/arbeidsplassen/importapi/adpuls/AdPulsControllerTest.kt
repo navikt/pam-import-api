@@ -26,9 +26,7 @@ import org.junit.jupiter.api.TestInstance
 import org.slf4j.LoggerFactory
 
 
-// TODO: Denne kjører ikke grønt, og jeg forstår ikke hvorfor
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// @Disabled
 class AdPulsControllerTest() : TestRunningApplication() {
 
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService

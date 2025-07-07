@@ -1,11 +1,6 @@
 package no.nav.arbeidsplassen.importapi
 
 
-// import io.swagger.v3.oas.annotations.OpenAPIDefinition
-// import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn
-// import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
-// import io.swagger.v3.oas.annotations.info.Info
-// import io.swagger.v3.oas.annotations.security.SecurityScheme
 import OpenApiConfig
 import io.javalin.Javalin
 import io.javalin.json.JavalinJackson
@@ -25,20 +20,6 @@ import no.nav.arbeidsplassen.importapi.security.JavalinAccessManager
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.flywaydb.core.Flyway
 import org.slf4j.MDC
-
-/*
-@OpenAPIDefinition(
-    info = Info(
-        title = "Arbeidsplassen import api",
-        version = "1.0",
-        description = "Import api for available jobs"
-    )
-)
-@SecurityScheme(
-    name = "bearer-auth", type = SecuritySchemeType.HTTP, scheme = "bearer",
-    `in` = SecuritySchemeIn.HEADER, bearerFormat = "JWT"
-)
-*/
 
 fun main() {
     val env = System.getenv()
