@@ -40,12 +40,14 @@ class AdOutboxServiceTest : TestRunningApplication() {
                 locationList = listOf(LocationDTO(country = "Danmark"))
             )
 
-            adOutboxService.lagreTilOutbox(
-                AdState(
-                    providerId = provider.id!!,
-                    reference = "ref",
-                    versionId = 1,
-                    jsonPayload = objectMapper.writeValueAsString(ad)
+            adOutboxService.lagreFlereTilOutbox(
+                listOf(
+                    AdState(
+                        providerId = provider.id!!,
+                        reference = "ref",
+                        versionId = 1,
+                        jsonPayload = objectMapper.writeValueAsString(ad)
+                    )
                 )
             )
 

@@ -15,8 +15,9 @@ import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
-import no.nav.arbeidsplassen.importapi.repository.TxTemplate
+import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -32,77 +33,84 @@ class TransferLogControllerTest : TestRunningApplication() {
         private val LOG = LoggerFactory.getLogger(TransferLogControllerTest::class.java)
     }
 
+    private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+    private val transferLogRepository: TransferLogRepository =
+        appCtx.databaseApplicationContext.transferLogRepository
+
     private val objectMapper: ObjectMapper by lazy { appCtx.baseServicesApplicationContext.objectMapper }
     private val tokenService: TokenService by lazy { appCtx.securityServicesApplicationContext.tokenService }
 
     private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
     private val strClient: Rx3StreamingHttpClient = Rx3StreamingHttpClient.create(URI(lokalUrlBase).toURL())
-    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
+
+    @AfterEach
+    fun teardown() {
+        val providerId = providerRepository.findByIdentifier("test")!!.id!!
+        transferLogRepository.deleteByProviderId(providerId)
+        providerRepository.deleteById(providerId)
+    }
 
     @Test
     fun `create provider and then upload ads in batches`() {
-        txTemplate.doInTransactionNullable { ctx ->
-            // create provider
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val message: HttpResponse<ProviderDTO> =
-                client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()
-            assertEquals(HttpStatus.CREATED, message.status)
-            val provider = message.body()
-            val providertoken = tokenService.token(provider!!)
-            LOG.info(provider.toString())
 
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/batch/${provider.id}",
-                objectMapper.transferToAdList()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(providertoken)
-            val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
-            assertEquals(HttpStatus.CREATED, response.status)
-            // Har ikke laget ennå:
-            /*
-        val get = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .bearerAuth(providertoken)
-        println(client.exchange(get, TransferLogDTO::class.java).blockingFirst().body())
-
-        val get2 = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
+        // create provider
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .bearerAuth(adminToken)
-        assertEquals(client.exchange(get2, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
-        */
-            ctx.setRollbackOnly()
-        }
+        val message: HttpResponse<ProviderDTO> =
+            client.exchange(postProvider, ProviderDTO::class.java).blockingFirst()
+        assertEquals(HttpStatus.CREATED, message.status)
+        val provider = message.body()
+        val providertoken = tokenService.token(provider!!)
+        LOG.info(provider.toString())
+
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/batch/${provider.id}",
+            objectMapper.transferToAdList()
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(providertoken)
+        val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
+        assertEquals(HttpStatus.CREATED, response.status)
+        // Har ikke laget ennå:
+        /*
+    val get = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON_TYPE)
+        .bearerAuth(providertoken)
+    println(client.exchange(get, TransferLogDTO::class.java).blockingFirst().body())
+
+    val get2 = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON_TYPE)
+        .bearerAuth(adminToken)
+    assertEquals(client.exchange(get2, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
+    */
     }
 
     @Test
     fun `create provider then upload one ad in stream`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test2", email = "test2@test2.no", phone = "123")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -170,14 +178,14 @@ class TransferLogControllerTest : TestRunningApplication() {
               ]
             }
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            val future = CompletableFuture<TransferLogDTO>()
-            response.subscribe { future.complete(it) }
-            assertEquals(TransferLogStatus.RECEIVED, future.get().status)
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        val future = CompletableFuture<TransferLogDTO>()
+        response.subscribe { future.complete(it) }
+        assertEquals(TransferLogStatus.RECEIVED, future.get().status)
 //        Thread.sleep(60000) // takes too long
 //        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
 //            .contentType(MediaType.APPLICATION_JSON)
@@ -186,28 +194,25 @@ class TransferLogControllerTest : TestRunningApplication() {
 //        val deleteResp = client.exchange(delete,TransferLogDTO::class.java).blockingFirst().body()
 //        println(deleteResp)
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload two ads in stream`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test3", email = "test3@test3.no", phone = "123")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
 
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -341,15 +346,15 @@ class TransferLogControllerTest : TestRunningApplication() {
               ]
             }
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe { responseQueue.add(it) }
-            assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(5000, TimeUnit.MILLISECONDS)?.status)
-            assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(2000, TimeUnit.MILLISECONDS)?.status)
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe { responseQueue.add(it) }
+        assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(5000, TimeUnit.MILLISECONDS)?.status)
+        assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(2000, TimeUnit.MILLISECONDS)?.status)
 
 //        Thread.sleep(60000) // takes too long
 //        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
@@ -359,27 +364,24 @@ class TransferLogControllerTest : TestRunningApplication() {
 //        val deleteResp = client.exchange(delete,TransferLogDTO::class.java).blockingFirst().body()
 //        println(deleteResp)
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload one and a half ads in stream with failure`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test4", email = "test4@test4.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             {
               "reference": "140095810",
               "positions": 1,
@@ -512,74 +514,68 @@ class TransferLogControllerTest : TestRunningApplication() {
                 }
               ]
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe { responseQueue.add(it) }
-            assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(5000, TimeUnit.MILLISECONDS)?.status)
-            assertEquals(TransferLogStatus.ERROR, responseQueue.poll(2000, TimeUnit.MILLISECONDS)?.status)
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe { responseQueue.add(it) }
+        assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(5000, TimeUnit.MILLISECONDS)?.status)
+        assertEquals(TransferLogStatus.ERROR, responseQueue.poll(2000, TimeUnit.MILLISECONDS)?.status)
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload zero ads in stream should fail`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test5", email = "test5@test5.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            var errorFromServer: Throwable? = null
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
-            responseQueue.poll(2000, TimeUnit.MILLISECONDS)
-            assertNotNull(errorFromServer)
-            assertEquals("HttpClientResponseException", errorFromServer?.javaClass?.simpleName)
-            // Message changes from Micronaut to Javalin:
-            // assertEquals("Client '/stillingsimport': Bad Request", errorFromServer?.message)
-            assertEquals("Bad Request", errorFromServer?.message)
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        var errorFromServer: Throwable? = null
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
+        responseQueue.poll(2000, TimeUnit.MILLISECONDS)
+        assertNotNull(errorFromServer)
+        assertEquals("HttpClientResponseException", errorFromServer?.javaClass?.simpleName)
+        // Message changes from Micronaut to Javalin:
+        // assertEquals("Client '/stillingsimport': Bad Request", errorFromServer?.message)
+        assertEquals("Bad Request", errorFromServer?.message)
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload gibberish before ad in stream should fail`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test6", email = "test6@test6.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
                 jfkdfjdk
             {
               "reference": "140095810",
@@ -648,79 +644,73 @@ class TransferLogControllerTest : TestRunningApplication() {
               ]
             }
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            var errorFromServer: Throwable? = null
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
-            val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
-            assertNull(errorFromServer)
-            assertEquals(TransferLogStatus.ERROR, transferLog?.status)
-            LOG.info("TransferLog: $transferLog")
-            assertTrue(transferLog!!.message!!.contains("JSON Parse error"))
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        var errorFromServer: Throwable? = null
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
+        val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
+        assertNull(errorFromServer)
+        assertEquals(TransferLogStatus.ERROR, transferLog?.status)
+        LOG.info("TransferLog: $transferLog")
+        assertTrue(transferLog!!.message!!.contains("JSON Parse error"))
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload valid json that is not a adDTO in stream should fail`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test7", email = "test7@test7.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             {
               "foo": "bar"
             }
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            var errorFromServer: Throwable? = null
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
-            val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
-            assertNull(errorFromServer)
-            assertEquals(TransferLogStatus.ERROR, transferLog?.status)
-            assertTrue(transferLog!!.message!!.contains("Missing parameter: reference"))
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        var errorFromServer: Throwable? = null
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
+        val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
+        assertNull(errorFromServer)
+        assertEquals(TransferLogStatus.ERROR, transferLog?.status)
+        assertTrue(transferLog!!.message!!.contains("Missing parameter: reference"))
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload valid AdDTO json in array in stream should fail-ish`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test8", email = "test8@test8.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             [
             {
               "reference": "140095810",
@@ -790,72 +780,67 @@ class TransferLogControllerTest : TestRunningApplication() {
             }
             ]
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            var errorFromServer: Throwable? = null
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
-            val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
-            LOG.info("TransferLog: $transferLog")
-            assertNull(errorFromServer)
-            // Server-koden her var veldig snål, man forventet plutselig å dekode json'en som en List<TransferLogDTO>,
-            // ikke som AdDTO som man ellers bruker, og man klarer det på sett og vis fordi man ignorerer de fleste feltene.
-            // Og man returnerer RECEIVED selv om man ikke har gjort et kvekk med det man mottok, det burde vært en ERROR
-            // (Grunnen til dette var at man endte opp i mekanismen som håndterte feil, den brukte en List.)
-            // Så her velger vi aktivt å gjøre det annerledes enn i Micronaut
-            // assertEquals(TransferLogStatus.RECEIVED, transferLog?.status)
-            // assertNull(transferLog!!.message)
-            // assertNull(transferLog.payload)
-            // assertNull(transferLog.versionId)
-            // assertEquals(0, transferLog.providerId)
-            assertEquals(TransferLogStatus.ERROR, transferLog?.status)
-            assertTrue(transferLog!!.message!!.contains("Missing parameter"))
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        var errorFromServer: Throwable? = null
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
+        val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
+        LOG.info("TransferLog: $transferLog")
+        assertNull(errorFromServer)
+        // Server-koden her var veldig snål, man forventet plutselig å dekode json'en som en List<TransferLogDTO>,
+        // ikke som AdDTO som man ellers bruker, og man klarer det på sett og vis fordi man ignorerer de fleste feltene.
+        // Og man returnerer RECEIVED selv om man ikke har gjort et kvekk med det man mottok, det burde vært en ERROR
+        // (Grunnen til dette var at man endte opp i mekanismen som håndterte feil, den brukte en List.)
+        // Så her velger vi aktivt å gjøre det annerledes enn i Micronaut
+        // assertEquals(TransferLogStatus.RECEIVED, transferLog?.status)
+        // assertNull(transferLog!!.message)
+        // assertNull(transferLog.payload)
+        // assertNull(transferLog.versionId)
+        // assertEquals(0, transferLog.providerId)
+        assertEquals(TransferLogStatus.ERROR, transferLog?.status)
+        assertTrue(transferLog!!.message!!.contains("Missing parameter"))
 
-            ctx.setRollbackOnly()
-        }
     }
 
     @Test
     fun `create provider then upload empty json array in stream should fail`() {
-        txTemplate.doInTransactionNullable { ctx ->
 
-            val adminToken = tokenService.adminToken()
-            val postProvider = HttpRequest.POST(
-                "internal/providers",
-                ProviderDTO(identifier = "test9", email = "test8@test9.no", phone = "124")
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-            val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
-            val providertoken = tokenService.token(provider!!)
-            // start the transfer
-            val post = HttpRequest.POST(
-                "api/v1/transfers/${provider.id}", """
+        val adminToken = tokenService.adminToken()
+        val postProvider = HttpRequest.POST(
+            "internal/providers",
+            ProviderDTO(identifier = "test", email = "test@test.no", phone = "12345678")
+        )
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        val provider = client.exchange(postProvider, ProviderDTO::class.java).blockingFirst().body()
+        val providertoken = tokenService.token(provider!!)
+        // start the transfer
+        val post = HttpRequest.POST(
+            "api/v1/transfers/${provider.id}", """
             [
             ]
         """.trimIndent()
-            )
-                .contentType(MediaType.APPLICATION_JSON_STREAM)
-                .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
-                .bearerAuth(providertoken)
-            val response = strClient.jsonStream(post, TransferLogDTO::class.java)
-            var errorFromServer: Throwable? = null
-            val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
-            response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
-            val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
-            assertNull(errorFromServer)
-            assertEquals(TransferLogStatus.ERROR, transferLog?.status)
-            // Her var det en bug i server-koden i Micronaut, den prøvde å dekode inputen som en liste og så sende tilbake første innslag,
-            // men når listen er tom feiler det jo selvsagt..
-            LOG.info("Transferlog: $transferLog")
-            // assertTrue(transferLog!!.message!!.contains("Error: Index 0 out of bounds for length 0"))
-            assertTrue(transferLog!!.message!!.contains("Missing parameter:"))
+        )
+            .contentType(MediaType.APPLICATION_JSON_STREAM)
+            .accept(MediaType.APPLICATION_JSON_STREAM_TYPE)
+            .bearerAuth(providertoken)
+        val response = strClient.jsonStream(post, TransferLogDTO::class.java)
+        var errorFromServer: Throwable? = null
+        val responseQueue = ArrayBlockingQueue<TransferLogDTO>(2)
+        response.subscribe({ responseQueue.add(it) }, { errorFromServer = it })
+        val transferLog = responseQueue.poll(2000, TimeUnit.MILLISECONDS)
+        assertNull(errorFromServer)
+        assertEquals(TransferLogStatus.ERROR, transferLog?.status)
+        // Her var det en bug i server-koden i Micronaut, den prøvde å dekode inputen som en liste og så sende tilbake første innslag,
+        // men når listen er tom feiler det jo selvsagt..
+        LOG.info("Transferlog: $transferLog")
+        // assertTrue(transferLog!!.message!!.contains("Error: Index 0 out of bounds for length 0"))
+        assertTrue(transferLog!!.message!!.contains("Missing parameter:"))
 
-            ctx.setRollbackOnly()
-        }
     }
 }
