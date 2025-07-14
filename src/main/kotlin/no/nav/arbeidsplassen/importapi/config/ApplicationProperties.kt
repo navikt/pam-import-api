@@ -79,7 +79,7 @@ class NaisOutgoingPortsConfigProperties(env: Map<String, String>) : OutgoingPort
 
 abstract class ControllerConfigProperties(
     val adPreviewUrl: String,
-    val transferlogBatchSize: Int = 100,
+    val transferlogBatchSize: Int,
 )
 
 class NaisControllerConfigProperties(env: Map<String, String>) : ControllerConfigProperties(
@@ -88,12 +88,12 @@ class NaisControllerConfigProperties(env: Map<String, String>) : ControllerConfi
 )
 
 abstract class ServicesConfigProperties(
-    val adminStatusPreviewUrl: String, // @Value("\${ad.preview.url}")
+    val adminStatusPreviewUrl: String,
     val adminStatusTopic: String,
     val adminStatusGroupId: String,
     val adminStatusSyncKafkaEnabled: Boolean,
     val adOutboxKafkaProducerTopic: String,
-    val transferlogDeleteMonths: Long = 6 // @Value("\${transferlog.delete.months:6}")
+    val transferlogDeleteMonths: Long,
 )
 
 class NaisServicesConfigProperties(env: Map<String, String>) : ServicesConfigProperties(
@@ -102,6 +102,7 @@ class NaisServicesConfigProperties(env: Map<String, String>) : ServicesConfigPro
     adminStatusGroupId = "import-api-adminstatussync-gcp",
     adminStatusSyncKafkaEnabled = true,
     adOutboxKafkaProducerTopic = env.variable("ANNONSEMOTTAK_TOPIC"),
+    transferlogDeleteMonths = 6
 )
 
 abstract class SchedulerConfigProperties(
@@ -109,8 +110,7 @@ abstract class SchedulerConfigProperties(
     val transferlogJobEnabled: Boolean,
 )
 
-// TODO: Her bruker man den samme variabelen for begge jobbene, det er kanskje ikke helt riktig?
 class NaisSchedulerConfigProperties(env: Map<String, String>) : SchedulerConfigProperties(
     adOutboxJobEnabled = env.variable("AD_OUTBOX_SCHEDULER_ENABLED").toBoolean(),
-    transferlogJobEnabled = env.variable("AD_OUTBOX_SCHEDULER_ENABLED").toBoolean(),
+    transferlogJobEnabled = true,
 )

@@ -59,6 +59,7 @@ class TestServicesConfigProperties(
     adminStatusGroupId = adminStatusGroupId,
     adminStatusSyncKafkaEnabled = adminStatusSyncKafkaEnabled,
     adOutboxKafkaProducerTopic = adOutboxKafkaProducerTopic,
+    transferlogDeleteMonths = 6L
 )
 
 class TestSchedulerConfigProperties(
