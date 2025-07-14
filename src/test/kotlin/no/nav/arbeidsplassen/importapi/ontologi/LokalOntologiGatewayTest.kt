@@ -3,6 +3,7 @@ package no.nav.arbeidsplassen.importapi.ontologi
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -11,6 +12,28 @@ import org.junit.jupiter.api.TestInstance
 class LokalOntologiGatewayTest {
 
     lateinit var lokalOntologiGateway: LokalOntologiGateway
+
+    @Test
+    @Disabled
+    fun `manuell integrasjonstest mot dev med trailing slash`() {
+
+        lokalOntologiGateway = LokalOntologiGateway("https://pam-ontologi.intern.dev.nav.no/")
+        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
+
+        assertEquals(51582L, ontologiResponse[0].code)
+        assertEquals("Møbelsnekker", ontologiResponse[0].name)
+    }
+
+    @Test
+    @Disabled
+    fun `manuell integrasjonstest mot dev uten trailing slash`() {
+
+        lokalOntologiGateway = LokalOntologiGateway("https://pam-ontologi.intern.dev.nav.no")
+        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
+
+        assertEquals(51582L, ontologiResponse[0].code)
+        assertEquals("Møbelsnekker", ontologiResponse[0].name)
+    }
 
     @Test
     fun `testOntologiResponsParsesTilTypeaheadObjekt`() {

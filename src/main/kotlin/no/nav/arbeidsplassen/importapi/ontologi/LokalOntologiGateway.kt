@@ -55,12 +55,10 @@ open class LokalOntologiGateway(
         }
     }
 
-    // TODO: Trenger en test! Jeg fjerner bruken av Micronauts UriTemplate, må verifiseres
     override fun hentTypeaheadStilling(stillingstittel: String): List<Typeahead> {
         val encodedPath = URLEncoder.encode(stillingstittel, StandardCharsets.UTF_8.toString())
         val url = "$baseurl/rest/typeahead/stilling?stillingstittel=${encodedPath}"
-        // val uriTemplate = UriTemplate.of(url).expand(mapOf("stillingstittel" to stillingstittel))
-
+        
         val client = HttpClient.newBuilder().build();
         val request = HttpRequest.newBuilder()
             .GET()
