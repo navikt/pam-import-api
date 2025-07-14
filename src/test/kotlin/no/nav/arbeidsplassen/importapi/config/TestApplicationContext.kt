@@ -22,10 +22,8 @@ class TestApplicationContext(
                 start()
             }
             .also { localConfig ->
-                // localEnv["DB_URL"] = localConfig.jdbcUrl.addInitScript()
                 localEnv["DB_HOST"] = localConfig.host
                 localEnv["DB_PORT"] = localConfig.getMappedPort(5432).toString()
-                // localEnv["DB_ADDITIONAL_PARAMETER"] = "?TC_INITSCRIPT=postgres/postgres-init.sql"
             }
 
     private val kafkaContainer: KafkaContainer =

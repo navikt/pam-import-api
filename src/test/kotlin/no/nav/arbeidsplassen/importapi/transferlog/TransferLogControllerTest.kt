@@ -18,6 +18,7 @@ import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
+import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,7 +42,7 @@ class TransferLogControllerTest : TestRunningApplication() {
     private val transferLogTasks: TransferLogTasks = appCtx.servicesApplicationContext.transferLogTasks
     private val adStateRepository: AdStateRepository = appCtx.databaseApplicationContext.adStateRepository
     private val adOutboxRepository: AdOutboxRepository = appCtx.databaseApplicationContext.adOutboxRepository
-
+    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
     private val objectMapper: ObjectMapper by lazy { appCtx.baseServicesApplicationContext.objectMapper }
     private val tokenService: TokenService by lazy { appCtx.securityServicesApplicationContext.tokenService }
 
@@ -54,6 +55,13 @@ class TransferLogControllerTest : TestRunningApplication() {
         transferLogRepository.deleteByProviderId(providerId)
         adStateRepository.deleteByProviderId(providerId)
         providerRepository.deleteById(providerId)
+
+        fun AdOutboxRepository.slettAlle() {
+            txTemplate.doInTransaction { ctx ->
+                val connection = ctx.connection()
+                connection.prepareStatement("""DELETE from ad_outbox""").executeUpdate()
+            }
+        }
         adOutboxRepository.slettAlle()
     }
 
