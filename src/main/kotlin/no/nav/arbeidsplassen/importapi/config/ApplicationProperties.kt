@@ -95,7 +95,6 @@ abstract class ServicesConfigProperties(
     val adminStatusGroupId: String,
     val adminStatusSyncKafkaEnabled: Boolean,
     val adOutboxKafkaProducerTopic: String,
-    val logSize: Int = 50, // @Value("\${transferlog.tasks-size:50}") // TODO: Denne er ikke egentlig i bruk
     val transferlogDeleteMonths: Long = 6 // @Value("\${transferlog.delete.months:6}")
 )
 

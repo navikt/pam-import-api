@@ -26,7 +26,6 @@ class TransferLogTasks(
     private val lokalOntologiGateway: OntologiGateway,
     private val adOutboxService: AdOutboxService,
     private val txTemplate: TxTemplate,
-    private val logSize: Int,
     private val deleteMonths: Long
 ) {
 

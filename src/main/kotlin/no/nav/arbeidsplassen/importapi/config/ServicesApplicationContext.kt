@@ -97,7 +97,6 @@ class ServicesApplicationContext(
         lokalOntologiGateway = outgoingPortsApplicationContext.ontologiGateway,
         adOutboxService = adOutboxService,
         txTemplate = databaseApplicationContext.txTemplate,
-        logSize = servicesConfigProperties.logSize,
         deleteMonths = servicesConfigProperties.transferlogDeleteMonths
     )
     val transferLogScheduler = TransferLogScheduler(
