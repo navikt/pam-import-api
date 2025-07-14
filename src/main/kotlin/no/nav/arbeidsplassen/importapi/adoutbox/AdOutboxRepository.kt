@@ -13,6 +13,9 @@ interface AdOutboxRepository {
     fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
     fun markerSomProsessert(adOutbox: AdOutbox): Boolean
     fun markerSomFeilet(adOutbox: AdOutbox): Boolean
+
+    // SKAL BARE BRUKES I TESTER
+    fun slettAlle()
 }
 
 class JdbcAdOutboxRepository(private val txTemplate: TxTemplate) : AdOutboxRepository {
@@ -38,6 +41,8 @@ class JdbcAdOutboxRepository(private val txTemplate: TxTemplate) : AdOutboxRepos
     val markerSomFeiletSQL =
         """UPDATE ad_outbox SET har_feilet = ?, antall_forsok = ?, siste_forsok_dato = ? WHERE id = ?"""
 
+    val deleteAllSQL = """DELETE from ad_outbox"""
+
     private fun ResultSet.mapToEntity() = AdOutbox(
         id = this.getLong("id"),
         uuid = this.getString("uuid"),
@@ -55,6 +60,13 @@ class JdbcAdOutboxRepository(private val txTemplate: TxTemplate) : AdOutboxRepos
             connection
                 .prepareStatement(selectSQL).executeQuery()
                 .use { generateSequence { if (it.next()) it.mapToEntity() else null }.toList() }
+        }
+    }
+
+    override fun slettAlle() {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteAllSQL).executeUpdate()
         }
     }
 

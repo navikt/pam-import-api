@@ -31,13 +31,13 @@ class TransferLogService(
             Boolean = transferLogRepository.existsByProviderIdAndMd5(providerId, md5)
 
     fun save(dto: TransferLogDTO): TransferLogDTO {
+        LOG.info("Saving transfer log for provider ${dto.providerId} with md5 ${dto.md5} and versionId ${dto.versionId}")
         return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
-        return transferLogRepository.findByIdAndProviderId(versionId, providerId)?.toDTO()
+        return transferLogRepository.findByIdAndProviderId(id = versionId, providerId = providerId)?.toDTO()
             ?: throw ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
-
     }
 
     fun findByVersionId(versionId: Long): TransferLogDTO {

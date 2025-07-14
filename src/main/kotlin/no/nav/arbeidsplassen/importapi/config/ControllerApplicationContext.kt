@@ -11,6 +11,7 @@ import no.nav.arbeidsplassen.importapi.properties.PropertiesEnumController
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.provider.ProviderController
 import no.nav.arbeidsplassen.importapi.transferlog.TransferController
+import no.nav.arbeidsplassen.importapi.transferlog.TransferlogInternalController
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 
 class ControllerApplicationContext(
@@ -40,6 +41,9 @@ class ControllerApplicationContext(
         objectMapper = baseServicesApplicationContext.objectMapper,
         adsSize = controllerConfigProperties.transferlogBatchSize
     )
+    val internalTransferController: TransferlogInternalController = TransferlogInternalController(
+        transferLogService = servicesApplicationContext.transferLogService,
+    )
     val adStateController: AdStateController = AdStateController(servicesApplicationContext.adStateService)
     val adStateInternalController: AdStateInternalController =
         AdStateInternalController(servicesApplicationContext.adStateService)
@@ -59,6 +63,7 @@ class ControllerApplicationContext(
         naisController,
         providerController,
         transferController,
+        internalTransferController,
         adStateController,
         adStateInternalController,
         adPreviewController,

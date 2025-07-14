@@ -32,22 +32,23 @@ object ImportApiErrorHandler {
     private val LOG = LoggerFactory.getLogger("HttpRequestErrorHandler")
 
     fun Javalin.importApiErrorHandler(): Javalin {
-        return this.exception(ImportApiError::class.java) { e, ctx ->
-            val message: ErrorMessage = createMessage(e)
-            LOG.warn("$message", e)
-            val status: HttpStatus = when (e.type) {
-                NOT_FOUND -> HttpStatus.NOT_FOUND
-                MISSING_PARAMETER, INVALID_VALUE, PARSE_ERROR -> HttpStatus.BAD_REQUEST
-                CONFLICT -> HttpStatus.CONFLICT
-                UNKNOWN -> HttpStatus.INTERNAL_SERVER_ERROR
+        return this
+            .exception(ImportApiError::class.java) { e, ctx ->
+                val message: ErrorMessage = createMessage(e)
+                LOG.warn("$message", e)
+                val status: HttpStatus = when (e.type) {
+                    NOT_FOUND -> HttpStatus.NOT_FOUND
+                    MISSING_PARAMETER, INVALID_VALUE, PARSE_ERROR -> HttpStatus.BAD_REQUEST
+                    CONFLICT -> HttpStatus.CONFLICT
+                    UNKNOWN -> HttpStatus.INTERNAL_SERVER_ERROR
+                }
+                ctx.status(status).json(message)
             }
-            ctx.status(status).json(message)
-        }.exception(JsonProcessingException::class.java) { e, ctx ->
-            val message: ErrorMessage = handleJsonProcessingException(e)
-            LOG.warn("$message", e)
-            ctx.status(HttpStatus.BAD_REQUEST).json(message)
-        }
-            // TODO: Alle disse bør jeg kanskje fjerne?
+            .exception(JsonProcessingException::class.java) { e, ctx ->
+                val message: ErrorMessage = handleJsonProcessingException(e)
+                LOG.warn("$message", e)
+                ctx.status(HttpStatus.BAD_REQUEST).json(message)
+            }
             .exception(NotFoundException::class.java) { e, ctx ->
                 LOG.info("NotFoundException: ${e.message}", e)
                 ctx.status(404).result(e.message ?: "")

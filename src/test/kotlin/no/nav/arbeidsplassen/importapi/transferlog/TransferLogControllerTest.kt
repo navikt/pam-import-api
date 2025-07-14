@@ -11,6 +11,8 @@ import java.net.URI
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
+import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
 import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.transferToAdList
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
@@ -36,6 +38,9 @@ class TransferLogControllerTest : TestRunningApplication() {
     private val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
     private val transferLogRepository: TransferLogRepository =
         appCtx.databaseApplicationContext.transferLogRepository
+    private val transferLogTasks: TransferLogTasks = appCtx.servicesApplicationContext.transferLogTasks
+    private val adStateRepository: AdStateRepository = appCtx.databaseApplicationContext.adStateRepository
+    private val adOutboxRepository: AdOutboxRepository = appCtx.databaseApplicationContext.adOutboxRepository
 
     private val objectMapper: ObjectMapper by lazy { appCtx.baseServicesApplicationContext.objectMapper }
     private val tokenService: TokenService by lazy { appCtx.securityServicesApplicationContext.tokenService }
@@ -47,7 +52,9 @@ class TransferLogControllerTest : TestRunningApplication() {
     fun teardown() {
         val providerId = providerRepository.findByIdentifier("test")!!.id!!
         transferLogRepository.deleteByProviderId(providerId)
+        adStateRepository.deleteByProviderId(providerId)
         providerRepository.deleteById(providerId)
+        adOutboxRepository.slettAlle()
     }
 
     @Test
@@ -79,20 +86,30 @@ class TransferLogControllerTest : TestRunningApplication() {
             .bearerAuth(providertoken)
         val response = client.exchange(post, TransferLogDTO::class.java).blockingFirst()
         assertEquals(HttpStatus.CREATED, response.status)
-        // Har ikke laget ennå:
-        /*
-    val get = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON_TYPE)
-        .bearerAuth(providertoken)
-    println(client.exchange(get, TransferLogDTO::class.java).blockingFirst().body())
+        val versionId = response.body()?.versionId
+        LOG.info("VersionId: $versionId")
 
-    val get2 = HttpRequest.GET<String>("/api/v1/transfers/${provider.id}/versions/${response.body()?.versionId}")
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON_TYPE)
-        .bearerAuth(adminToken)
-    assertEquals(client.exchange(get2, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
-    */
+        LOG.info("GETing for provider")
+        val get = HttpRequest.GET<String>("api/v1/transfers/${provider.id}/versions/$versionId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(providertoken)
+        LOG.info("Body: ${client.exchange(get, TransferLogDTO::class.java).blockingFirst().body()}")
+
+        LOG.info("GETing for admin")
+        val get2 = HttpRequest.GET<String>("api/v1/transfers/${provider.id}/versions/$versionId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        assertEquals(client.exchange(get2, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
+
+        LOG.info("Internal GETing for admin")
+        val get3 = HttpRequest.GET<String>("internal/transfers/$versionId")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(adminToken)
+        assertEquals(client.exchange(get3, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
+
     }
 
     @Test
@@ -186,14 +203,16 @@ class TransferLogControllerTest : TestRunningApplication() {
         val future = CompletableFuture<TransferLogDTO>()
         response.subscribe { future.complete(it) }
         assertEquals(TransferLogStatus.RECEIVED, future.get().status)
-//        Thread.sleep(60000) // takes too long
-//        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON_TYPE)
-//            .bearerAuth(providertoken)
-//        val deleteResp = client.exchange(delete,TransferLogDTO::class.java).blockingFirst().body()
-//        println(deleteResp)
 
+        // Den neste testen er avhengig av at en scheduled jobb er kjørt som oppretter AdState for TransferLogs
+        // Her kjører vi den manuelt:
+        transferLogTasks.processTransferLogTask()
+
+        val delete = HttpRequest.DELETE<TransferLogDTO>("api/v1/transfers/${provider.id}/140095810?delete=true")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .bearerAuth(providertoken)
+        assertEquals(client.exchange(delete, TransferLogDTO::class.java).blockingFirst().status, HttpStatus.OK)
     }
 
     @Test
@@ -355,14 +374,6 @@ class TransferLogControllerTest : TestRunningApplication() {
         response.subscribe { responseQueue.add(it) }
         assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(5000, TimeUnit.MILLISECONDS)?.status)
         assertEquals(TransferLogStatus.RECEIVED, responseQueue.poll(2000, TimeUnit.MILLISECONDS)?.status)
-
-//        Thread.sleep(60000) // takes too long
-//        val delete = HttpRequest.DELETE<TransferLogDTO>("/api/v1/transfers/${provider.id}/140095810?delete=true")
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .accept(MediaType.APPLICATION_JSON_TYPE)
-//            .bearerAuth(providertoken)
-//        val deleteResp = client.exchange(delete,TransferLogDTO::class.java).blockingFirst().body()
-//        println(deleteResp)
 
     }
 

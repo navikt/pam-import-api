@@ -39,7 +39,7 @@ class TransferController(
     private val providerService: ProviderService,
     private val adStateService: AdStateService,
     private val objectMapper: ObjectMapper,
-    val adsSize: Int // @Value("\${transferlog.batch-size:100}")
+    val adsSize: Int
 ) : JavalinController {
 
     companion object {
@@ -106,7 +106,7 @@ class TransferController(
     private fun postTransfer(ctx: Context) {
         val providerId = ctx.providerIdParam()
         val ads = ctx.adListBody()
-        LOG.info("Streaming ${ads.size} for provider $providerId")
+        LOG.info("Batching ${ads.size} for provider $providerId")
 
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
@@ -138,10 +138,11 @@ class TransferController(
         }
 
         val transferLogDTO = TransferLogDTO(payload = content, md5 = md5, items = ads.size, providerId = provider.id!!)
-        ctx.status(HttpStatus.CREATED).json(transferLogService.save(transferLogDTO).apply { payload = null })
+        val dto = transferLogService.save(transferLogDTO)
+        LOG.info("Successfully saved $dto")
+        ctx.status(HttpStatus.CREATED).json(dto.apply { payload = null })
     }
 
-    // @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
     @OpenApi(
         path = "/stillingsimport/api/v1/transfers/{providerId}",
         methods = [HttpMethod.POST],
@@ -261,9 +262,15 @@ class TransferController(
         ]
     )
     private fun getTransfer(ctx: Context) {
+        LOG.info("getTransfer called")
         val providerId: Long = ctx.providerIdParam()
         val versionId: Long = ctx.versionIdParam()
-        ctx.status(HttpStatus.OK).json(transferLogService.findByVersionIdAndProviderId(versionId, providerId))
+        ctx.status(HttpStatus.OK).json(
+            transferLogService.findByVersionIdAndProviderId(
+                versionId = versionId,
+                providerId = providerId
+            )
+        )
     }
 
     @OpenApi(
@@ -323,7 +330,8 @@ class TransferController(
         val delete: Boolean = ctx.deleteParam()
 
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
-        val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
+        val adState = adStateService.getAdStatesByProviderReference(providerId = providerId, reference = reference)
+        LOG.info("Found adState: {}", adState)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
         val adWithoutInvalidCategories =
             transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
@@ -331,6 +339,7 @@ class TransferController(
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
+        LOG.info("found provider: {}", provider)
         val transferLog = transferLogService.save(
             TransferLogDTO(
                 message = adStatus.name,

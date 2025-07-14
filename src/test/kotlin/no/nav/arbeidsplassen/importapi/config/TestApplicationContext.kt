@@ -39,7 +39,6 @@ class TestApplicationContext(
                 localEnv["KAFKA_BROKERS"] = localConfig.bootstrapServers
             }
 
-    //val applicationProperties = testApplicationProperties(dbHost, dbPort, kafkaBrokers)
     val applicationContext = object : ApplicationContext(testApplicationProperties(localEnv)) {
         override val outgoingPortsApplicationContext: OutgoingPortsApplicationContext =
             TestOutgoingPortsApplicationContext()

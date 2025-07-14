@@ -3,10 +3,11 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-class TransferlogInternalController(private val transferLogService: TransferLogService) {
+class TransferlogInternalController(private val transferLogService: TransferLogService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferlogInternalController::class.java)
@@ -14,7 +15,7 @@ class TransferlogInternalController(private val transferLogService: TransferLogS
         private fun Context.versionIdParam(): Long = pathParam("versionId").toLong()
     }
 
-    fun setupRoutes(javalin: Javalin) {
+    override fun setupRoutes(javalin: Javalin) {
         javalin.get(
             "/internal/transfers/{versionId}",
             { getByTransferId(it) },

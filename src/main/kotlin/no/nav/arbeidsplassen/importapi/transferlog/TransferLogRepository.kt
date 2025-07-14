@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 interface TransferLogRepository : CrudRepository<TransferLog> {
     fun existsByProviderIdAndMd5(providerId: Long, md5: String): Boolean
 
-    // TODO: Gir denne mening? Id er pk, så hvorfor har vi med providerId? For å sikre at en provider ikke får tilgang til andres data?
+    // Antar her at providerId er med for å sikre at en provider ikke får tilgang til andres data
     fun findByIdAndProviderId(id: Long, providerId: Long): TransferLog?
     fun findByStatus(status: TransferLogStatus): List<TransferLog>
     fun deleteByUpdatedBefore(updated: LocalDateTime)

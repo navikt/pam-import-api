@@ -15,7 +15,6 @@ import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
-import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory
 class AdPulsControllerTest() : TestRunningApplication() {
 
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
-    private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
     private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
 

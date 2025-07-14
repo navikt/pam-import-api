@@ -26,7 +26,6 @@ class SchedulerApplicationContext(
         .withIdentity("adOutboxJob", "adOutbox")
         .build()
 
-    // @Scheduled(cron = "*/15 * * * * *")
     private val adOutboxTrigger = TriggerBuilder.newTrigger()
         .withIdentity("adOutboxTrigger", "adOutbox")
         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(15))
@@ -37,7 +36,6 @@ class SchedulerApplicationContext(
         .withIdentity("adPulsJob", "adPuls")
         .build()
 
-    // @Scheduled(cron="05 15 01 * * *")
     private val adPulsTrigger = TriggerBuilder.newTrigger()
         .withIdentity("adPulsTrigger", "adPuls")
         .withSchedule(CronScheduleBuilder.cronSchedule("5 15 1 * * ?"))

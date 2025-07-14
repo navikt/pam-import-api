@@ -68,8 +68,6 @@ class TransferLogTasksTest : TestRunningApplication() {
     @Test
     fun deleteTransferLogTaskTest() {
         txTemplate.doInTransactionNullable { ctx ->
-            // Jeg måtte innføre dette for å kompensere for at transaksjonshåndteringen ikke lenger er helt Micronaut-kompatibel..
-            // (By default, when using @MicronautTest, each @Test method will be wrapped in a transaction that will be rolled back when the test finishes.)
 
             val provider = providerRepository.newTestProvider()
             transferLogRepository.save(

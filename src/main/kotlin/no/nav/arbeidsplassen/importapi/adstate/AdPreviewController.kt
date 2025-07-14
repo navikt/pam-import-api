@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 class AdPreviewController(
     private val adStateService: AdStateService,
-    private val previewUrl: String // @Value("\${ad.preview.url}")
+    private val previewUrl: String
 ) : JavalinController {
 
     companion object {
