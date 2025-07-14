@@ -37,7 +37,6 @@ abstract class DatabaseConfigProperties(
     val user: String,
     val pw: String,
     val dbDriver: String,
-    // private val url :String,
     val additionalParameter: String,
 )
 
@@ -48,7 +47,6 @@ class NaisDatabaseConfigProperties(env: Map<String, String>) : DatabaseConfigPro
     user = env.variable("DB_USERNAME"),
     pw = env.variable("DB_PASSWORD"),
     dbDriver = env.variable("DB_DRIVER"),
-    // url = env.variable("DB_URL"),
     additionalParameter = env["DB_ADDITIONAL_PARAMETER"] ?: ""
 )
 
@@ -111,8 +109,8 @@ abstract class SchedulerConfigProperties(
     val transferlogJobEnabled: Boolean,
 )
 
+// TODO: Her bruker man den samme variabelen for begge jobbene, det er kanskje ikke helt riktig?
 class NaisSchedulerConfigProperties(env: Map<String, String>) : SchedulerConfigProperties(
     adOutboxJobEnabled = env.variable("AD_OUTBOX_SCHEDULER_ENABLED").toBoolean(),
-    // Denne mangler i oppsettet, så her vil defaulten bli brukt:
-    transferlogJobEnabled = env.nullableVariable("AD_OUTBOX_SCHEDULER_ENABLED")?.toBoolean() ?: true,
+    transferlogJobEnabled = env.variable("AD_OUTBOX_SCHEDULER_ENABLED").toBoolean(),
 )

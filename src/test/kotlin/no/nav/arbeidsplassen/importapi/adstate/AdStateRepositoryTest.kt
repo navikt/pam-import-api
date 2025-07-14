@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-// @Testcontainers
 class AdStateRepositoryTest : TestRepositories() {
 
     private val adStateRepository: AdStateRepository = appCtx.databaseApplicationContext.adStateRepository

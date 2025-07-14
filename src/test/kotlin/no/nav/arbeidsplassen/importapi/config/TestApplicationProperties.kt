@@ -13,7 +13,6 @@ class TestDatabaseConfigProperties(
     user = "test",
     pw = "test",
     dbDriver = "org.postgresql.Driver",
-    // url = env.variable("DB_URL"),
     additionalParameter = ""
 ) {
     constructor(env: Map<String, String>) :
