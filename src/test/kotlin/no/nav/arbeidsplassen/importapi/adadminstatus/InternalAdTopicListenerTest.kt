@@ -24,7 +24,7 @@ class InternalAdTopicListenerTest {
     fun `skal kunne starte opp og lytte til Kafka uten feil`() {
 
         val leaderElection = mock<LeaderElection>()
-        `when`(leaderElection.isLeader()).thenReturn(false)
+        `when`(leaderElection.isLeader()).thenReturn(true)
         val healthService = HealthService()
         val objectMapper = jacksonObjectMapper()
             .registerModule(JavaTimeModule())

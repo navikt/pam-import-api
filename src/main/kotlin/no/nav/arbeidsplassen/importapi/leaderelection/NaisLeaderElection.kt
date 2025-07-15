@@ -27,8 +27,9 @@ class NaisLeaderElection(
     override fun isLeader(): Boolean {
         LOG.info("isLeader called with electorPath $electorPath")
         val leader = getLeader()
-        LOG.info("isLeader called with hostname $hostname, leader $leader")
-        return hostname == getLeader()
+        val isLeader = hostname == getLeader()
+        LOG.info("isLeader returning $isLeader for hostname $hostname and leader $leader")
+        return isLeader
     }
 
     private fun getLeader(): String {

@@ -22,20 +22,23 @@ class KafkaListenerStarter(
     lateinit var listenerThread: Thread
 
     fun start() {
-        // Når kun leader lytter på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
-        // og fortsatt kunne håndtere REST-kall
-        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
+        if (adminStatusSyncKafkaEnabled) {
             LOG.info("Starter kafka rapid listener")
             try {
                 val consumerConfig = kafkaConfig.kafkaJsonConsumer(topic, groupId)
-                val listener = KafkaTopicJsonListener(consumerConfig, healthService, adTransportProsessor)
+                val listener = KafkaTopicJsonListener(
+                    leaderElection = leaderElection,
+                    kafkaConsumer = consumerConfig,
+                    healthService = healthService,
+                    messageListener = adTransportProsessor
+                )
                 listenerThread = listener.startListener()
             } catch (e: Exception) {
                 LOG.error("Greide ikke å starte Kafka listener: ${e.message}", e)
                 healthService.addUnhealthyVote()
             }
         } else {
-            LOG.info("Starter IKKE kafka rapid listener; adminStatusSyncKafkaEnabled=$adminStatusSyncKafkaEnabled og leaderElection=${leaderElection.isLeader()}")
+            LOG.info("Starter IKKE kafka rapid listener; adminStatusSyncKafkaEnabled=$adminStatusSyncKafkaEnabled")
         }
     }
 

@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.kafka
 
 import java.time.Duration
 import java.time.LocalDateTime
+import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -18,6 +19,7 @@ abstract class KafkaTopicListener<T> {
         private val LOG = LoggerFactory.getLogger(KafkaTopicListener::class.java)
     }
 
+    abstract val leaderElection: LeaderElection
     abstract val healthService: HealthService
     abstract val kafkaConsumer: KafkaConsumer<String?, T?>
 
@@ -28,7 +30,9 @@ abstract class KafkaTopicListener<T> {
         LOG.info("Starter Kafka listener")
         var records: ConsumerRecords<String?, T?>?
 
-        while (healthService.isHealthy() && !Thread.currentThread().isInterrupted) {
+        // Når kun leader poller på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
+        // og fortsatt kunne håndtere REST-kall
+        while (healthService.isHealthy() && leaderElection.isLeader() && !Thread.currentThread().isInterrupted) {
             var currentPositions = mutableMapOf<TopicPartition, Long>()
             try {
                 LOG.info("Poller i Kafka listener")
