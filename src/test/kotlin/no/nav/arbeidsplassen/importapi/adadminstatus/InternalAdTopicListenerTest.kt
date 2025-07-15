@@ -15,8 +15,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.utility.DockerImageName
+import org.testcontainers.kafka.ConfluentKafkaContainer
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InternalAdTopicListenerTest {
@@ -38,7 +37,7 @@ class InternalAdTopicListenerTest {
         val adminStatusRepository = mock<AdminStatusRepository>()
         val internalAdTopicListener = InternalAdTopicListener(adminStatusRepository, objectMapper)
 
-        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
+        ConfluentKafkaContainer("confluentinc/cp-kafka:7.7.0").use { container ->
             container.start()
 
             val kafkaConfig =

@@ -8,15 +8,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.KafkaContainer
-import org.testcontainers.utility.DockerImageName
+import org.testcontainers.kafka.ConfluentKafkaContainer
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdOutboxKafkaProducerTest {
     @Test
     fun `AdOutboxKafkaProducer starter og klarer å produsere melding`() {
 
-        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
+        ConfluentKafkaContainer("confluentinc/cp-kafka:7.7.0").use { container ->
             container.start()
 
             val healthService = HealthService()
