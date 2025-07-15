@@ -32,7 +32,7 @@ class NaisLeaderElection(
         if (electorPath == "NOLEADERELECTION") return hostname
         if (leader.isBlank() || lastCalled.isBefore(LocalDateTime.now().minusMinutes(2))) {
             leader = objectMapper.readValue(getResource(electorUri), Elector::class.java).name
-            LOG.debug("Running leader election getLeader is {} ", leader)
+            LOG.info("Running leader election getLeader is {} ", leader)
             lastCalled = LocalDateTime.now()
         }
         return leader
