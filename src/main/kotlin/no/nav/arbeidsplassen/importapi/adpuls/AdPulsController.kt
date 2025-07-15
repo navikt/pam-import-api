@@ -1,49 +1,104 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.micronaut.http.annotation.QueryValue
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.javalin.Javalin
+import io.javalin.http.Context
+import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiParam
+import io.javalin.openapi.OpenApiResponse
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import javax.annotation.Nullable
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.repository.Pageable
 import no.nav.arbeidsplassen.importapi.repository.RestOrderBy
 import no.nav.arbeidsplassen.importapi.repository.RestPageable
 import no.nav.arbeidsplassen.importapi.repository.RestSlice
+import no.nav.arbeidsplassen.importapi.repository.RestSliceAdPulsDTO
 import no.nav.arbeidsplassen.importapi.repository.RestSortable
 import no.nav.arbeidsplassen.importapi.repository.Slice
 import no.nav.arbeidsplassen.importapi.repository.Sortable
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
-@Controller("/api/v1/stats/")
-@SecurityRequirement(name = "bearer-auth")
-class AdPulsController(private val adPulsService: AdPulsService) {
+class AdPulsController(private val adPulsService: AdPulsService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsController::class.java)
+        private fun Context.providerIdParam(): Long = pathParam("providerId").toLong()
+        private fun Context.fromParam(): String =
+            queryParam("from") ?: throw IllegalArgumentException("from is required")
+
+        private fun Context.pageParam(): Long? = queryParam("page")?.toLong()
+        private fun Context.numberParam(): Long? = queryParam("number")?.toLong()
+        private fun Context.sizeParam(): Int? = queryParam("size")?.toInt()
+        private fun Context.sortParams(): List<String>? = queryParams("sort").flatMap { it.split(",") }
     }
 
-    @Get("/{providerId}")
-    fun getAllTodayStatsForProvider(
-        @PathVariable providerId: Long,
-        @QueryValue from: String,
-        @Nullable @QueryValue page: Long?,
-        @Nullable @QueryValue number: Long?,
-        @Nullable @QueryValue size: Int?,
-        @Nullable @QueryValue sort: List<String>?,
-    ): RestSlice<AdPulsDTO> {
-        LOG.info("Entering getAllTodayStatsForProvider")
-        val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
-        LOG.info("Getting stats for provider $providerId from $fromDate")
-        require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
+    override fun setupRoutes(javalin: Javalin) {
+        javalin.get(
+            "/api/v1/stats/{providerId}",
+            { getAllTodayStatsForProvider(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+    }
 
-        val pamImportPageable = mapPageable(page, number, size, sort)
-        return mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
+    @OpenApi(
+        path = "/stillingsimport/api/v1/stats/{providerId}",
+        methods = [HttpMethod.GET],
+        pathParams = [OpenApiParam(
+            name = "providerId",
+            type = Long::class,
+            required = true,
+            description = "providerId"
+        )],
+        queryParams = [
+            OpenApiParam(name = "from", type = String::class, required = false, description = "from"),
+            OpenApiParam(name = "page", type = Long::class, required = false, description = "page"),
+            OpenApiParam(name = "number", type = Long::class, required = false, description = "number"),
+            OpenApiParam(name = "size", type = Int::class, required = false, description = "size"),
+            OpenApiParam(
+                name = "sort",
+                type = Array<String>::class,
+                required = false,
+                description = "sort",
+                example = "created, updated, asc, desc"
+            ),
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getAllTodayStatsForProvider 200 response",
+                content = [OpenApiContent(
+                    from = RestSliceAdPulsDTO::class,
+                )],
+            ),
+        ]
+    )
+    fun getAllTodayStatsForProvider(ctx: Context) {
+        try {
+            LOG.debug("Entering getAllTodayStatsForProvider")
+            val providerId = ctx.providerIdParam()
+            val from = ctx.fromParam()
+            val page = ctx.pageParam()
+            val number = ctx.numberParam()
+            val size = ctx.sizeParam()
+            val sort = ctx.sortParams()
+            LOG.info("Retrieved params in getAllTodayStatsForProvider")
+            val fromDate = LocalDateTime.parse(from).truncatedTo(ChronoUnit.HOURS)
+            LOG.info("Getting stats for provider $providerId from $fromDate")
+            require(fromDate.isAfter(LocalDateTime.now().minusHours(24))) { "date is out of range, max 24h from now" }
+
+            val pamImportPageable = mapPageable(page, number, size, sort)
+            val slice = mapSlice(adPulsService.findByProviderIdAndUpdatedAfter(providerId, fromDate, pamImportPageable))
+            LOG.debug("Returning json in getAllTodayStatsForProvider")
+            ctx.status(HttpStatus.OK).json(slice)
+            LOG.debug("Exiting getAllTodayStatsForProvider")
+        } catch (e: Exception) {
+            LOG.error("Error in getAllTodayStatsForProvider", e)
+            throw e
+        }
     }
 
     private fun <T> mapSlice(slice: Slice<T>): RestSlice<T> {
@@ -87,6 +142,8 @@ class AdPulsController(private val adPulsService: AdPulsService) {
     }
 
     private fun validatePageable(page: Long, size: Int, sort: List<String>) {
+        LOG.info("Sort: " + sort)
+        LOG.info("Filtered Sort: " + sort.filterNot { it == "updated" || it == "created" || it == "asc" || it == "desc" })
         require(page >= 0) { "size can not be less than 0" }
         require(size <= 1000) { "size can not be more than 1000" }
         require(

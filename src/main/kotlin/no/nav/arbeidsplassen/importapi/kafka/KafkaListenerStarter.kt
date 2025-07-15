@@ -1,47 +1,53 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
-import io.micronaut.context.annotation.Requires
-import io.micronaut.context.annotation.Value
-import io.micronaut.context.event.ApplicationEventListener
-import io.micronaut.context.event.StartupEvent
-import jakarta.inject.Singleton
-import no.nav.arbeidsplassen.importapi.LeaderElection
 import no.nav.arbeidsplassen.importapi.adadminstatus.InternalAdTopicListener
+import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.slf4j.LoggerFactory
 
-@Singleton
-@Requires(property = "adminstatussync.kafka.enabled", value = "true")
 class KafkaListenerStarter(
     private val adTransportProsessor: InternalAdTopicListener,
     private val healthService: HealthService,
     private val kafkaConfig: KafkaConfig,
     private val leaderElection: LeaderElection,
-    @Value("\${adminstatus.kafka.topic:teampam.stilling-intern-1}") private val topic: String,
-    @Value("\${adminstatus.kafka.group-id:import-api-adminstatussync-gcp}") private val groupId: String,
-) : ApplicationEventListener<StartupEvent> {
+    private val topic: String,
+    private val groupId: String,
+    private val adminStatusSyncKafkaEnabled: Boolean
+) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaListenerStarter::class.java)
     }
 
+    lateinit var listenerThread: Thread
+
     fun start() {
-        // Leader skal ikke lytte på kafkameldinger slik at leader vil overleve en potensiell giftpille
+        // Når kun leader lytter på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
         // og fortsatt kunne håndtere REST-kall
-        if (!leaderElection.isLeader()) {
+        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
             LOG.info("Starter kafka rapid listener")
             try {
                 val consumerConfig = kafkaConfig.kafkaJsonConsumer(topic, groupId)
                 val listener = KafkaTopicJsonListener(consumerConfig, healthService, adTransportProsessor)
-                listener.startListener()
+                listenerThread = listener.startListener()
             } catch (e: Exception) {
                 LOG.error("Greide ikke å starte Kafka listener: ${e.message}", e)
                 healthService.addUnhealthyVote()
             }
+        } else {
+            LOG.info("Starter IKKE kafka rapid listener; adminStatusSyncKafkaEnabled=$adminStatusSyncKafkaEnabled og leaderElection=${leaderElection.isLeader()}")
         }
     }
 
-    override fun onApplicationEvent(event: StartupEvent?) {
-        LOG.info("onApplicationEvent StartupEvent")
-        start()
+    fun stop() {
+        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
+            LOG.info("Stopper kafka rapid listener")
+            try {
+                listenerThread.interrupt()
+            } catch (e: Exception) {
+                LOG.error("Greide ikke å stoppe Kafka listener: ${e.message}", e)
+                healthService.addUnhealthyVote()
+            }
+        }
     }
 }

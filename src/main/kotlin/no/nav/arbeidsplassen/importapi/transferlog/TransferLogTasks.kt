@@ -3,10 +3,7 @@ package no.nav.arbeidsplassen.importapi.transferlog
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
-import io.micronaut.context.annotation.Value
-import jakarta.inject.Singleton
 import java.time.LocalDateTime
-import no.nav.arbeidsplassen.importapi.Open
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxService
 import no.nav.arbeidsplassen.importapi.adstate.AdState
 import no.nav.arbeidsplassen.importapi.adstate.AdStateRepository
@@ -14,25 +11,22 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.ontologi.KonseptGrupperingDTO
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyType
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import org.slf4j.LoggerFactory
 
-@Singleton
-@Open
 class TransferLogTasks(
     private val transferLogRepository: TransferLogRepository,
     private val adStateRepository: AdStateRepository,
     private val objectMapper: ObjectMapper,
     private val meterRegistry: MeterRegistry,
     private val styrkCodeConverter: StyrkCodeConverter,
-    private val lokalOntologiGateway: LokalOntologiGateway,
+    private val lokalOntologiGateway: OntologiGateway,
     private val adOutboxService: AdOutboxService,
     private val txTemplate: TxTemplate,
-    @Value("\${transferlog.tasks-size:50}") private val logSize: Int,
-    @Value("\${transferlog.delete.months:6}") private val deleteMonths: Long
+    private val deleteMonths: Long
 ) {
 
     companion object {
@@ -55,7 +49,7 @@ class TransferLogTasks(
     fun mapTransferLog(transferLog: TransferLog) {
         try {
             txTemplate.doInTransaction {
-                val adList = mapTransferLogs(transferLog)
+                val adList: List<AdState> = mapTransferLogs(transferLog)
                 LOG.info("mapping transfer ${transferLog.id} for provider ${transferLog.providerId} with updated ${transferLog.updated} found ${adList.size} ads ")
                 val savedList = adStateRepository.saveAll(adList)
                 transferLogRepository.save(transferLog.copy(status = TransferLogStatus.DONE))

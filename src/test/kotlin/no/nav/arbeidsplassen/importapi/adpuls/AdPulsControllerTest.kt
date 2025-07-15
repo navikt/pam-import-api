@@ -1,47 +1,49 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
-import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import jakarta.inject.Inject
+import java.net.URI
 import java.time.LocalDateTime
 import java.util.UUID
 import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
 import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
+import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.slf4j.LoggerFactory
 
-@MicronautTest
-@Property(name = "JWT_SECRET", value = "Thisisaverylongsecretandcanonlybeusedintest")
-class AdPulsControllerTest(
-    private val tokenService: TokenService,
-    private val repository: AdPulsRepository,
-    private val providerRepository: ProviderRepository
-) {
-    @Inject
-    @field:Client("\${micronaut.server.context-path}")
-    lateinit var client: Rx3HttpClient
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AdPulsControllerTest() : TestRunningApplication() {
+
+    private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
+
+    private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsControllerTest::class.java)
 
+        val repository: AdPulsRepository = appCtx.databaseApplicationContext.adPulsRepository
+        val providerRepository: ProviderRepository = appCtx.databaseApplicationContext.providerRepository
+
+
         @BeforeAll
         @JvmStatic
-        fun createProvider(adPulsControllerTest: AdPulsControllerTest) {
-            val provider = adPulsControllerTest.providerRepository.newTestProvider()
-            val first = adPulsControllerTest.repository.save(
+        fun setup() {
+            val provider = providerRepository.newTestProvider()
+            val first = repository.save(
                 AdPuls(
                     providerId = provider.id!!,
                     uuid = UUID.randomUUID().toString(),
@@ -50,13 +52,13 @@ class AdPulsControllerTest(
                     total = 10
                 )
             )
-            val inDb = adPulsControllerTest.repository.findById(first.id!!)!!
+            val inDb = repository.findById(first.id!!)!!
             val new = inDb.copy(total = 20)
-            adPulsControllerTest.repository.save(new)
+            repository.save(new)
 
-            adPulsControllerTest.repository.saveAll(
+            repository.saveAll(
                 (1..20).map {
-                    Thread.sleep(1)
+                    // Thread.sleep(1)
                     AdPuls(
                         providerId = provider.id!!,
                         uuid = UUID.randomUUID().toString(),
@@ -68,15 +70,23 @@ class AdPulsControllerTest(
             )
         }
 
+        @AfterAll
+        @JvmStatic
+        fun teardown() {
+            val providerId = providerRepository.findTestProvider().id!!
+            repository.deleteByProviderId(providerId)
+            providerRepository.deleteById(providerId)
+        }
     }
+
 
     @Test
     fun `GET med sort, size og page skal fungere`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -105,7 +115,7 @@ class AdPulsControllerTest(
               "offset" : 10,
               "size" : 10
             }
-        """.trimIndent()
+            """.trimIndent()
         assertJsonEquals(
             expectedJson,
             response.body(),
@@ -116,11 +126,11 @@ class AdPulsControllerTest(
 
     @Test
     fun `GET uten sort, size og page skal gi defaults`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -166,12 +176,14 @@ class AdPulsControllerTest(
     }
 
     @Test
-    fun `GET med feilaktig sort skal gi 500`() {
-        val providerId = 10000
+    fun `GET med feilaktig sort skal gi 400`() {
+        // HPH : Denne er endret fra Micronaut til Javalin, i Micronaut returnerte den 500,
+        // men jeg synes 400 gir mer mening og tenker det er en grei endring..
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -182,17 +194,17 @@ class AdPulsControllerTest(
             // Litt usikker på hvorfor den automatisk mapper til en exception i stedet for at dette fungerer:
             // assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status)
         } catch (ex: HttpClientResponseException) {
-            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.status)
+            assertEquals(HttpStatus.BAD_REQUEST, ex.status)
         }
     }
 
     @Test
     fun `GET med sort men uten direction skal gi default direction`() {
-        val providerId = 10000
+        val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
         val getRequest =
-            HttpRequest.GET<String>("/api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1")
+            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .bearerAuth(adminToken)
@@ -236,5 +248,4 @@ class AdPulsControllerTest(
         )
         LOG.info("Body" + response.body())
     }
-
 }

@@ -2,6 +2,7 @@ package no.nav.arbeidsplassen.importapi.kafka
 
 import java.time.Duration
 import java.time.LocalDateTime
+import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -27,7 +28,7 @@ abstract class KafkaTopicListener<T> {
         LOG.info("Starter Kafka listener")
         var records: ConsumerRecords<String?, T?>?
 
-        while (healthService.isHealthy()) {
+        while (healthService.isHealthy() && !Thread.currentThread().isInterrupted) {
             var currentPositions = mutableMapOf<TopicPartition, Long>()
             try {
                 LOG.info("Poller i Kafka listener")
@@ -58,6 +59,12 @@ abstract class KafkaTopicListener<T> {
                 kafkaConsumer.commitSync(currentPositions.mapValues { (_, offset) -> offsetMetadata(offset) })
                 currentPositions.clear()
             }
+        }
+        if (!healthService.isHealthy()) {
+            LOG.info("Stopper i Kafka listener fordi applikasjonen ikke er healthy")
+        }
+        if (!Thread.currentThread().isInterrupted) {
+            LOG.info("Stopper i Kafka listener fordi listener thread er interrupted")
         }
 
         kafkaConsumer.close()

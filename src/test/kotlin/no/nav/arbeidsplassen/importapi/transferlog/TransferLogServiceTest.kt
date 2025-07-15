@@ -1,41 +1,32 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import no.nav.arbeidsplassen.importapi.dto.*
+import java.time.LocalDateTime
+import java.util.UUID
+import no.nav.arbeidsplassen.importapi.dto.AdDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
+import no.nav.arbeidsplassen.importapi.dto.CategoryType
+import no.nav.arbeidsplassen.importapi.dto.EmployerDTO
+import no.nav.arbeidsplassen.importapi.dto.LocationDTO
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
 import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import java.time.LocalDateTime
-import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransferLogServiceTest {
 
-    lateinit var transferLogService: TransferLogService
-
-    @Mock
     val transferLogRepository: TransferLogRepository = mock(TransferLogRepository::class.java)
-
-    @Mock
     val propertyNameValueValidation: PropertyNameValueValidation = mock(PropertyNameValueValidation::class.java)
-
-    @Mock
     val ontologiGateway: LokalOntologiGateway = mock(LokalOntologiGateway::class.java)
-
-
-    @BeforeAll
-    fun setUp() {
-        transferLogService = TransferLogService(transferLogRepository, propertyNameValueValidation, ontologiGateway)
-    }
+    val transferLogService: TransferLogService =
+        TransferLogService(transferLogRepository, propertyNameValueValidation, ontologiGateway)
 
     @Test
     fun `Invalid JANZZ code category is removed`() {
@@ -131,9 +122,12 @@ class TransferLogServiceTest {
             reference = UUID.randomUUID().toString(), title = "title",
             locationList = listOf(LocationDTO(country = "Norge"))
         )
-         val exception = assertThrows<ImportApiError> {
+        val exception = assertThrows<ImportApiError> {
             transferLogService.validate(ad)
         }
-        Assertions.assertEquals("Location does not have postal code, or does not have county/municipality", exception.message)
+        Assertions.assertEquals(
+            "Location does not have postal code, or does not have county/municipality",
+            exception.message
+        )
     }
 }

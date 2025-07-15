@@ -1,51 +1,161 @@
 package no.nav.arbeidsplassen.importapi.properties
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.QueryValue
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import io.javalin.Javalin
+import io.javalin.http.Context
+import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiAdditionalContent
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiResponse
+import no.nav.arbeidsplassen.importapi.config.JavalinController
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.ontologi.Typeahead
 import no.nav.pam.yrkeskategorimapper.StyrkCodeConverter
 import no.nav.pam.yrkeskategorimapper.domain.Occupation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.security.KeyStore
-import jakarta.annotation.security.PermitAll
 
-@PermitAll
-@Controller("/api/v1/categories")
-class CategoryMapsController(private val ontologiGateway: LokalOntologiGateway, private val styrkCodeConverter: StyrkCodeConverter) {
+class CategoryMapsController(
+    private val ontologiGateway: OntologiGateway,
+    private val styrkCodeConverter: StyrkCodeConverter
+) : JavalinController {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(CategoryMapsController::class.java)
+        private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
-    @Get("/pyrk/occupations")
-    fun getPyrkCategoryMap():Map<String, PyrkOccupation> {
-        return styrkCodeConverter.occupationMap.toList().distinctBy { (k,v) -> v.categoryLevel2 }.sortedBy {(k,v) -> v.styrkCode }.toMap().mapValues{it.value.simplyfy()}
+    override fun setupRoutes(javalin: Javalin) {
+        javalin.get("/api/v1/categories/pyrk/occupations", { getPyrkCategoryMap(it) })
+        javalin.get("/api/v1/categories/styrk/occupations", { getStyrkCategoryMap(it) })
+        javalin.get("/api/v1/categories/janzz/occupations", { getJanzzCategories(it) })
     }
 
-    @Get("/styrk/occupations")
-    fun getStyrkCategoryMap(@QueryValue(defaultValue = "code") sort: String): Map<String, Occupation> {
-        return if ("alfa"==sort) {
-            styrkCodeConverter.occupationMap.toList().sortedBy { (k, v) -> v.styrkDescription }.toMap()
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/pyrk/occupations",
+        methods = [HttpMethod.GET],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getPyrkCategoryMap 200 response",
+                content = [OpenApiContent(
+                    mimeType = "application/map-string-object",
+                    additionalProperties = OpenApiAdditionalContent(
+                        from = PyrkOccupation::class
+                    ),
+                    example = """
+                       {
+                         "additionalProp1": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         },
+                         "additionalProp2": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         },
+                         "additionalProp3": {
+                           "styrkCode": "string",
+                           "categoryLevel1": "string",
+                           "categoryLevel2": "string"
+                         }
+                       } 
+                    """
+                )],
+            ),
+        ]
+    )
+    fun getPyrkCategoryMap(ctx: Context) {
+        val pyrkCategoryMap: Map<String, PyrkOccupation> = styrkCodeConverter.occupationMap
+            .toList()
+            .distinctBy { (_, v) -> v.categoryLevel2 }
+            .sortedBy { (_, v) -> v.styrkCode }
+            .toMap()
+            .mapValues { it.value.simplyfy() }
+        ctx.status(HttpStatus.OK).json(pyrkCategoryMap)
+    }
+
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/styrk/occupations",
+        methods = [HttpMethod.GET],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getStyrkCategoryMap 200 response",
+                content = [OpenApiContent(
+                    mimeType = "application/map-string-object",
+                    additionalProperties = OpenApiAdditionalContent(
+                        from = Occupation::class
+                    ),
+                    example = """
+                       {
+                          "additionalProp1": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          },
+                          "additionalProp2": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          },
+                          "additionalProp3": {
+                            "styrkCode": "string",
+                            "styrkDescription": "string",
+                            "categoryLevel1": "string",
+                            "categoryLevel2": "string"
+                          }
+                       }
+                    """
+                )],
+            ),
+        ]
+    )
+    fun getStyrkCategoryMap(ctx: Context) {
+        val sort = ctx.sortParam()
+        val styrkCategoryMap = if ("alfa" == sort) {
+            styrkCodeConverter.occupationMap
+                .toList()
+                .sortedBy { (_, v) -> v.styrkDescription }
+                .toMap()
+        } else {
+            styrkCodeConverter.occupationMap
+                .toList()
+                .sortedBy { (_, v) -> v.styrkCode }
+                .toMap()
         }
-        else styrkCodeConverter.occupationMap.toList().sortedBy { (k,v) -> v.styrkCode }.toMap()
+        ctx.status(HttpStatus.OK).json(styrkCategoryMap)
     }
 
-    @Get("/janzz/occupations")
-    fun getJanzzCategories(): List<Typeahead> {
+    @OpenApi(
+        path = "/stillingsimport/api/v1/categories/janzz/occupations",
+        methods = [HttpMethod.GET],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getJanzzCategoryMap 200 response",
+                content = [OpenApiContent(
+                    from = Array<Typeahead>::class,
+                )],
+            ),
+        ]
+    )
+    fun getJanzzCategories(ctx: Context) {
         try {
-            log.info("Henter stillinger fra ontologi.")
-            return ontologiGateway.hentTypeaheadStillingerFraOntologi()
+            LOG.info("Henter stillinger fra ontologi.")
+            val typeahead = ontologiGateway.hentTypeaheadStillingerFraOntologi()
+            ctx.status(HttpStatus.OK).json(typeahead)
         } catch (e: Exception) {
-            log.error("Feilet i henting av typeahead stillinger fra ontologi.", e)
+            LOG.error("Feilet i henting av typeahead stillinger fra ontologi.", e)
             throw e;
         }
     }
 
     data class PyrkOccupation(val styrkCode: String, val categoryLevel1: String, val categoryLevel2: String)
-    fun Occupation.simplyfy(): PyrkOccupation = PyrkOccupation(styrkCode, categoryLevel1, categoryLevel2)
 
+    fun Occupation.simplyfy(): PyrkOccupation = PyrkOccupation(styrkCode, categoryLevel1, categoryLevel2)
 }

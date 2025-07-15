@@ -1,61 +1,112 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
+import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.JsonToken
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.InvalidNullException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.module.kotlin.treeToValue
-import io.micronaut.context.annotation.Value
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Body
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Delete
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.micronaut.http.annotation.Post
-import io.micronaut.http.annotation.QueryValue
-import io.netty.handler.codec.CodecException
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.exceptions.CompositeException
-import io.reactivex.rxjava3.schedulers.Schedulers
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.javalin.Javalin
+import io.javalin.http.Context
+import io.javalin.http.HttpStatus
+import io.javalin.openapi.HttpMethod
+import io.javalin.openapi.OpenApi
+import io.javalin.openapi.OpenApiContent
+import io.javalin.openapi.OpenApiParam
+import io.javalin.openapi.OpenApiRequestBody
+import io.javalin.openapi.OpenApiResponse
+import io.javalin.openapi.OpenApiSecurity
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
+import no.nav.arbeidsplassen.importapi.common.toMD5Hex
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatus
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.feltFraPathReference
-import no.nav.arbeidsplassen.importapi.provider.ProviderDTO
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
 import no.nav.arbeidsplassen.importapi.security.Roles
-import no.nav.arbeidsplassen.importapi.toMD5Hex
 import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN])
-@Controller("/api/v1/transfers")
-@SecurityRequirement(name = "bearer-auth")
 class TransferController(
     private val transferLogService: TransferLogService,
     private val providerService: ProviderService,
     private val adStateService: AdStateService,
     private val objectMapper: ObjectMapper,
-    @Value("\${transferlog.batch-size:100}") val adsSize: Int
-) {
+    val adsSize: Int
+) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferController::class.java)
+
+        private fun Context.providerIdParam(): Long = pathParam("providerId").toLong()
+        private fun Context.referenceParam(): String = pathParam("reference")
+        private fun Context.deleteParam(): Boolean = queryParam("delete")?.toBoolean() ?: false
+        private fun Context.versionIdParam(): Long = pathParam("versionId").toLong()
+        private fun Context.adListBody(): List<AdDTO> {
+            val typeReference = object : TypeReference<List<AdDTO>>() {}
+            val ads: List<AdDTO> = this.bodyAsClass(typeReference.type)
+            return ads
+        }
     }
 
-    @Post("/batch/{providerId}")
-    fun postTransfer(@PathVariable providerId: Long, @Body ads: List<AdDTO>): HttpResponse<TransferLogDTO> {
-        LOG.info("Streaming ${ads.size} for provider $providerId")
+    override fun setupRoutes(javalin: Javalin) {
+        javalin.post(
+            "/api/v1/transfers/batch/{providerId}",
+            { postTransfer(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+        javalin.post(
+            "/api/v1/transfers/{providerId}",
+            { streamTransfer(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+        javalin.get(
+            "/api/v1/transfers/{providerId}/versions/{versionId}",
+            { getTransfer(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+        javalin.get(
+            "/api/v1/transfers/{providerId}/versions/{versionId}/payload",
+            { getTransferPayload(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+        javalin.delete(
+            "/api/v1/transfers/{providerId}/{reference}",
+            { stopAdByProviderReference(it) },
+            Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
+        )
+    }
+
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/batch/{providerId}",
+        methods = [HttpMethod.POST],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId")
+        ],
+        requestBody = OpenApiRequestBody(
+            required = true,
+            content = [OpenApiContent(from = Array<AdDTO>::class)]
+        ),
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "postTransfer 200 response",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
+    private fun postTransfer(ctx: Context) {
+        val providerId = ctx.providerIdParam()
+        val ads = ctx.adListBody()
+        LOG.info("Batching ${ads.size} for provider $providerId")
 
         if (ads.size > adsSize || ads.isEmpty()) {
             throw ImportApiError("ads should be between 1 to max $adsSize", ErrorType.INVALID_VALUE)
@@ -70,15 +121,15 @@ class TransferController(
         val md5 = content.toMD5Hex()
         val provider = providerService.findById(providerId)
         if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
-            return HttpResponse.ok(
-                TransferLogDTO(
-                    message = "Content already exist, skipping",
-                    status = TransferLogStatus.SKIPPED,
-                    items = 1,
-                    md5 = md5,
-                    providerId = provider.id!!
-                )
+            val transferLog = TransferLogDTO(
+                message = "Content already exist, skipping",
+                status = TransferLogStatus.SKIPPED,
+                items = 1,
+                md5 = md5,
+                providerId = provider.id!!
             )
+            ctx.status(HttpStatus.OK).json(transferLog)
+            return
         }
 
         updatedAds.stream().forEach {
@@ -87,57 +138,96 @@ class TransferController(
         }
 
         val transferLogDTO = TransferLogDTO(payload = content, md5 = md5, items = ads.size, providerId = provider.id!!)
-        return HttpResponse.created(transferLogService.save(transferLogDTO).apply {
-            payload = null
-        })
+        val dto = transferLogService.save(transferLogDTO)
+        LOG.info("Successfully saved $dto")
+        ctx.status(HttpStatus.CREATED).json(dto.apply { payload = null })
     }
 
-    @Post(value = "/{providerId}", processes = [MediaType.APPLICATION_JSON_STREAM])
-    fun postStream(@PathVariable providerId: Long, @Body json: Flowable<JsonNode>): Flowable<TransferLogDTO> {
-        val provider = providerService.findById(providerId)
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}",
+        methods = [HttpMethod.POST],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId")
+        ],
+        requestBody = OpenApiRequestBody(
+            required = true,
+            content = [OpenApiContent(mimeType = "application/x-json-stream", from = AdDTO::class)]
+        ),
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "postStream 200 response",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
+    private fun streamTransfer(ctx: Context) {
+        // Når man leser denne metoden så kan man kanskje reagere på at feilsituasjoner håndteres litt ulikt
+        // Dette er et valg tatt for å emulere hvordan det var i Micronaut.
+        val providerId = ctx.providerIdParam()
         LOG.info("Streaming for provider $providerId")
 
-        val o = json.subscribeOn(Schedulers.io())
-            .onErrorReturn { it: Throwable ->
-                LOG.warn("Feil ved streaming av ads fra provider $providerId: ${it.message}")
-                objectMapper.valueToTree(
-                    listOf(
-                        TransferLogDTO(
-                            message = "JSON Parse error: ${it.localizedMessage}",
-                            status = TransferLogStatus.ERROR,
-                            providerId = provider.id!!
-                        )
-                    )
-                )
-            }
-            .map {
-                receiveAd(it, provider)
+        ctx.bodyInputStream().use { inputStream ->
+            val parser: JsonParser = JsonFactory().createParser(inputStream)
+            var token: JsonToken? = try {
+                parser.nextToken()
+            } catch (ex: JsonParseException) {
+                // Kommer hvis inputstreamen inneholder gibberish
+                ctx
+                    .status(200)
+                    .outputStream().use { outputStream ->
+                        objectMapper.writeValue(outputStream, handleError(ex, providerId))
+                    }
+                return
             }
 
-        return o;
+            if (token == null) {
+                // Kommer hvis inputstreamen er tom
+                ctx.status(400)
+                return
+            }
+
+            ctx
+                .status(200)
+                .outputStream().use { outputStream ->
+                    // Den følgende koden har tatt inspirasjon herfra, men er så endret en del:
+                    // https://sohlich.github.io/post/jackson/
+                    while (token != null) {
+                        try {
+                            val node: JsonNode = objectMapper.readValue(parser, JsonNode::class.java)
+                            val response = receiveAd(node, providerId)
+                            LOG.info("Skriver response til outputstream")
+                            objectMapper.writeValue(outputStream, response)
+
+                            LOG.info("Leser neste token")
+                            token = parser.nextToken()
+                        } catch (e: JsonParseException) {
+                            LOG.error("JsonParseException", e)
+                            objectMapper.writeValue(outputStream, handleError(e, providerId))
+                            break
+                        }
+                    }
+                }
+        }
     }
 
-    private fun receiveAd(jsonNode: JsonNode, provider: ProviderDTO): TransferLogDTO {
+    private fun receiveAd(jsonNode: JsonNode, providerId: Long): TransferLogDTO {
         return runCatching {
-            // Denne if'en er her for å håndtere det man lager i onErrorReturn på linje 101.
-            // Det var litt overraskende, må jeg innrømme..
-            if (jsonNode.isArray) {
-                val errorDto = objectMapper.treeToValue<List<TransferLogDTO>>(jsonNode)
-                return@runCatching errorDto[0]
-            }
+            LOG.info("Received ad for provider $providerId")
             var ad = objectMapper.treeToValue(jsonNode, AdDTO::class.java)
-            LOG.info("Got ad ${ad.reference} for ${provider.id!!}")
+            LOG.info("Got ad ${ad.reference} for $providerId")
             ad = transferLogService.handleExpiryAndStarttimeCombinations(ad)
-            ad = transferLogService.handleInvalidCategories(ad, provider.id!!, ad.reference)
+            ad = transferLogService.handleInvalidCategories(ad, providerId, ad.reference)
             val content = objectMapper.writeValueAsString(ad)
             val md5 = content.toMD5Hex()
-            if (transferLogService.existsByProviderIdAndMd5(provider.id!!, md5)) {
+            if (transferLogService.existsByProviderIdAndMd5(providerId, md5)) {
                 TransferLogDTO(
                     message = "Content already exist, skipping",
                     status = TransferLogStatus.SKIPPED,
                     items = 1,
                     md5 = md5,
-                    providerId = provider.id!!
+                    providerId = providerId
                 )
             } else {
                 transferLogService.validate(ad)
@@ -146,91 +236,102 @@ class TransferController(
                         payload = content,
                         md5 = md5,
                         items = 1,
-                        providerId = provider.id!!
+                        providerId = providerId
                     )
                 ).apply {
                     payload = null
                 }
             }
-        }.getOrElse { handleError(it, provider) }
+        }.getOrElse { handleError(it, providerId) }
     }
 
-    private fun handleError(error: Throwable, provider: ProviderDTO): TransferLogDTO {
-        val transferLogDTO = when (error) {
-            is CompositeException -> {
-                val codecException = error.exceptions.find { it is CodecException }
-                codecException?.let { c ->
-                    TransferLogDTO(
-                        message = "JSON Parse error: ${c.localizedMessage}",
-                        status = TransferLogStatus.ERROR,
-                        providerId = provider.id!!
-                    )
-                } ?: TransferLogDTO(
-                    message = "Parse error: ${error.exceptions.firstOrNull()?.localizedMessage}",
-                    status = TransferLogStatus.ERROR,
-                    providerId = provider.id!!
-                )
-            }
-
-            is CodecException -> TransferLogDTO(
-                message = "JSON Parse error: at ${error.localizedMessage}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/versions/{versionId}",
+        methods = [HttpMethod.GET],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "versionId", type = Long::class, required = true, description = "versionId")
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getTransfer 200 response",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
+    private fun getTransfer(ctx: Context) {
+        LOG.info("getTransfer called")
+        val providerId: Long = ctx.providerIdParam()
+        val versionId: Long = ctx.versionIdParam()
+        ctx.status(HttpStatus.OK).json(
+            transferLogService.findByVersionIdAndProviderId(
+                versionId = versionId,
+                providerId = providerId
             )
-
-            is JsonParseException -> TransferLogDTO(
-                message = "Parse error: at ${error.location}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-
-            is InvalidFormatException -> TransferLogDTO(
-                message = "Invalid value: ${error.value} at ${feltFraPathReference(error.pathReference)}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-
-            is InvalidNullException -> TransferLogDTO(
-                message = "Missing parameter: ${error.propertyName.simpleName}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-
-            is MismatchedInputException -> TransferLogDTO(
-                message = "Missing parameter: ${feltFraPathReference(error.pathReference)}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-
-            else -> TransferLogDTO(
-                message = "Error: ${error.localizedMessage}",
-                status = TransferLogStatus.ERROR,
-                providerId = provider.id!!
-            )
-        }
-        LOG.warn("Exception {} providerId: {}", transferLogDTO.message, provider.id)
-        return transferLogDTO
+        )
     }
 
-    @Get("/{providerId}/versions/{versionId}")
-    fun getTransfer(@PathVariable providerId: Long, @PathVariable versionId: Long): TransferLogDTO {
-        return transferLogService.findByVersionIdAndProviderId(versionId, providerId)
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/versions/{versionId}/payload",
+        methods = [HttpMethod.GET],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "versionId", type = Long::class, required = true, description = "versionId")
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "getTransferPayload 200 response",
+                content = [OpenApiContent(from = Array<AdDTO>::class)]
+            ),
+        ]
+    )
+    private fun getTransferPayload(ctx: Context) {
+        val providerId: Long = ctx.providerIdParam()
+        val versionId: Long = ctx.versionIdParam()
+        val payload = transferLogService.findByVersionIdAndProviderId(versionId, providerId).payload
+        val adList: List<AdDTO> =
+            objectMapper.readValue(payload, object : TypeReference<List<AdDTO>>() {}) ?: emptyList()
+        ctx.status(HttpStatus.OK).json(adList)
     }
 
-    @Get("/{providerId}/versions/{versionId}/payload")
-    fun getTransferPayload(@PathVariable providerId: Long, @PathVariable versionId: Long): List<AdDTO> {
-        return objectMapper.readValue(
-            transferLogService.findByVersionIdAndProviderId(versionId, providerId).payload,
-            object : TypeReference<List<AdDTO>>() {})
-    }
 
-    @Delete("/{providerId}/{reference}")
-    fun stopAdByProviderReference(
-        @PathVariable providerId: Long, @PathVariable reference: String,
-        @QueryValue(defaultValue = "false") delete: Boolean
-    ): TransferLogDTO {
+    @OpenApi(
+        path = "/stillingsimport/api/v1/transfers/{providerId}/{reference}",
+        methods = [HttpMethod.DELETE],
+        security = [OpenApiSecurity(name = "BearerAuth")],
+        pathParams = [
+            OpenApiParam(name = "providerId", type = Long::class, required = true, description = "providerId"),
+            OpenApiParam(name = "reference", type = String::class, required = true, description = "reference")
+        ],
+        queryParams = [
+            OpenApiParam(
+                name = "delete",
+                type = Boolean::class,
+                required = false,
+                description = "Default value : false"
+            ),
+        ],
+        responses = [
+            OpenApiResponse(
+                status = "200",
+                description = "stopAdByProviderReference 200 response. TransferLogDTO.payload is set to null",
+                content = [OpenApiContent(from = TransferLogDTO::class)]
+            ),
+        ]
+    )
+
+    private fun stopAdByProviderReference(ctx: Context) {
+        val providerId: Long = ctx.providerIdParam()
+        val reference: String = ctx.referenceParam()
+        val delete: Boolean = ctx.deleteParam()
+
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
-        val adState = adStateService.getAdStatesByProviderReference(providerId, reference)
+        val adState = adStateService.getAdStatesByProviderReference(providerId = providerId, reference = reference)
+        LOG.info("Found adState: {}", adState)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
         val adWithoutInvalidCategories =
             transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
@@ -238,7 +339,8 @@ class TransferController(
         val jsonPayload = objectMapper.writeValueAsString(ad)
         val md5 = jsonPayload.toMD5Hex()
         val provider = providerService.findById(providerId)
-        return transferLogService.save(
+        LOG.info("found provider: {}", provider)
+        val transferLog = transferLogService.save(
             TransferLogDTO(
                 message = adStatus.name,
                 payload = jsonPayload,
@@ -249,6 +351,43 @@ class TransferController(
         ).apply {
             payload = null
         }
+        ctx.status(HttpStatus.OK).json(transferLog)
     }
 
+    private fun handleError(error: Throwable, providerId: Long): TransferLogDTO {
+        val transferLogDTO = when (error) {
+
+            is JsonParseException -> TransferLogDTO(
+                message = "JSON Parse error: at ${error.location}",
+                status = TransferLogStatus.ERROR,
+                providerId = providerId
+            )
+
+            is InvalidFormatException -> TransferLogDTO(
+                message = "Invalid value: ${error.value} at ${feltFraPathReference(error.pathReference)}",
+                status = TransferLogStatus.ERROR,
+                providerId = providerId
+            )
+
+            is InvalidNullException -> TransferLogDTO(
+                message = "Missing parameter: ${error.propertyName.simpleName}",
+                status = TransferLogStatus.ERROR,
+                providerId = providerId
+            )
+
+            is MismatchedInputException -> TransferLogDTO(
+                message = "Missing parameter: ${feltFraPathReference(error.pathReference)}",
+                status = TransferLogStatus.ERROR,
+                providerId = providerId
+            )
+
+            else -> TransferLogDTO(
+                message = "Error: ${error.localizedMessage}",
+                status = TransferLogStatus.ERROR,
+                providerId = providerId
+            )
+        }
+        LOG.warn("Exception {} providerId: {}", transferLogDTO.message, providerId)
+        return transferLogDTO
+    }
 }

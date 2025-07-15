@@ -1,14 +1,20 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import jakarta.inject.Singleton
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import no.nav.arbeidsplassen.importapi.repository.BaseCrudRepository
+import no.nav.arbeidsplassen.importapi.repository.CrudRepository
 import no.nav.arbeidsplassen.importapi.repository.QueryLog.QUERY_LOG
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepository<Provider>(txTemplate) {
+interface ProviderRepository : CrudRepository<Provider> {
+    fun saveOnMigrate(entities: Iterable<Provider>) // Er ikke i bruk?
+    fun findByIdentifier(identifier: String): Provider?
+    fun deleteByIdentifier(identifier: String)
+}
+
+class JdbcProviderRepository(private val txTemplate: TxTemplate) : ProviderRepository,
+    BaseCrudRepository<Provider>(txTemplate) {
 
     override val insertSQL =
         """insert into provider (jwtid, identifier, email, phone, created) values (?,?,?,?,?)"""
@@ -19,9 +25,13 @@ class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepositor
     override val findAllSQL =
         """select id, identifier, jwtid, email, phone, created, updated from provider"""
     override val deleteSQL = """delete from provider where id = ?"""
+    val findByIdentifierSQL =
+        """select id, identifier, jwtid, email, phone, created, updated from provider where identifier = ?"""
     val migrateSQL =
         """insert into provider (jwtid, identifier, email, phone, created, updated, id) values (?,?,?,?,?,?,?)"""
-
+    val deleteByIdentifierSQL =
+        """delete from provider where identifier = ?"""
+    
     override fun ResultSet.mapToEntity() = Provider(
         id = this.getLong("id"),
         identifier = this.getString("identifier"),
@@ -49,7 +59,7 @@ class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepositor
     override fun Provider.kopiMedNyId(nyId: Long): Provider =
         this.copy(id = nyId)
 
-    fun saveOnMigrate(entities: Iterable<Provider>) {
+    override fun saveOnMigrate(entities: Iterable<Provider>) {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             entities.forEach {
@@ -63,6 +73,22 @@ class ProviderRepository(private val txTemplate: TxTemplate) : BaseCrudRepositor
                     setObject(7, it.id)
                     execute()
                 }
+            }
+        }
+    }
+
+    override fun findByIdentifier(identifier: String): Provider? {
+        return singleFind(findByIdentifierSQL) {
+            it.setString(1, identifier)
+        }
+    }
+
+    override fun deleteByIdentifier(identifier: String) {
+        txTemplate.doInTransaction { ctx ->
+            val connection = ctx.connection()
+            connection.prepareStatement(deleteByIdentifierSQL).apply {
+                setString(1, identifier)
+                check(executeUpdate() == 1)
             }
         }
     }

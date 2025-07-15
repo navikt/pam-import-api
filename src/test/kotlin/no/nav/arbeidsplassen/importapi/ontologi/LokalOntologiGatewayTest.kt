@@ -1,21 +1,39 @@
 package no.nav.arbeidsplassen.importapi.ontologi
 
-import io.micronaut.context.annotation.Property
-import io.micronaut.context.annotation.PropertySource
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 
-@MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PropertySource(value = [Property(name="pam.ontologi.typeahead.url", value = "http://unittest-pam-ontologi")])
-class LokalOntologiGatewayTest{
+class LokalOntologiGatewayTest {
 
     lateinit var lokalOntologiGateway: LokalOntologiGateway
+
+    @Test
+    @Disabled
+    fun `manuell integrasjonstest mot dev med trailing slash`() {
+
+        lokalOntologiGateway = LokalOntologiGateway("https://pam-ontologi.intern.dev.nav.no/")
+        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
+
+        assertEquals(51582L, ontologiResponse[0].code)
+        assertEquals("Møbelsnekker", ontologiResponse[0].name)
+    }
+
+    @Test
+    @Disabled
+    fun `manuell integrasjonstest mot dev uten trailing slash`() {
+
+        lokalOntologiGateway = LokalOntologiGateway("https://pam-ontologi.intern.dev.nav.no")
+        val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
+
+        assertEquals(51582L, ontologiResponse[0].code)
+        assertEquals("Møbelsnekker", ontologiResponse[0].name)
+    }
 
     @Test
     fun `testOntologiResponsParsesTilTypeaheadObjekt`() {
@@ -23,13 +41,11 @@ class LokalOntologiGatewayTest{
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
             .setBody(ontologiBody(konseptId = "19564", label = "Møbelsnekker/ interiørsnekker"))
-
         server.enqueue(response)
-
         server.start()
+        val httpUrl = server.url("/")
 
-        lokalOntologiGateway = LokalOntologiGateway("http://" + server.hostName + ":" + server.port)
-
+        lokalOntologiGateway = LokalOntologiGateway(httpUrl.toString())
         val ontologiResponse = lokalOntologiGateway.hentTypeaheadStilling("Møbelsnekker")
 
         assertEquals(19564L, ontologiResponse[0].code)
@@ -43,14 +59,20 @@ class LokalOntologiGatewayTest{
         val server = MockWebServer()
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
-            .setBody(konseptGrupperingResponse(konseptId = "19574", noLabel = "Modellsnekker", styrk08SSB = "12322", styrk08SSB2 = "54535", esco=EscoDTO(label="modellsnekker", uri="www.esco.com/modellsnekker")))
-
+            .setBody(
+                konseptGrupperingResponse(
+                    konseptId = "19574",
+                    noLabel = "Modellsnekker",
+                    styrk08SSB = "12322",
+                    styrk08SSB2 = "54535",
+                    esco = EscoDTO(label = "modellsnekker", uri = "www.esco.com/modellsnekker")
+                )
+            )
         server.enqueue(response)
-
         server.start()
+        val httpUrl = server.url("/")
 
-        lokalOntologiGateway = LokalOntologiGateway("http://" + server.hostName + ":" + server.port)
-
+        lokalOntologiGateway = LokalOntologiGateway(httpUrl.toString())
         val konseptGrupperingsresponse = lokalOntologiGateway.hentStyrkOgEscoKonsepterBasertPaJanzz(19574)
 
         assertEquals(19574L, konseptGrupperingsresponse?.konseptId)
@@ -63,12 +85,18 @@ class LokalOntologiGatewayTest{
         server.shutdown()
     }
 
-    fun ontologiBody(konseptId: String,label: String) : String = """[{
+    fun ontologiBody(konseptId: String, label: String): String = """[{
         "konseptId": "$konseptId",
         "label": "$label"
     }]"""
 
-    fun konseptGrupperingResponse(konseptId: String, noLabel: String?, styrk08SSB: String, styrk08SSB2: String, esco: EscoDTO?) : String = """{
+    fun konseptGrupperingResponse(
+        konseptId: String,
+        noLabel: String?,
+        styrk08SSB: String,
+        styrk08SSB2: String,
+        esco: EscoDTO?
+    ): String = """{
         "konseptId": "$konseptId",
         "noLabel": "$noLabel",
         "styrk08SSB": ["$styrk08SSB", "$styrk08SSB2"],

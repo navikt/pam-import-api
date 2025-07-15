@@ -1,13 +1,21 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import jakarta.inject.Singleton
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.repository.TxTemplate
 
-@Singleton
-class AdOutboxRepository(private val txTemplate: TxTemplate) {
+
+interface AdOutboxRepository {
+    fun hentAlle(): List<AdOutbox>
+    fun lagre(entity: AdOutbox): Int
+    fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox>
+    fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
+    fun markerSomProsessert(adOutbox: AdOutbox): Boolean
+    fun markerSomFeilet(adOutbox: AdOutbox): Boolean
+}
+
+open class JdbcAdOutboxRepository(private val txTemplate: TxTemplate) : AdOutboxRepository {
 
     val lagreSQL = """
             INSERT INTO ad_outbox (uuid, payload, opprettet_dato, har_feilet, antall_forsok, siste_forsok_dato, prosessert_dato)
@@ -41,7 +49,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         prosessertDato = this.getObject("prosessert_dato", LocalDateTime::class.java)
     )
 
-    fun hentAlle(): List<AdOutbox> {
+    override fun hentAlle(): List<AdOutbox> {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection
@@ -50,7 +58,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         }
     }
 
-    fun lagre(entity: AdOutbox): Int {
+    override fun lagre(entity: AdOutbox): Int {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(lagreSQL).apply {
@@ -65,7 +73,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         }
     }
 
-    fun hentUprosesserteMeldinger(batchSize: Int = 1000, outboxDelay: Long = 30): List<AdOutbox> {
+    override fun hentUprosesserteMeldinger(batchSize: Int, outboxDelay: Long): List<AdOutbox> {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(hentUprosesserteSQL)
@@ -80,9 +88,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         }
     }
 
-    fun lagreFlere(entities: Iterable<AdOutbox>) = entities.sumOf { lagre(it) }
-
-    fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
+    override fun markerSomProsessert(adOutbox: AdOutbox): Boolean {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(markerSomProsessertSQL).apply {
@@ -92,7 +98,7 @@ class AdOutboxRepository(private val txTemplate: TxTemplate) {
         }
     }
 
-    fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
+    override fun markerSomFeilet(adOutbox: AdOutbox): Boolean {
         return txTemplate.doInTransaction { ctx ->
             val connection = ctx.connection()
             connection.prepareStatement(markerSomFeiletSQL).apply {

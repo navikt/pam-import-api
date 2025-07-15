@@ -1,20 +1,29 @@
 package no.nav.arbeidsplassen.importapi.dto
 
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
-import no.nav.arbeidsplassen.importapi.properties.PropertyNames.*
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.engagementtype
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.extent
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.jobarrangement
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.remote
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.sector
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workLanguage
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workday
+import no.nav.arbeidsplassen.importapi.properties.PropertyNames.workhours
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
 
-@MicronautTest
-class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNameValueValidation) {
+class PropertyEnumValidationTest {
+
+    private val propertyEnumValidation: PropertyNameValueValidation = PropertyNameValueValidation()
+
     @Test
     fun validatePropertyNameValue() {
-        val correct = HashMap<PropertyNames,Any>().apply {
+        val correct = HashMap<PropertyNames, Any>().apply {
             put(extent, "Heltid")
             put(engagementtype, "Fast")
             put(jobarrangement, "Skift")
@@ -24,7 +33,7 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             put(remote, "Hjemmekontor")
         }
         propertyEnumValidation.checkOnlyValidValues(correct)
-        val errors = HashMap<PropertyNames,Any>().apply {
+        val errors = HashMap<PropertyNames, Any>().apply {
             put(extent, "Heltid/Deltid")
             put(engagementtype, "Fast")
             put(jobarrangement, "Skift")
@@ -59,7 +68,8 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
             workLanguage to """["Torsk"]"""
         )
 
-        val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
+        val error =
+            assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(stringifyedListsWithBadValues) }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
 
@@ -73,7 +83,9 @@ class PropertyEnumValidationTest(private val propertyEnumValidation: PropertyNam
     fun `Properties that dont support multiple values throw exception`() {
         val valuesThatDoesntSupportMultipleValues = hashMapOf(sector to """["Offentlig", "Privat"]""")
 
-        val error = assertThrows<ImportApiError> { propertyEnumValidation.checkOnlyValidValues(valuesThatDoesntSupportMultipleValues) }
+        val error = assertThrows<ImportApiError> {
+            propertyEnumValidation.checkOnlyValidValues(valuesThatDoesntSupportMultipleValues)
+        }
         assertEquals(ErrorType.INVALID_VALUE, error.type)
     }
 }

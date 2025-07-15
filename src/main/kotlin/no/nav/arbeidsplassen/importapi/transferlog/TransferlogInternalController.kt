@@ -1,33 +1,43 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import io.micronaut.http.annotation.PathVariable
-import io.micronaut.http.annotation.Put
-import io.swagger.v3.oas.annotations.Hidden
-import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.security.ProviderAllowed
+import io.javalin.Javalin
+import io.javalin.http.Context
+import io.javalin.http.HttpStatus
+import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
 
-@ProviderAllowed(value = [Roles.ROLE_ADMIN])
-@Controller("/internal/transfers")
-@Hidden
-class TransferlogInternalController(private val transferLogService: TransferLogService) {
+class TransferlogInternalController(private val transferLogService: TransferLogService) : JavalinController {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(TransferlogInternalController::class.java)
+
+        private fun Context.versionIdParam(): Long = pathParam("versionId").toLong()
     }
 
-    @Get("/{versionId}")
-    fun getByTransferId(@PathVariable versionId: Long):TransferLogDTO {
-        return transferLogService.findByVersionId(versionId)
+    override fun setupRoutes(javalin: Javalin) {
+        javalin.get(
+            "/internal/transfers/{versionId}",
+            { getByTransferId(it) },
+            Roles.ROLE_ADMIN
+        )
+        javalin.put(
+            "/internal/transfers/{versionId}/resend",
+            { resendTransfer(it) },
+            Roles.ROLE_ADMIN
+        )
     }
 
-    @Put("/{versionId}/resend")
-    fun resendTransfer(@PathVariable versionId: Long): TransferLogDTO {
+    fun getByTransferId(ctx: Context) {
+        val versionId = ctx.versionIdParam()
+        val transferLog = transferLogService.findByVersionId(versionId)
+        ctx.status(HttpStatus.OK).json(transferLog)
+    }
+
+    fun resendTransfer(ctx: Context) {
+        val versionId = ctx.versionIdParam()
         LOG.info("resend $versionId by admin")
-        return transferLogService.resend(versionId)
+        val transferLog = transferLogService.resend(versionId)
+        ctx.status(HttpStatus.OK).json(transferLog)
     }
-
 }
