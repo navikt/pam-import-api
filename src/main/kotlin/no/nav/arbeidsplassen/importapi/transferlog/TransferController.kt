@@ -139,7 +139,7 @@ class TransferController(
 
         val transferLogDTO = TransferLogDTO(payload = content, md5 = md5, items = ads.size, providerId = provider.id!!)
         val dto = transferLogService.save(transferLogDTO)
-        LOG.info("Successfully saved $dto")
+        LOG.info("Successfully saved ad with versionId ${transferLogDTO.versionId}")
         ctx.status(HttpStatus.CREATED).json(dto.apply { payload = null })
     }
 
@@ -331,7 +331,7 @@ class TransferController(
 
         LOG.info("stopAdByProviderReference providerId: {} reference: {}, delete: {}", providerId, reference, delete)
         val adState = adStateService.getAdStatesByProviderReference(providerId = providerId, reference = reference)
-        LOG.info("Found adState: {}", adState)
+        LOG.info("Found adState: {}", adState.id)
         val adStatus = if (delete) AdStatus.DELETED else AdStatus.STOPPED
         val adWithoutInvalidCategories =
             transferLogService.handleInvalidCategories(ad = adState.ad, providerId = providerId, reference = reference)
