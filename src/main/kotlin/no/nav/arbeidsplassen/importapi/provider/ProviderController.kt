@@ -22,10 +22,16 @@ class ProviderController(
     }
 
     override fun setupRoutes(javalin: Javalin) {
+        javalin.get("/internal/providers", { listProviders(it) }, Roles.ROLE_ADMIN)
         javalin.get("/internal/providers/{id}", { getProvider(it) }, Roles.ROLE_ADMIN)
         javalin.post("/internal/providers", { createProvider(it) }, Roles.ROLE_ADMIN)
         javalin.put("/internal/providers/{id}", { updateProvider(it) }, Roles.ROLE_ADMIN)
         javalin.put("/internal/providers/{id}/token", { generateNewTokenForProvider(it) }, Roles.ROLE_ADMIN)
+    }
+
+    fun listProviders(ctx: Context) {
+        val providers = providerService.findAll()
+        ctx.status(HttpStatus.OK).json(providers)
     }
 
     fun getProvider(ctx: Context) {

@@ -9,6 +9,8 @@ class ProviderService(
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 
+    fun findAll() : List<ProviderDTO> = providerRepository.findAll().map { it.toDTO() }
+
     fun findById(id: Long): ProviderDTO {
         return providerCache.get(id)
             ?: providerRepository.findById(id)!!.toDTO()
