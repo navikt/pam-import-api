@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import java.util.UUID
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxKafkaProducer.Meldingstype.IMPORT_API
 import no.nav.arbeidsplassen.importapi.kafka.HealthService
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
@@ -10,13 +9,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdOutboxKafkaProducerTest {
     @Test
     fun `AdOutboxKafkaProducer starter og klarer å produsere melding`() {
 
-        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
+        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.7.0")).use { container ->
             container.start()
 
             val healthService = HealthService()

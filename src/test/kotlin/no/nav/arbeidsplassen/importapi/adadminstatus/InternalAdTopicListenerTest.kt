@@ -38,7 +38,7 @@ class InternalAdTopicListenerTest {
         val adminStatusRepository = mock<AdminStatusRepository>()
         val internalAdTopicListener = InternalAdTopicListener(adminStatusRepository, objectMapper)
 
-        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka")).use { container ->
+        KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.7.0")).use { container ->
             container.start()
 
             val kafkaConfig = KafkaConfig(mapOf("KAFKA_BROKERS" to container.bootstrapServers))
