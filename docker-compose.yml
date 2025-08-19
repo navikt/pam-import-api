@@ -11,7 +11,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
   broker:
-    image: confluentinc/cp-kafka:5.5.0
+    image: confluentinc/cp-kafka:7.7.0
     hostname: broker
     container_name: broker_importapi
     depends_on:
@@ -37,8 +37,8 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
-    - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
-    command: ["postgres", "-c", "log_statement=none"]
+      - ./src/test/resources/postgres:/docker-entrypoint-initdb.d
+    command: [ "postgres", "-c", "log_statement=none" ]
   pamad:
     depends_on:
       - postgres

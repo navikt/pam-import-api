@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.adoutbox
 
-import java.util.UUID
 import no.nav.arbeidsplassen.importapi.config.TestKafkaConfigProperties
 import no.nav.arbeidsplassen.importapi.kafka.KafkaConfig
 import no.nav.arbeidsplassen.importapi.nais.HealthService
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.kafka.ConfluentKafkaContainer
+import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AdOutboxKafkaProducerTest {

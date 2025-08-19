@@ -22,6 +22,16 @@ class InternalAdTopicListener(
                 val adTransport = jacksonMapper.readValue<AdTransport>(message.payload)
                 if (adTransport.source == "IMPORTAPI") {
                     LOG.info("Mapping import api ad ${adTransport.uuid}")
+
+                    // Fix for NPE caused by uknown bug in pam-ad, skipping this ad
+                    if (setOf(
+                            "731557db-c5f3-4493-89ae-cf8ec4bdec85",
+                            "16b64093-14bb-4afc-8568-e2420bb21e90",
+                        ).contains(message.key)
+                    ) {
+                        return
+                    }
+
                     val adminStatus = adTransport.toAdminStatus(adminStatusRepository)
                     adminStatusRepository.save(adminStatus)
                     LOG.info("{} was saved as import-api ad", adminStatus.uuid)
