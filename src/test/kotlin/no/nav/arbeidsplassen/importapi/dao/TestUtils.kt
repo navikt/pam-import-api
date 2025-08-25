@@ -9,7 +9,17 @@ import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 class TestUtils
 
 fun ProviderRepository.newTestProvider(): Provider {
-    return save(Provider(identifier = "tester", email = "tester@tester.test", phone = "12345678"))
+    return save(
+        Provider(
+            identifier = "tester",
+            email = "tester@tester.test",
+            phone = "12345678"
+        )
+    )
+}
+
+fun ProviderRepository.findTestProvider(): Provider {
+    return findByIdentifier("tester")!!
 }
 
 fun ObjectMapper.transferJsonString(): String {
@@ -17,5 +27,7 @@ fun ObjectMapper.transferJsonString(): String {
 }
 
 fun ObjectMapper.transferToAdList(): List<AdDTO> {
-    return readValue(TestUtils::class.java.getResourceAsStream("/transfer-ads.json"), object: TypeReference<List<AdDTO>>(){})
+    return readValue(
+        TestUtils::class.java.getResourceAsStream("/transfer-ads.json"),
+        object : TypeReference<List<AdDTO>>() {})
 }

@@ -1,26 +1,20 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.micronaut.cache.annotation.CacheConfig
-import io.micronaut.cache.annotation.CacheInvalidate
-import io.micronaut.cache.annotation.Cacheable
-import no.nav.arbeidsplassen.importapi.Open
-import jakarta.inject.Singleton
-
-@Singleton
-@Open
-@CacheConfig("providers")
-class ProviderService(private val providerRepository: ProviderRepository) {
-
-
-    // the second parameter is used to cache invalidate, dont remove it.
-    @CacheInvalidate(parameters = ["id"])
+class ProviderService(
+    private val providerRepository: ProviderRepository,
+    private val providerCache: ProviderCache,
+) {
     fun save(dto: ProviderDTO, id: Long? = dto.id): ProviderDTO {
+        providerCache.invalidate(id)
         return providerRepository.save(dto.toEntity()).toDTO()
     }
 
-    @Cacheable
-    fun findById(id:Long): ProviderDTO {
-        return providerRepository.findById(id)!!.toDTO()
+    fun findAll() : List<ProviderDTO> = providerRepository.findAll().map { it.toDTO() }
+
+    fun findById(id: Long): ProviderDTO {
+        return providerCache.get(id)
+            ?: providerRepository.findById(id)!!.toDTO()
+                .also { providerCache.set(id, it) }
     }
 
     private fun ProviderDTO.toEntity(): Provider {
@@ -28,6 +22,6 @@ class ProviderService(private val providerRepository: ProviderRepository) {
     }
 
     private fun Provider.toDTO(): ProviderDTO {
-        return ProviderDTO(id=id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
+        return ProviderDTO(id = id, jwtid = jwtid, email = email, identifier = identifier, phone = phone)
     }
 }

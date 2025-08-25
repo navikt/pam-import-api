@@ -1,17 +1,15 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.inject.Singleton
 import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStateDTO
 import no.nav.arbeidsplassen.importapi.dto.AdStatePublicDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.provider.info
 
-@Singleton
 class AdStateService(
     private val adStateRepository: AdStateRepository,
     private val objectMapper: ObjectMapper,
@@ -24,9 +22,9 @@ class AdStateService(
             ?: throw ImportApiError("AdState with $uuid not found", ErrorType.NOT_FOUND)
     }
 
-    fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long):
-            AdStatePublicDTO = adStateRepository.findByUuidAndProviderId(uuid, providerId)?.toDTO()
-        ?: throw ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)
+    fun getAdStateByUuidAndProviderId(uuid: String, providerId: Long): AdStatePublicDTO =
+        adStateRepository.findByUuidAndProviderId(uuid, providerId)?.toDTO()
+            ?: throw ImportApiError("AdState with $uuid for provider $providerId not found", ErrorType.NOT_FOUND)
 
     fun getAdStatesByProviderReference(providerId: Long, reference: String): AdStatePublicDTO =
         adStateRepository.findByProviderIdAndReference(providerId, reference)?.toDTO()

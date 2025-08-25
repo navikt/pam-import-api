@@ -1,9 +1,9 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
-import jakarta.inject.Singleton
 import java.net.InetAddress
 import java.util.Collections
 import java.util.UUID
+import no.nav.arbeidsplassen.importapi.config.KafkaConfigProperties
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener
@@ -18,16 +18,9 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
-@Singleton
-open class KafkaConfig(envInput: Map<String, String> = emptyMap()) {
+open class KafkaConfig(private val kafkaConfigProperties: KafkaConfigProperties) {
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaConfig::class.java)
-    }
-
-    private val env: Map<String, String> = if (envInput == null || envInput.isEmpty()) {
-        System.getenv()
-    } else {
-        envInput
     }
 
     open fun kafkaJsonConsumer(topic: String, groupId: String): KafkaConsumer<String?, ByteArray?> {
@@ -56,29 +49,30 @@ open class KafkaConfig(envInput: Map<String, String> = emptyMap()) {
         return KafkaProducer(kafkaProducerProperties())
     }
 
-    private fun generateInstanceId(env: Map<String, String>): String {
-        if (env.containsKey("NAIS_APP_NAME")) return env["NAIS_APP_NAME"] + ":" + InetAddress.getLocalHost().hostName
-        return UUID.randomUUID().toString()
+    private fun generateInstanceId(kafkaConfigProperties: KafkaConfigProperties): String {
+        return kafkaConfigProperties.applicationName?.plus(":")?.plus(InetAddress.getLocalHost().hostName)
+            ?: UUID.randomUUID().toString()
+
     }
 
     private fun kafkaConsumerProperties(groupId: String): Map<String, Any> {
-        val clientId = generateInstanceId(env)
+        val clientId = generateInstanceId(kafkaConfigProperties)
         val autoOffsetResetConfig = "earliest"
 
         val props = mutableMapOf<String, Any>()
-        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]!!
+        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaConfigProperties.brokers
 
-        if (!env["KAFKA_CREDSTORE_PASSWORD"].isNullOrBlank()) {
-            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
+        if (!kafkaConfigProperties.credstorePassword.isNullOrBlank()) {
+            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
+            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
+            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
             props[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
             props[SslConfigs.SSL_KEYSTORE_TYPE_CONFIG] = "PKCS12"
         }
 
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_KEYSTORE_PATH"]?.let { props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL" }
+        kafkaConfigProperties.truststorePath?.let { props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = it }
+        kafkaConfigProperties.keystorePath?.let { props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = it }
+        kafkaConfigProperties.truststorePath?.let { props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL" }
 
         props[ConsumerConfig.GROUP_ID_CONFIG] = groupId
         props[ConsumerConfig.CLIENT_ID_CONFIG] = clientId
@@ -94,22 +88,22 @@ open class KafkaConfig(envInput: Map<String, String> = emptyMap()) {
     }
 
     private fun kafkaProducerProperties(): Map<String, Any> {
-        val clientId = generateInstanceId(env)
+        val clientId = generateInstanceId(kafkaConfigProperties)
 
         val props = mutableMapOf<String, Any>()
-        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = env["KAFKA_BROKERS"]!!
+        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = kafkaConfigProperties.brokers
 
-        if (!env["KAFKA_CREDSTORE_PASSWORD"].isNullOrBlank()) {
-            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
-            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = env["KAFKA_CREDSTORE_PASSWORD"]!!
+        if (!kafkaConfigProperties.credstorePassword.isNullOrBlank()) {
+            props[SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
+            props[SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
+            props[SslConfigs.SSL_KEY_PASSWORD_CONFIG] = kafkaConfigProperties.credstorePassword
             props[SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG] = "JKS"
             props[SslConfigs.SSL_KEYSTORE_TYPE_CONFIG] = "PKCS12"
         }
 
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_KEYSTORE_PATH"]?.let { props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = it }
-        env["KAFKA_TRUSTSTORE_PATH"]?.let { props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL" }
+        kafkaConfigProperties.truststorePath?.let { props[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = it }
+        kafkaConfigProperties.keystorePath?.let { props[SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG] = it }
+        kafkaConfigProperties.truststorePath?.let { props[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = "SSL" }
 
         props[ProducerConfig.CLIENT_ID_CONFIG] = clientId
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = ByteArraySerializer::class.java.name

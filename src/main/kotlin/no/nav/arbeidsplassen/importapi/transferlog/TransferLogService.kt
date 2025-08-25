@@ -1,6 +1,5 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import jakarta.inject.Singleton
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -9,19 +8,18 @@ import no.nav.arbeidsplassen.importapi.dto.AdDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryDTO
 import no.nav.arbeidsplassen.importapi.dto.CategoryType
 import no.nav.arbeidsplassen.importapi.dto.TransferLogDTO
-import no.nav.arbeidsplassen.importapi.exception.ErrorType
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError
-import no.nav.arbeidsplassen.importapi.ontologi.LokalOntologiGateway
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType
+import no.nav.arbeidsplassen.importapi.ontologi.OntologiGateway
 import no.nav.arbeidsplassen.importapi.properties.PropertyNameValueValidation
 import no.nav.arbeidsplassen.importapi.properties.PropertyNames
 import org.slf4j.LoggerFactory
 
 
-@Singleton
 class TransferLogService(
     private val transferLogRepository: TransferLogRepository,
     private val propertyNameValueValidation: PropertyNameValueValidation,
-    private val ontologiGateway: LokalOntologiGateway
+    private val ontologiGateway: OntologiGateway
 ) {
 
     companion object {
@@ -33,13 +31,13 @@ class TransferLogService(
             Boolean = transferLogRepository.existsByProviderIdAndMd5(providerId, md5)
 
     fun save(dto: TransferLogDTO): TransferLogDTO {
+        LOG.info("Saving transfer log for provider ${dto.providerId} with md5 ${dto.md5} and versionId ${dto.versionId}")
         return transferLogRepository.save(dto.toEntity()).toDTO()
     }
 
     fun findByVersionIdAndProviderId(versionId: Long, providerId: Long): TransferLogDTO {
-        return transferLogRepository.findByIdAndProviderId(versionId, providerId)?.toDTO()
+        return transferLogRepository.findByIdAndProviderId(id = versionId, providerId = providerId)?.toDTO()
             ?: throw ImportApiError("Transfer $versionId not found", ErrorType.NOT_FOUND)
-
     }
 
     fun findByVersionId(versionId: Long): TransferLogDTO {

@@ -2,13 +2,11 @@ package no.nav.arbeidsplassen.importapi.adadminstatus
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import jakarta.inject.Singleton
 import no.nav.arbeidsplassen.importapi.feed.AdTransport
 import no.nav.arbeidsplassen.importapi.kafka.KafkaTopicJsonListener
 import org.slf4j.LoggerFactory
 
 
-@Singleton
 class InternalAdTopicListener(
     private val adminStatusRepository: AdminStatusRepository,
     private val jacksonMapper: ObjectMapper

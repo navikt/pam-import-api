@@ -77,5 +77,6 @@ spec:
         - application: pam-ontologi
     inbound:
       rules:
+        - application: pam-import-api-admin
         - application: toi-publisering-til-arbeidsplassen
           namespace: toi
