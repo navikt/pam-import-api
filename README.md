@@ -3,7 +3,7 @@
 
 ## Beskrivelse
 
-pam-import-api er en applikasjon som lar stillingsleverandærer laste opp og publisere stillingsannonser
+pam-import-api er en applikasjon som lar stillingsleverandører laste opp og publisere stillingsannonser
 på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
 
 # Technical documentation
