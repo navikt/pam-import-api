@@ -1,7 +1,5 @@
 package no.nav.arbeidsplassen.importapi.kafka
 
-import java.time.Duration
-import java.time.LocalDateTime
 import no.nav.arbeidsplassen.importapi.leaderelection.LeaderElection
 import no.nav.arbeidsplassen.importapi.nais.HealthService
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -13,10 +11,13 @@ import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.errors.AuthorizationException
 import org.intellij.lang.annotations.Language
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.LocalDateTime
 
 abstract class KafkaTopicListener<T> {
     companion object {
         private val LOG = LoggerFactory.getLogger(KafkaTopicListener::class.java)
+        private const val TEN_SECONDS = 10_000L
     }
 
     abstract val leaderElection: LeaderElection
@@ -30,9 +31,16 @@ abstract class KafkaTopicListener<T> {
         LOG.info("Starter Kafka listener")
         var records: ConsumerRecords<String?, T?>?
 
-        // Når kun leader poller på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
-        // og fortsatt kunne håndtere REST-kall
-        while (healthService.isHealthy() && leaderElection.isLeader() && !Thread.currentThread().isInterrupted) {
+        while (healthService.isHealthy() && !Thread.currentThread().isInterrupted) {
+
+            // Når kun ikke-leader poller på kafkameldinger vil systemet som en helhet overleve en potensiell giftpille
+            // og fortsatt kunne håndtere REST-kall
+            // Leader står derfor bare og surrer her, og sover i 10 sekunder av gangen
+            if (leaderElection.isLeader()) {
+                Thread.sleep(TEN_SECONDS)
+                continue
+            }
+
             var currentPositions = mutableMapOf<TopicPartition, Long>()
             try {
                 LOG.info("Poller i Kafka listener")
@@ -65,13 +73,17 @@ abstract class KafkaTopicListener<T> {
             }
         }
         if (!healthService.isHealthy()) {
-            LOG.info("Stopper i Kafka listener fordi applikasjonen ikke er healthy")
+            LOG.info("Stoppet i Kafka listener fordi applikasjonen ikke er healthy")
         }
         if (!Thread.currentThread().isInterrupted) {
-            LOG.info("Stopper i Kafka listener fordi listener thread er interrupted")
+            LOG.info("Stoppet i Kafka listener fordi listener thread er interrupted")
         }
 
-        kafkaConsumer.close()
+        try {
+            kafkaConsumer.close()
+        } catch (e: Exception) {
+            LOG.warn("Exception ved closing av kafka consumer: ${e.message}", e)
+        }
     }
 
     private fun offsetMetadata(offset: Long): OffsetAndMetadata {

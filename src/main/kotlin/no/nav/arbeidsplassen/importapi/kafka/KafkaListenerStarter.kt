@@ -43,7 +43,7 @@ class KafkaListenerStarter(
     }
 
     fun stop() {
-        if (adminStatusSyncKafkaEnabled && leaderElection.isLeader()) {
+        if (adminStatusSyncKafkaEnabled) {
             LOG.info("Stopper kafka rapid listener")
             try {
                 listenerThread.interrupt()
