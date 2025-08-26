@@ -28,6 +28,7 @@ class InternalAdTopicListener(
                             "731557db-c5f3-4493-89ae-cf8ec4bdec85",
                             "16b64093-14bb-4afc-8568-e2420bb21e90",
                             "6083d0ab-899f-41a6-84a0-4d343686851b",
+                            "455230ba-a5b5-4367-8056-742817e4a877",
                         ).contains(message.key)
                     ) {
                         return
