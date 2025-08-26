@@ -199,7 +199,8 @@ class TransferController(
                             LOG.info("Leser neste token")
                             token = parser.nextToken()
                         } catch (e: JsonParseException) {
-                            LOG.error("JsonParseException i streaming apiet: ${e.message}", e)
+                            LOG.error("JsonParseException i streaming apiet for provider $providerId: ${e.message}", e)
+                            LOG.error("Json token er $token")
                             objectMapper.writeValue(outputStream, handleError(e, providerId))
                             break
                         }
