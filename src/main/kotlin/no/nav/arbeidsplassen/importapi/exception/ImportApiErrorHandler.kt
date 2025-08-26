@@ -8,17 +8,12 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
 import io.javalin.Javalin
 import io.javalin.http.HttpStatus
-import java.util.UUID
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.CONFLICT
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.INVALID_VALUE
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.MISSING_PARAMETER
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.NOT_FOUND
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.PARSE_ERROR
-import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.UNKNOWN
+import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.*
 import no.nav.arbeidsplassen.importapi.security.ForbiddenException
 import no.nav.arbeidsplassen.importapi.security.NotFoundException
 import no.nav.arbeidsplassen.importapi.security.UnauthorizedException
 import org.slf4j.LoggerFactory
+import java.util.*
 
 object ImportApiErrorHandler {
 
@@ -35,6 +30,9 @@ object ImportApiErrorHandler {
         return this
             .exception(ImportApiError::class.java) { e, ctx ->
                 val message: ErrorMessage = createMessage(e)
+                if (e.message?.startsWith("AdAdminStatus for") ?: false) {
+                    LOG.info("$message")
+                }
                 LOG.warn("$message", e)
                 val status: HttpStatus = when (e.type) {
                     NOT_FOUND -> HttpStatus.NOT_FOUND
