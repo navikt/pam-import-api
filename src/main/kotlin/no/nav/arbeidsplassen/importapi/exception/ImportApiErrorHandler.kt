@@ -33,7 +33,7 @@ object ImportApiErrorHandler {
                 if (e.message?.startsWith("AdAdminStatus for") ?: false) {
                     LOG.info("$message")
                 }
-                LOG.warn("$message", e)
+                LOG.warn("ImportApiError: $message", e)
                 val status: HttpStatus = when (e.type) {
                     NOT_FOUND -> HttpStatus.NOT_FOUND
                     MISSING_PARAMETER, INVALID_VALUE, PARSE_ERROR -> HttpStatus.BAD_REQUEST
@@ -44,7 +44,7 @@ object ImportApiErrorHandler {
             }
             .exception(JsonProcessingException::class.java) { e, ctx ->
                 val message: ErrorMessage = handleJsonProcessingException(e)
-                LOG.warn("$message", e)
+                LOG.warn("JsonProcessingException: $message", e)
                 ctx.status(HttpStatus.BAD_REQUEST).json(message)
             }
             .exception(NotFoundException::class.java) { e, ctx ->
@@ -60,7 +60,7 @@ object ImportApiErrorHandler {
                 LOG.info("IllegalArgumentException: ${e.message}", e)
                 ctx.status(400).result(e.message ?: "")
             }.exception(Exception::class.java) { e, ctx ->
-                LOG.info("Exception: ${e.message}", e)
+                LOG.warn("Catch-all exception: ${e.message}", e)
                 ctx.status(500).result(e.message ?: "")
             }
     }
