@@ -13,14 +13,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import io.javalin.Javalin
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
-import io.javalin.openapi.HttpMethod
-import io.javalin.openapi.OpenApi
-import io.javalin.openapi.OpenApiContent
-import io.javalin.openapi.OpenApiParam
-import io.javalin.openapi.OpenApiRequestBody
-import io.javalin.openapi.OpenApiResponse
-import io.javalin.openapi.OpenApiSecurity
-import java.time.LocalDateTime
+import io.javalin.openapi.*
 import no.nav.arbeidsplassen.importapi.adstate.AdStateService
 import no.nav.arbeidsplassen.importapi.common.toMD5Hex
 import no.nav.arbeidsplassen.importapi.config.JavalinController
@@ -33,6 +26,7 @@ import no.nav.arbeidsplassen.importapi.exception.feltFraPathReference
 import no.nav.arbeidsplassen.importapi.provider.ProviderService
 import no.nav.arbeidsplassen.importapi.security.Roles
 import org.slf4j.LoggerFactory
+import java.time.LocalDateTime
 
 class TransferController(
     private val transferLogService: TransferLogService,
@@ -174,6 +168,7 @@ class TransferController(
                 parser.nextToken()
             } catch (ex: JsonParseException) {
                 // Kommer hvis inputstreamen inneholder gibberish
+                LOG.warn("JsonParseException pga gibberish i streamen: ${ex.message}", ex)
                 ctx
                     .status(200)
                     .outputStream().use { outputStream ->
@@ -183,6 +178,7 @@ class TransferController(
             }
 
             if (token == null) {
+                LOG.warn("Tom inputstream")
                 // Kommer hvis inputstreamen er tom
                 ctx.status(400)
                 return
@@ -203,7 +199,7 @@ class TransferController(
                             LOG.info("Leser neste token")
                             token = parser.nextToken()
                         } catch (e: JsonParseException) {
-                            LOG.error("JsonParseException", e)
+                            LOG.error("JsonParseException i streaming apiet: ${e.message}", e)
                             objectMapper.writeValue(outputStream, handleError(e, providerId))
                             break
                         }
