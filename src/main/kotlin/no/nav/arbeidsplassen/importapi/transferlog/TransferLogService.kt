@@ -175,7 +175,7 @@ class TransferLogService(
 
     private fun locationMustHavePostalCodeOrCountyMunicipal(ad: AdDTO) = (ad.locationList.isNotEmpty()
             && (!ad.locationList[0].postalCode.isNullOrEmpty() ||
-            (!ad.locationList[0].county.isNullOrEmpty() && !ad.locationList[0].municipal.isNullOrEmpty())))
+            !ad.locationList[0].county.isNullOrEmpty() || !ad.locationList[0].municipal.isNullOrEmpty()))
 
     private fun isCountryAbroad(ad: AdDTO) = ad.locationList.isNotEmpty() && ad.locationList[0].isCountryAbroad()
 
