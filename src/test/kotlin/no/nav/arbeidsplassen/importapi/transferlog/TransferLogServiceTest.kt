@@ -130,4 +130,26 @@ class TransferLogServiceTest {
             exception.message
         )
     }
+
+    @Test
+    fun `Does accept ad with only county set`() {
+        val ad = AdDTO(
+            published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(county = "Vestland"))
+        )
+        transferLogService.validate(ad)
+    }
+
+    @Test
+    fun `Does accept ad with only municipality set`() {
+        val ad = AdDTO(
+            published = LocalDateTime.now(), expires = LocalDateTime.now(),
+            adText = "adText", employer = EmployerDTO(null, "test", null, LocationDTO()),
+            reference = UUID.randomUUID().toString(), title = "title",
+            locationList = listOf(LocationDTO(municipal = "Bergen"))
+        )
+        transferLogService.validate(ad)
+    }
 }
