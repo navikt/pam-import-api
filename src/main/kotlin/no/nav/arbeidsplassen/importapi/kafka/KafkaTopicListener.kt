@@ -68,8 +68,14 @@ abstract class KafkaTopicListener<T> {
                 LOG.error("Uventet Exception i consumerloop, restarter app ${e.message}", e)
                 healthService.addUnhealthyVote()
             } finally {
-                kafkaConsumer.commitSync(currentPositions.mapValues { (_, offset) -> offsetMetadata(offset) })
-                currentPositions.clear()
+                try {
+                    kafkaConsumer.commitSync(currentPositions.mapValues { (_, offset) -> offsetMetadata(offset) })
+                } catch (e: Exception) {
+                    LOG.error("Exception ved commitSync, restarter app ${e.message}", e)
+                    healthService.addUnhealthyVote()
+                } finally {
+                    currentPositions.clear()
+                }
             }
         }
         if (!healthService.isHealthy()) {
