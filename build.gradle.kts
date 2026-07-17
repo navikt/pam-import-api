@@ -15,7 +15,7 @@ val logbackSyslogVersion = "1.0.0"
 val nimbusVersion = "10.0.2"
 val flywayVersion = "11.5.0"
 val hikariVersion = "5.1.0"
-val kafkaClientsVersion = "3.9.1"
+val kafkaClientsVersion = "3.9.2"
 val openApiVersion = "6.7.0-1"
 
 val testContainersVersion = "1.21.3"
