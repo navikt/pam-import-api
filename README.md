@@ -65,6 +65,17 @@ All secrets are now available in the Nais console. There are three of them:
 ./gradlew run
 ```
 
+### Controller tests
+
+Controller tests send real HTTP requests to Javalin using the JDK HTTP client and the application's
+Jackson mapper. The shared application starts on an OS-assigned port and is stopped by a JUnit
+extension after the test suite; its database connection pool is closed as well.
+Tests assert HTTP status codes and response bodies directly, including error responses and JSON streams.
+
+```
+./gradlew test --tests '*ControllerTest'
+```
+
 ## Run Kafka and Postgres with docker-compose
 
 ```

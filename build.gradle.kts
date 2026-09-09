@@ -101,8 +101,6 @@ dependencies {
     testImplementation("org.awaitility:awaitility:4.3.0")
     testImplementation("org.mockito:mockito-core:5.23.0")
 
-    testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:3.9.0")
-    testImplementation("io.micronaut:micronaut-jackson-databind:4.10.25")
     testImplementation("net.javacrumbs.json-unit:json-unit:6.2.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:5.5.0")
 }

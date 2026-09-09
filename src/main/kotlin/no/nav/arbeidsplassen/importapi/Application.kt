@@ -32,12 +32,12 @@ fun main() {
 
 const val KONSUMENT_ID_MDC_KEY = "konsument_id"
 
-fun ApplicationContext.startApp(): Javalin {
+fun ApplicationContext.startApp(port: Int = 9028): Javalin {
 
     kjørFlywayMigreringer(this.databaseApplicationContext.dataSource)
 
     return startJavalin(
-        port = 9028,
+        port = port,
         jsonMapper = JavalinJackson(this.baseServicesApplicationContext.objectMapper),
         meterRegistry = this.baseServicesApplicationContext.prometheusRegistry,
         accessManager = this.securityServicesApplicationContext.accessManager,

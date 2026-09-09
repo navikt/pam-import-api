@@ -1,24 +1,17 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
-import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import java.net.URI
 import java.time.LocalDateTime
 import java.util.UUID
 import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
 import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
 import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestHttpClient
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.provider.ProviderRepository
 import no.nav.arbeidsplassen.importapi.security.TokenService
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,7 +23,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
 
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
 
-    private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
+    private val client = TestHttpClient(lokalUrlBase, appCtx.baseServicesApplicationContext.objectMapper)
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsControllerTest::class.java)
@@ -85,14 +78,11 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
-        val getRequest =
-            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-
-        val response: HttpResponse<String> = client.exchange(getRequest, String::class.java).blockingFirst()
-        assertEquals(HttpStatus.OK, response.status)
+        val response = client.get(
+            "api/v1/stats/${providerId}?from=${from}&sort=created,asc&size=10&page=1",
+            adminToken
+        )
+        assertEquals(200, response.statusCode())
 
         val expectedJson = """
             {
@@ -129,14 +119,8 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
-        val getRequest =
-            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-
-        val response: HttpResponse<String> = client.exchange(getRequest, String::class.java).blockingFirst()
-        assertEquals(HttpStatus.OK, response.status)
+        val response = client.get("api/v1/stats/${providerId}?from=${from}", adminToken)
+        assertEquals(200, response.statusCode())
 
         val expectedJson = """
             {
@@ -167,35 +151,20 @@ class AdPulsControllerTest() : TestRunningApplication() {
                 "content",
                 "pageable.sort.orderBy"
             )
-            // Micronaut gir en tom orderBy når man ikke sender noe inn
-            // Her er spørringen som brukes:
-            // SELECT ad_puls_."id",ad_puls_."provider_id",ad_puls_."uuid",ad_puls_."reference",ad_puls_."type",ad_puls_."total",ad_puls_."created",ad_puls_."updated" FROM "ad_puls" ad_puls_ WHERE (ad_puls_."provider_id" = ? AND ad_puls_."updated" > ?) LIMIT 1000
-            // Dette er en dum spørring, så dette vil vi ikke videreføre når vi skriver vekk Micronaut Data. Derfor legger jeg til pageable.sort.orderBy på whenIgnoringPaths
         )
         LOG.info("Body" + response.body())
     }
 
     @Test
     fun `GET med feilaktig sort skal gi 400`() {
-        // HPH : Denne er endret fra Micronaut til Javalin, i Micronaut returnerte den 500,
-        // men jeg synes 400 gir mer mening og tenker det er en grei endring..
         val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
-        val getRequest =
-            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-
-        try {
-            client.exchange(getRequest, String::class.java).blockingFirst()
-            fail("Should have thrown HttpClientResponseException")
-            // Litt usikker på hvorfor den automatisk mapper til en exception i stedet for at dette fungerer:
-            // assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.status)
-        } catch (ex: HttpClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, ex.status)
-        }
+        val response = client.get(
+            "api/v1/stats/${providerId}?from=${from}&sort=foobar,asc&size=10&page=1",
+            adminToken
+        )
+        assertEquals(400, response.statusCode())
     }
 
     @Test
@@ -203,14 +172,11 @@ class AdPulsControllerTest() : TestRunningApplication() {
         val providerId = providerRepository.findTestProvider().id!!
         val from = LocalDateTime.now().minusHours(20)
         val adminToken = tokenService.adminToken()
-        val getRequest =
-            HttpRequest.GET<String>("api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_TYPE)
-                .bearerAuth(adminToken)
-
-        val response: HttpResponse<String> = client.exchange(getRequest, String::class.java).blockingFirst()
-        assertEquals(HttpStatus.OK, response.status)
+        val response = client.get(
+            "api/v1/stats/${providerId}?from=${from}&sort=created&size=10&page=1",
+            adminToken
+        )
+        assertEquals(200, response.statusCode())
 
         val expectedJson = """
             {
@@ -241,10 +207,6 @@ class AdPulsControllerTest() : TestRunningApplication() {
                 "content",
                 "pageable.sort.orderBy"
             )
-            // Micronaut gir en tom orderBy når man ikke sender noe inn
-            // Her er spørringen som brukes:
-            // SELECT ad_puls_."id",ad_puls_."provider_id",ad_puls_."uuid",ad_puls_."reference",ad_puls_."type",ad_puls_."total",ad_puls_."created",ad_puls_."updated" FROM "ad_puls" ad_puls_ WHERE (ad_puls_."provider_id" = ? AND ad_puls_."updated" > ?) LIMIT 1000
-            // Dette er en dum spørring, så dette vil vi ikke videreføre når vi skriver vekk Micronaut Data. Derfor legger jeg til pageable.sort.orderBy på whenIgnoringPaths, vi vil legge til default sortering
         )
         LOG.info("Body" + response.body())
     }

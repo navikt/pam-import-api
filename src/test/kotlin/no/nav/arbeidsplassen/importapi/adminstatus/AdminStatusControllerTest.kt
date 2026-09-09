@@ -1,16 +1,13 @@
 package no.nav.arbeidsplassen.importapi.adminstatus
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.MediaType
-import io.micronaut.rxjava3.http.client.Rx3HttpClient
-import java.net.URI
 import java.util.UUID
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.PublishStatus
 import no.nav.arbeidsplassen.importapi.adadminstatus.Status
 import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
+import no.nav.arbeidsplassen.importapi.app.TestHttpClient
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
 import no.nav.arbeidsplassen.importapi.dao.newTestProvider
 import no.nav.arbeidsplassen.importapi.dto.AdAdminStatusDTO
@@ -33,7 +30,7 @@ class AdminStatusControllerTest : TestRunningApplication() {
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
     private val objectMapper: ObjectMapper = appCtx.baseServicesApplicationContext.objectMapper
 
-    private val client: Rx3HttpClient = Rx3HttpClient.create(URI(lokalUrlBase).toURL())
+    private val client = TestHttpClient(lokalUrlBase, objectMapper)
 
     private val txTemplate: TxTemplate = appCtx.databaseApplicationContext.txTemplate
 
@@ -77,12 +74,10 @@ class AdminStatusControllerTest : TestRunningApplication() {
         val providerId = providerRepository.findTestProvider().id!!
 
         val adminToken = tokenService.adminToken()
-        val get = HttpRequest.GET<AdAdminStatusDTO>("api/v1/adminstatus/$providerId/12345")
-            .contentType(MediaType.APPLICATION_JSON)
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .bearerAuth(adminToken)
-        val adminstatus = client.exchange(get, AdAdminStatusDTO::class.java).blockingFirst()
-        assertEquals(adminstatus.body.get().reference, "12345")
-        LOG.info(objectMapper.writeValueAsString(adminstatus.body.get()))
+        val response = client.get("api/v1/adminstatus/$providerId/12345", adminToken)
+        assertEquals(200, response.statusCode())
+        val adminstatus = objectMapper.readValue(response.body(), AdAdminStatusDTO::class.java)
+        assertEquals("12345", adminstatus.reference)
+        LOG.info(objectMapper.writeValueAsString(adminstatus))
     }
 }
