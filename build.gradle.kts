@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 val jacksonVersion = "2.22.2"
 val javalinVersion = "7.2.3"
 val micrometerVersion = "1.17.1"
@@ -22,7 +20,6 @@ val testContainersVersion = "1.21.4"
 plugins {
     kotlin("jvm") version "2.4.10"
     kotlin("kapt") version "2.4.10"
-    id("com.gradleup.shadow") version "9.6.1"
     application
 }
 
@@ -48,11 +45,6 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<ShadowJar> {
-    archiveFileName.set("pam-import-api-all.jar")
-    mergeServiceFiles()
-}
-
 kapt {
     javacOptions {
         option("--enable-preview", "")
@@ -72,7 +64,6 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
 
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
