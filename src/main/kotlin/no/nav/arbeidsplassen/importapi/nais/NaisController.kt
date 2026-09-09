@@ -1,10 +1,9 @@
 package no.nav.arbeidsplassen.importapi.nais
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.ContentType
 import io.javalin.http.HttpStatus
-import io.micrometer.prometheus.PrometheusMeterRegistry
-import io.prometheus.client.exporter.common.TextFormat
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.arbeidsplassen.importapi.config.JavalinController
 import no.nav.arbeidsplassen.importapi.config.SecretSignatureConfigProperties
 import org.slf4j.LoggerFactory
@@ -18,8 +17,8 @@ class NaisController(
         private val LOG = LoggerFactory.getLogger(NaisController::class.java)
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get("/internal/isReady", {
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get("/internal/isReady", {
             if ("Thisisaverylongsecretandcanonlybeusedintest" == secretSignatureConfigProperties.secret) {
                 it
                     .contentType(ContentType.TEXT_PLAIN)
@@ -32,7 +31,7 @@ class NaisController(
                     .result("OK")
             }
         })
-        javalin.get(
+        javalin.routes.get(
             "/internal/isAlive",
             {
                 if (healthService.isHealthy()) {
@@ -49,11 +48,11 @@ class NaisController(
                 }
             }
         )
-        javalin.get(
+        javalin.routes.get(
             "/internal/prometheus",
             {
                 it
-                    .contentType(TextFormat.CONTENT_TYPE_004)
+                    .contentType(ContentType.TEXT_PLAIN)
                     .result(prometheusMeterRegistry.scrape())
             }
         )

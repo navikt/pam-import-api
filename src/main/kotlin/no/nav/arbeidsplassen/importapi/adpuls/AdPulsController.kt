@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adpuls
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
@@ -36,8 +36,8 @@ class AdPulsController(private val adPulsService: AdPulsService) : JavalinContro
         private fun Context.sortParams(): List<String>? = queryParams("sort").flatMap { it.split(",") }
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get(
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get(
             "/api/v1/stats/{providerId}",
             { getAllTodayStatsForProvider(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN

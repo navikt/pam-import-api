@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.transferlog
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.config.JavalinController
@@ -15,13 +15,13 @@ class TransferlogInternalController(private val transferLogService: TransferLogS
         private fun Context.versionIdParam(): Long = pathParam("versionId").toLong()
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get(
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get(
             "/internal/transfers/{versionId}",
             { getByTransferId(it) },
             Roles.ROLE_ADMIN
         )
-        javalin.put(
+        javalin.routes.put(
             "/internal/transfers/{versionId}/resend",
             { resendTransfer(it) },
             Roles.ROLE_ADMIN

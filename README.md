@@ -11,7 +11,7 @@ på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
 ## Technologies
 
 * Kotlin
-* Micronaut
+* Javalin
 * Postgres
 * Kafka
 
@@ -65,6 +65,17 @@ All secrets are now available in the Nais console. There are three of them:
 ./gradlew run
 ```
 
+### Controller tests
+
+Controller tests send real HTTP requests to Javalin using the JDK HTTP client and the application's
+Jackson mapper. The shared application starts on an OS-assigned port and is stopped by a JUnit
+extension after the test suite; its database connection pool is closed as well.
+Tests assert HTTP status codes and response bodies directly, including error responses and JSON streams.
+
+```
+./gradlew test --tests '*ControllerTest'
+```
+
 ## Run Kafka and Postgres with docker-compose
 
 ```
@@ -73,16 +84,9 @@ docker-compose up --build
 
 ### Kafka
 
-Running with Kafka in tests, you need to add these system properties:
-
-```
-KAFKA_BOOTSTRAP_SERVERS=host1:port,host2:port
-KAFKA_SSL_TRUSTSTORE_LOCATION=truststore
-KAFKA_SSL_TRUSTSTORE_PASSWORD=truststorepassword
-KAFKA_SASL_MECHANISME=PLAIN
-KAFKA_SASL_JAAS_CONFIG='org.apache.kafka.common.security.plain.PlainLoginModule required username=kafka password=password;'
-KAFKA_SECURITY_PROTOKOL=SASL_SSL
-```
+Kafka integration tests use Testcontainers and require Docker. `TestKafkaConfigProperties` supplies
+the broker address without SSL credentials for local tests. The application reads `KAFKA_BROKERS`,
+not `KAFKA_BOOTSTRAP_SERVERS`.
 
 ### Creating new provider in test
 

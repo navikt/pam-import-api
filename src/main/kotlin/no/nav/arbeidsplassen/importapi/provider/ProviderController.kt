@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.provider
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import java.util.UUID
@@ -21,12 +21,12 @@ class ProviderController(
         private fun Context.providerBody(): ProviderDTO = this.bodyAsClass(ProviderDTO::class.java)
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get("/internal/providers", { listProviders(it) }, Roles.ROLE_ADMIN)
-        javalin.get("/internal/providers/{id}", { getProvider(it) }, Roles.ROLE_ADMIN)
-        javalin.post("/internal/providers", { createProvider(it) }, Roles.ROLE_ADMIN)
-        javalin.put("/internal/providers/{id}", { updateProvider(it) }, Roles.ROLE_ADMIN)
-        javalin.put("/internal/providers/{id}/token", { generateNewTokenForProvider(it) }, Roles.ROLE_ADMIN)
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get("/internal/providers", { listProviders(it) }, Roles.ROLE_ADMIN)
+        javalin.routes.get("/internal/providers/{id}", { getProvider(it) }, Roles.ROLE_ADMIN)
+        javalin.routes.post("/internal/providers", { createProvider(it) }, Roles.ROLE_ADMIN)
+        javalin.routes.put("/internal/providers/{id}", { updateProvider(it) }, Roles.ROLE_ADMIN)
+        javalin.routes.put("/internal/providers/{id}/token", { generateNewTokenForProvider(it) }, Roles.ROLE_ADMIN)
     }
 
     fun listProviders(ctx: Context) {

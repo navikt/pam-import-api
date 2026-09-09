@@ -1,8 +1,8 @@
 package no.nav.arbeidsplassen.importapi.config
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 
 interface JavalinController {
 
-    fun setupRoutes(javalin: Javalin)
+    fun setupRoutes(javalin: JavalinConfig)
 }

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory
  *   }
  * }
  * ```
- * Internt ligger transaksjonskonteksten i en ScopedValue. Dette er en eksperimentell feature i java 21-23
+ * Internt ligger transaksjonskonteksten i en ScopedValue. Dette er en stabil feature fra Java 25
  * som håndterer lettvektstråder (LWT) bedre enn ThreadLocal.
  * Default transaksjonssemantikk er PropagationRequired. Dvs at det blir startet en ny transaksjon hvis det ikke allerede finnes
  * en pågående transaksjon. Hvis det finnes en pågående transaksjon, så blir ny transaksjon del av eksisterende.
@@ -74,9 +74,7 @@ class TxTemplate(private val ds: DataSource) {
 
         val ctx = if (isNestedTransaction) scopedValueTxContext.get() else TxContext(conn)
 
-        // NB: ScopedValue.where er litt endret fra java 21 til 23.
-        //     I Java 21 så funker ScopedValue.callWhere helt fint, i 23 må det deles opp
-        return ScopedValue.callWhere(scopedValueTxContext, ctx) {
+        return ScopedValue.where(scopedValueTxContext, ctx).call<R?, Throwable> {
             var result: R? = null
             var resultEx: Throwable? = null
             try {

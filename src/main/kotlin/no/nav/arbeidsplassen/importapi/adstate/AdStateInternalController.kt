@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.config.JavalinController
@@ -14,14 +14,14 @@ class AdStateInternalController(private val adStateService: AdStateService) : Ja
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get(
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get(
             "/internal/adstates/{uuid}",
             { getAdState(it) },
             Roles.ROLE_ADMIN
         )
 
-        javalin.put(
+        javalin.routes.put(
             "/internal/adstates/{uuid}/resend",
             { resendAdState(it) },
             Roles.ROLE_ADMIN

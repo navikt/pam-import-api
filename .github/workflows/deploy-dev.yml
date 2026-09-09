@@ -19,6 +19,6 @@ jobs:
       id-token: write
     with:
       NAIS_RESOURCE: naiserator.yml
-      JAVA_VERSION: '21'
+      JAVA_VERSION: '25'
     secrets:
       NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}

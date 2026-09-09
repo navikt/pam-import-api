@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adstate
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.config.JavalinController
@@ -16,9 +16,9 @@ class AdPreviewController(
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get("/api/v1/preview/{uuid}", { previewAd(it) })
-        javalin.get("/frontend/{uuid}", { forwardIndexHtml(it) })
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get("/api/v1/preview/{uuid}", { previewAd(it) })
+        javalin.routes.get("/frontend/{uuid}", { forwardIndexHtml(it) })
     }
 
     // Fixme: HPH Denne ser ikke ut til å være i bruk basert på accessloggene

@@ -11,7 +11,6 @@ val quartzVersion = "2.5.2"
 val commonsTextVersion = "1.15.0"
 val logbackVersion = "1.6.3"
 val logbackEncoderVersion = "9.0"
-val logbackSyslogVersion = "1.0.0"
 val nimbusVersion = "10.9.1"
 val flywayVersion = "13.4.0"
 val hikariVersion = "7.1.0"
@@ -24,12 +23,15 @@ plugins {
     kotlin("jvm") version "2.4.10"
     kotlin("kapt") version "2.4.10"
     id("com.gradleup.shadow") version "9.6.1"
-    // id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     application
 }
 
 application {
     mainClass.set("no.nav.arbeidsplassen.importapi.ApplicationKt")
+}
+
+kotlin {
+    jvmToolchain(25)
 }
 
 repositories {
@@ -58,20 +60,16 @@ kapt {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
     implementation("io.javalin:javalin:$javalinVersion")
-    implementation("org.eclipse.jetty:jetty-util")
     implementation("io.javalin:javalin-micrometer:$javalinVersion")
     implementation("io.micrometer:micrometer-core:$micrometerVersion")
     implementation("io.micrometer:micrometer-registry-prometheus:$micrometerVersion")
-    // implementation("io.prometheus:simpleclient_common:0.16.0")
 
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
-    implementation("com.papertrailapp:logback-syslog4j:$logbackSyslogVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusVersion")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
@@ -92,20 +90,9 @@ dependencies {
     implementation("io.javalin.community.openapi:javalin-redoc-plugin:$openApiVersion") // for Redoc UI
 
     testImplementation(kotlin("test"))
-    testImplementation("org.assertj:assertj-core:3.27.7")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("org.testcontainers:kafka:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("io.mockk:mockk:1.14.11")
-    testImplementation("org.awaitility:awaitility:4.3.0")
     testImplementation("org.mockito:mockito-core:5.23.0")
 
-    testImplementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client:4.1.0")
-    testImplementation("io.micronaut:micronaut-jackson-databind:5.1.13")
-    testImplementation("net.javacrumbs.json-unit:json-unit:6.2.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:5.5.0")
 }
-
-
-// run.jvmArgs("-noverify", "-XX:TieredStopAtLevel=1", "-Dcom.sun.management.jmxremote", "-Dlogback.configurationFile=src/test/resources/logback-test.xml", "--enable-preview")
