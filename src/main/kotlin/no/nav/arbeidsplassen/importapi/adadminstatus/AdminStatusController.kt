@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.adadminstatus
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
@@ -24,20 +24,20 @@ class AdminStatusController(private val adminStatusService: AdminStatusService) 
         private fun Context.uuidParam(): String = pathParam("uuid")
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get(
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get(
             "/api/v1/adminstatus/{providerId}/{reference}",
             { adAdminStatus(it) },
             Roles.ROLE_PROVIDER,
             Roles.ROLE_ADMIN
         )
-        javalin.get(
+        javalin.routes.get(
             "/api/v1/adminstatus/{providerId}/versions/{versionId}",
             { adAdminStatusByVersion(it) },
             Roles.ROLE_PROVIDER,
             Roles.ROLE_ADMIN
         )
-        javalin.get(
+        javalin.routes.get(
             "/api/v1/adminstatus/{providerId}/uuid/{uuid}",
             { adAdminStatusByUuid(it) },
             Roles.ROLE_PROVIDER,

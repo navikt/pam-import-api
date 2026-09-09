@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.properties
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
@@ -26,10 +26,10 @@ class CategoryMapsController(
         private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get("/api/v1/categories/pyrk/occupations", { getPyrkCategoryMap(it) })
-        javalin.get("/api/v1/categories/styrk/occupations", { getStyrkCategoryMap(it) })
-        javalin.get("/api/v1/categories/janzz/occupations", { getJanzzCategories(it) })
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get("/api/v1/categories/pyrk/occupations", { getPyrkCategoryMap(it) })
+        javalin.routes.get("/api/v1/categories/styrk/occupations", { getStyrkCategoryMap(it) })
+        javalin.routes.get("/api/v1/categories/janzz/occupations", { getJanzzCategories(it) })
     }
 
     @OpenApi(

@@ -2,7 +2,7 @@ package no.nav.arbeidsplassen.importapi.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.metrics.prometheus.PrometheusMetricsTrackerFactory
+import com.zaxxer.hikari.metrics.micrometer.MicrometerMetricsTrackerFactory
 import no.nav.arbeidsplassen.importapi.adadminstatus.AdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adadminstatus.JdbcAdminStatusRepository
 import no.nav.arbeidsplassen.importapi.adoutbox.AdOutboxRepository
@@ -31,9 +31,8 @@ class DatabaseApplicationContext(
         initializationFailTimeout = 5000
         username = databaseConfigProperties.user
         password = databaseConfigProperties.pw
-        // CollectorRegistry.defaultRegistry
         metricsTrackerFactory =
-            PrometheusMetricsTrackerFactory(baseServicesApplicationContext.prometheusRegistry.prometheusRegistry)
+            MicrometerMetricsTrackerFactory(baseServicesApplicationContext.prometheusRegistry)
         validate()
     }.let(::HikariDataSource)
 

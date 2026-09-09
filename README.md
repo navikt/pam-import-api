@@ -11,7 +11,7 @@ på [arbeidsplassen.nav.no](https://arbeidsplassen.nav.no/).
 ## Technologies
 
 * Kotlin
-* Micronaut
+* Javalin
 * Postgres
 * Kafka
 
@@ -73,16 +73,9 @@ docker-compose up --build
 
 ### Kafka
 
-Running with Kafka in tests, you need to add these system properties:
-
-```
-KAFKA_BOOTSTRAP_SERVERS=host1:port,host2:port
-KAFKA_SSL_TRUSTSTORE_LOCATION=truststore
-KAFKA_SSL_TRUSTSTORE_PASSWORD=truststorepassword
-KAFKA_SASL_MECHANISME=PLAIN
-KAFKA_SASL_JAAS_CONFIG='org.apache.kafka.common.security.plain.PlainLoginModule required username=kafka password=password;'
-KAFKA_SECURITY_PROTOKOL=SASL_SSL
-```
+Kafka integration tests use Testcontainers and require Docker. `TestKafkaConfigProperties` supplies
+the broker address without SSL credentials for local tests. The application reads `KAFKA_BROKERS`,
+not `KAFKA_BOOTSTRAP_SERVERS`.
 
 ### Creating new provider in test
 

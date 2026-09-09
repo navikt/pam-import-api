@@ -1,6 +1,6 @@
 package no.nav.arbeidsplassen.importapi.properties
 
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.HttpMethod
@@ -21,9 +21,9 @@ class PropertiesEnumController(private val propertyNameValueValidation: Property
         private fun Context.sortParam(): String = queryParam("sort") ?: "code"
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.get("/api/v1/properties/values", { getPropertyValidValues(it) })
-        javalin.get("/api/v1/properties/names", { getPropertyNames(it) })
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.get("/api/v1/properties/values", { getPropertyValidValues(it) })
+        javalin.routes.get("/api/v1/properties/names", { getPropertyNames(it) })
     }
 
     @OpenApi(

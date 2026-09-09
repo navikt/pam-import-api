@@ -17,7 +17,7 @@ class TestOutgoingPortsApplicationContext : OutgoingPortsApplicationContext {
             uuid: String,
             payload: ByteArray,
             meldingstype: Meldingstype
-        ): RecordMetadata = RecordMetadata(TopicPartition("test", 0), 0, 0, 0, 0, 0, 0)
+        ): RecordMetadata = RecordMetadata(TopicPartition("test", 0), 0, 0, 0, 0, 0)
     }
 
     override val leaderElection = object : LeaderElection {

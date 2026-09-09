@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.InvalidNullException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.HttpStatus
 import no.nav.arbeidsplassen.importapi.exception.ImportApiError.ErrorType.*
 import no.nav.arbeidsplassen.importapi.security.ForbiddenException
@@ -26,8 +26,8 @@ object ImportApiErrorHandler {
     // Global error logger for errorhandler
     private val LOG = LoggerFactory.getLogger("HttpRequestErrorHandler")
 
-    fun Javalin.importApiErrorHandler(): Javalin {
-        return this
+    fun JavalinConfig.importApiErrorHandler() {
+        routes
             .exception(ImportApiError::class.java) { e, ctx ->
                 val message: ErrorMessage = createMessage(e)
                 if (e.message?.startsWith("AdAdminStatus for") ?: false) {

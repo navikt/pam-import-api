@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.InvalidNullException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import io.javalin.Javalin
+import io.javalin.config.JavalinConfig
 import io.javalin.http.Context
 import io.javalin.http.HttpStatus
 import io.javalin.openapi.*
@@ -50,28 +50,28 @@ class TransferController(
         }
     }
 
-    override fun setupRoutes(javalin: Javalin) {
-        javalin.post(
+    override fun setupRoutes(javalin: JavalinConfig) {
+        javalin.routes.post(
             "/api/v1/transfers/batch/{providerId}",
             { postTransfer(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
         )
-        javalin.post(
+        javalin.routes.post(
             "/api/v1/transfers/{providerId}",
             { streamTransfer(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
         )
-        javalin.get(
+        javalin.routes.get(
             "/api/v1/transfers/{providerId}/versions/{versionId}",
             { getTransfer(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
         )
-        javalin.get(
+        javalin.routes.get(
             "/api/v1/transfers/{providerId}/versions/{versionId}/payload",
             { getTransferPayload(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
         )
-        javalin.delete(
+        javalin.routes.delete(
             "/api/v1/transfers/{providerId}/{reference}",
             { stopAdByProviderReference(it) },
             Roles.ROLE_PROVIDER, Roles.ROLE_ADMIN
