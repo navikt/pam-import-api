@@ -2,8 +2,8 @@ package no.nav.arbeidsplassen.importapi.adpuls
 
 import java.time.LocalDateTime
 import java.util.UUID
-import net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals
-import net.javacrumbs.jsonunit.JsonAssert.whenIgnoringPaths
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.arbeidsplassen.importapi.app.TestRunningApplication
 import no.nav.arbeidsplassen.importapi.app.TestHttpClient
 import no.nav.arbeidsplassen.importapi.dao.findTestProvider
@@ -22,8 +22,9 @@ import org.slf4j.LoggerFactory
 class AdPulsControllerTest() : TestRunningApplication() {
 
     private val tokenService: TokenService = appCtx.securityServicesApplicationContext.tokenService
+    private val objectMapper = appCtx.baseServicesApplicationContext.objectMapper
 
-    private val client = TestHttpClient(lokalUrlBase, appCtx.baseServicesApplicationContext.objectMapper)
+    private val client = TestHttpClient(lokalUrlBase, objectMapper)
 
     companion object {
         private val LOG = LoggerFactory.getLogger(AdPulsControllerTest::class.java)
@@ -109,7 +110,7 @@ class AdPulsControllerTest() : TestRunningApplication() {
         assertJsonEquals(
             expectedJson,
             response.body(),
-            whenIgnoringPaths("content")
+            "content"
         )
         LOG.info("Body" + response.body())
     }
@@ -147,10 +148,8 @@ class AdPulsControllerTest() : TestRunningApplication() {
         assertJsonEquals(
             expectedJson,
             response.body(),
-            whenIgnoringPaths(
-                "content",
-                "pageable.sort.orderBy"
-            )
+            "content",
+            "pageable.sort.orderBy"
         )
         LOG.info("Body" + response.body())
     }
@@ -203,11 +202,30 @@ class AdPulsControllerTest() : TestRunningApplication() {
         assertJsonEquals(
             expectedJson,
             response.body(),
-            whenIgnoringPaths(
-                "content",
-                "pageable.sort.orderBy"
-            )
+            "content",
+            "pageable.sort.orderBy"
         )
         LOG.info("Body" + response.body())
+    }
+
+    private fun assertJsonEquals(expected: String, actual: String, vararg ignoredPaths: String) {
+        val expectedNode = objectMapper.readTree(expected)
+        val actualNode = objectMapper.readTree(actual)
+
+        ignoredPaths.forEach { path ->
+            removeJsonPath(expectedNode, path)
+            removeJsonPath(actualNode, path)
+        }
+
+        assertEquals(expectedNode, actualNode)
+    }
+
+    private fun removeJsonPath(node: JsonNode, path: String) {
+        val segments = path.split(".")
+        val parent = segments.dropLast(1).fold(node) { current, segment ->
+            current.get(segment) ?: error("Missing JSON path segment '$segment' in '$path'")
+        }
+        (parent as? ObjectNode)?.remove(segments.last())
+            ?: error("JSON path '$path' does not point to an object field")
     }
 }
