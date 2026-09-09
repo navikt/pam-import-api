@@ -36,6 +36,9 @@ spec:
       destinations:
         - id: loki
         - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   ingresses:
   {{#each ingress as |url|}}
      - {{url}}
