@@ -13,7 +13,7 @@ class TestApplicationContext(
     private val localEnv: MutableMap<String, String>,
 ) {
     private val postgresContainer: PostgreSQLContainer<*> =
-        PostgreSQLContainer(DockerImageName.parse("postgres:15-alpine"))
+        PostgreSQLContainer(DockerImageName.parse("postgres:18-alpine"))
             .waitingFor(Wait.forListeningPort())
             .withDatabaseName("test")
             .withUsername("test")
