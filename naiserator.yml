@@ -63,7 +63,7 @@ spec:
   gcp:
     sqlInstances:
       - name: import-api-stilling
-        type: POSTGRES_14
+        type: POSTGRES_18
         tier: "{{ cloudsql_tier }}"
         diskType: SSD
         highAvailability: true
