@@ -1,0 +1,5 @@
+[tools]
+java = "25"
+
+[tasks.build]
+run = "./gradlew clean build installDist"

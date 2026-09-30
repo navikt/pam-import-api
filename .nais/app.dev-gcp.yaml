@@ -1,0 +1,22 @@
+spec:
+  ingresses:
+    - https://arbeidsplassen-api.ekstern.dev.nav.no/stillingsimport
+    - https://pam-import-api.intern.dev.nav.no/stillingsimport
+  kafka:
+    pool: nav-dev
+  gcp:
+    sqlInstances:
+      - name: import-api-stilling
+        type: POSTGRES_18
+        tier: db-custom-1-3840
+        diskType: SSD
+        highAvailability: true
+        diskSize: 20
+        diskAutoresize: true
+        databases:
+          - name: importapi
+            envVarPrefix: DB
+        cascadingDelete: false
+  env:
+    - name: AD_PREVIEW_URL
+      value: https://arbeidsplassen.ekstern.dev.nav.no/stillinger/stilling
