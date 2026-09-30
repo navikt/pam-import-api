@@ -1,16 +1,16 @@
-val jacksonVersion = "2.22.2"
+val jacksonVersion = "2.22.3"
 val javalinVersion = "7.2.3"
 val micrometerVersion = "1.17.1"
 val postgresqlVersion = "42.7.13"
 val pamAnsettelsesKodeverkVersion = "1.18"
 val pamStyrkKategoriMapperVersion = "1.20241202-289c80b8"
-val htmlSanitizerVersion = "20260313.1"
+val htmlSanitizerVersion = "20260922.1"
 val quartzVersion = "2.5.2"
 val commonsTextVersion = "1.15.0"
 val logbackVersion = "1.6.3"
 val logbackEncoderVersion = "9.0"
-val nimbusVersion = "10.9.1"
-val flywayVersion = "13.4.0"
+val nimbusVersion = "10.10"
+val flywayVersion = "13.7.0"
 val hikariVersion = "7.1.0"
 val kafkaClientsVersion = "4.3.1"
 val openApiVersion = "7.2.3"
@@ -18,8 +18,8 @@ val openApiVersion = "7.2.3"
 val testContainersVersion = "1.21.4"
 
 plugins {
-    kotlin("jvm") version "2.4.10"
-    kotlin("kapt") version "2.4.10"
+    kotlin("jvm") version "2.4.20"
+    kotlin("kapt") version "2.4.20"
     application
 }
 
