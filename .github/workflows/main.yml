@@ -1,0 +1,16 @@
+name: main
+on:
+  push:
+    branches:
+      - master
+      - feature/**
+  pull_request:
+
+jobs:
+  build-deploy:
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      id-token: write
+    uses: navikt/pam-deploy/.github/workflows/build-deploy.yml@v9
