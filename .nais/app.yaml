@@ -7,12 +7,17 @@ metadata:
     team: teampam
 spec:
   port: 9028
+  startup:
+    path: /stillingsimport/internal/isAlive
+    initialDelay: 0
+    periodSeconds: 1
+    failureThreshold: 60
   liveness:
     path: /stillingsimport/internal/isAlive
-    initialDelay: 40
+    initialDelay: 0
   readiness:
     path: /stillingsimport/internal/isReady
-    initialDelay: 40
+    initialDelay: 0
   replicas:
     min: 2
     max: 2
