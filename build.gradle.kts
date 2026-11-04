@@ -1,19 +1,19 @@
 val jacksonVersion = "2.22.4"
-val javalinVersion = "7.2.3"
-val micrometerVersion = "1.17.1"
+val javalinVersion = "7.2.4"
+val micrometerVersion = "1.17.2"
 val postgresqlVersion = "42.7.14"
 val pamAnsettelsesKodeverkVersion = "1.18"
 val pamStyrkKategoriMapperVersion = "1.20241202-289c80b8"
 val htmlSanitizerVersion = "20261011.1"
 val quartzVersion = "2.5.2"
 val commonsTextVersion = "1.15.0"
-val logbackVersion = "1.6.5"
+val logbackVersion = "1.6.6"
 val logbackEncoderVersion = "9.0"
 val nimbusVersion = "10.10"
-val flywayVersion = "13.10.3"
+val flywayVersion = "13.11.1"
 val hikariVersion = "7.1.0"
-val kafkaClientsVersion = "4.3.2"
-val openApiVersion = "7.2.3"
+val kafkaClientsVersion = "4.4.0"
+val openApiVersion = "7.2.4"
 
 val testContainersVersion = "1.21.4"
 
@@ -85,5 +85,5 @@ dependencies {
     testImplementation("org.testcontainers:kafka:$testContainersVersion")
     testImplementation("org.mockito:mockito-core:5.24.0")
 
-    testImplementation("com.squareup.okhttp3:mockwebserver:5.5.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:5.5.1")
 }
