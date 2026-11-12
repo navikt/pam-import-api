@@ -24,10 +24,10 @@ spec:
     cpuThresholdPercentage: 50
   resources:
     limits:
-      memory: 500Mi
+      memory: 1500Mi
     requests:
-      cpu: 50m
-      memory: 320Mi
+      cpu: 1000m
+      memory: 500Mi
   vault:
     enabled: false
   webproxy: false
